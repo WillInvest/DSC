@@ -115,3 +115,12 @@ The workspace was empty at initialization. No application code, build commands, 
 - The preserved beta backend uses local `.runtime` SQLite databases for accounts/research/requests, DuckDB user data, exports, and a private signing key. Its chat auth snapshot is `.runtime/backend-auth.json`; never print or commit these secrets.
 - The beta catalog reads `/home/fao/dsc-test-baseline-20260909/.runtime/data-release.json` and datasets under `/home/fao/dsc/data/catalog-releases` on dsc-web. This preserves the existing beta application; connecting it to the future dsc-data database remains separate work.
 - The old backend and data-sync services on dsc-data have been retired. No backend dependency on its old PostgreSQL cluster was found; the cluster has been removed. Migration checks include dataset hashes, SQLite integrity, agent readiness, dataset preview, HTTPS responses, and rejection of unauthenticated catalog access.
+
+## Protected Savva transfer on dsc-node
+
+- Preserve `/home/node/transferduck.py`, its navigation symlink under `node-operations/transfers`, `/home/node/transfer.log`, and the `node` crontab entry (Monday 01:30 server-local time, working directory `/home/node`).
+- It uses `/usr/bin/python3` and `requests` to read `/home/node/DSC-Data/accepted-compacted/`, compare against `http://155.246.103.59:8080/catalouge`, and upload missing files to `/update`. The destination belongs to Savva (`spetrov1@155.246.103.59`). The current script excludes paths containing `state`.
+- Keep `DSC-Data` out of wholesale cleanup: its accepted data is an active transfer dependency. Preserve the transfer and required data unless the user explicitly changes that requirement. Do not run the transfer or modify the destination backend merely to inspect it.
+- Node cleanup remains analysis-only pending a revised, explicit deletion scope that preserves this transfer and the RETH/Lighthouse watchdog.
+
+- dsc-data cleanup completed: only the `dsc-data` human login and home remain; required OS/service accounts are retained. The retired `dsc-link` account is removed. New scripts, environments, pilot data, source checkout, and Git bundle are preserved. Root usage is approximately 37 GiB with 854 GiB free. See [server migration](server-migration.md). The `fao` account on **dsc-web** must remain: the migrated application uses it.
