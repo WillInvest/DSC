@@ -1,7 +1,7 @@
 # Unified extraction completion and monitoring plan
 
 Recorded: 2026-10-23.
-Status: agreed design; implementation has not started.
+Status: coordinator, tracker and phone monitor deployed. Production backfill is running through block 26,259,811 with 15 reviewed Aave profiles and systemd restart supervision. See `scripts/orchestration/production-run.md`.
 
 ## Objective
 
@@ -40,8 +40,7 @@ Example:
 | 13,000,000 | 7 | 1 |
 | 13,000,001 | 5 | 0 |
 
-The matrix is the logical interface. Decide the physical format before
-implementation: a dense file, sparse records, or a database with a matrix export.
+The matrix is the logical interface. Physical format: SQLite on dsc-data, with compact interval coverage and a combined per-block bitmask lookup.
 Do not silently replace the agreed single combined view with separate dataset
 status files. The durable completion record belongs on dsc-data; chain ID and
 extraction configuration must identify the scope of its entries.
@@ -154,3 +153,56 @@ Build and verify reverted extraction/archive scripts first (see `reverted-extrac
 - Monitor percentages and contiguous progress reflect real gaps and sampling rules.
 
 Writing this plan does not deploy a status store, start extraction, or enable deletion.
+
+## Implemented orchestration interface
+
+`python scripts/run.py --contracts contracts/ethereum/pools.csv` runs on dsc-data.
+It owns local SQLite, schedules 1,000-block batches, controls workers over LAN SSH,
+and records extraction, transfer, validation, acceptance and cleanup stages.
+`--dry-run`, `--status`, inclusive `--from-block`/`--to-block`, `--profiles`,
+`--data-root`, `--servers` and opt-in `--cleanup` are supported.
+
+Server-to-server routing uses dsc-node 10.246.103.160 and dsc-revert 10.246.103.26;
+dsc-data is 10.246.103.151. dsc-web is not the coordinator.
+
+See `scripts/orchestration/README.md` for implementation details, deployment
+and remaining limitations. CLI status and bounded matrix export are implemented;
+the monitoring website and application-database ingestion are subsequent work.
+Full Aave ABI history is not supplied by the tracker.
+
+## Verified implementation results (2026-10-23)
+
+- 62 automated tests pass, including interval merging, atomic rollback, config
+  isolation, backup restoration, verified-empty completion, archive reuse across
+  different ranges, missing-profile blocking, and restart after transfer.
+- Live private-LAN pilots covered Uniswap V2/V3 and Aave V2 at block 13,000,000,
+  and Uniswap V2/V3 and Aave V3 at block 17,000,000. Every tested cell reached 7.
+- Six event batches were verified empty and still completed.
+- Both repeat runs left all 16 job attempts/stages unchanged: two selection jobs
+  accepted and 14 node-staging jobs cleaned. Two block hashes are stored once
+  in the tracker, shared across contracts.
+- An isolated tracker copy simulated an interrupted acknowledgement after file
+  transfer. Recovery reached 7 without running Cryo again.
+- Evidence: `scripts/orchestration/pilot-validation.json`; server pilot records
+  are under `/home/dsc-data/data/runner-pilot`. The production 102-address CSV
+  is deployed at `/home/dsc-data/contracts/ethereum/pools.csv`.
+
+Remaining before the complete historical backfill: reviewed Aave ABI profiles
+covering its full history and initialization/upgrade boundaries, plus a larger
+capacity/throughput pilot. Aave currently invokes Cryo per block for reserve
+calls; measure that overhead without reducing the required frequency.
+The monitor UI and PostgreSQL ingestion remain separate work.
+
+## Phone monitor deployment (2026-10-23)
+
+The read-only phone monitor is implemented on dsc-web at
+https://dsc-web.tail5aad6c.ts.net/ through private Tailscale Serve HTTPS.
+Server-to-server reporting uses LAN SSH to dsc-data, with a restricted fixed-command
+key and read-only SQLite access. The page refreshes every 30 seconds and shows
+separate production/pilot workspaces, per-dataset progress, jobs/errors, heartbeat,
+missing ranges and bounded 0–7 block details. Runner target/configuration manifests
+and heartbeat support were added without changing extraction semantics.
+
+See `scripts/monitor/README.md` for deployment, API, testing and operations.
+71 data-side tests and four web API tests pass. Live HTTPS and a 390-pixel browser
+layout were verified; final phone access is a user-device check.

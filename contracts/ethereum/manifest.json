@@ -1,0 +1,12 @@
+{
+  "chain_id": 1,
+  "scope": "curated large established pools; not an exhaustive list",
+  "count": 102,
+  "verified_through_block": 26259428,
+  "block_hash": "0x6f0b147ec4b280a37c4ffdf562d9f295f5d882e8d38eb3bb92e6d7c0ef7e87fa",
+  "selection_sha256": "975c4929579d77b111fa745e1a8a67299d0db0863955d402d8dee0acb4af6f51",
+  "sources_sha256": "fbeebf9dd5b1dba82e6ee1dcd74972ca7a781f8c40365ecf565520cdd772d6e8",
+  "files": {
+    "pools.csv": "b6f9a045c343e2fd742fb918b4fcece58b8ff8845456b12d159cd997db128a78"
+  }
+}

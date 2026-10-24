@@ -1,0 +1,17 @@
+{
+  "provider": "The Graph",
+  "retrieved_at": "2026-10-24T03:08:25.778928+00:00",
+  "through_block": 26259428,
+  "metric": "txCount: swaps and liquidity operations, not swap-only or unique transactions",
+  "selection": "50 per version; descending integer txCount, ascending address for ties; no TVL filter",
+  "subgraphs": {
+    "v2": "A3Np3RQbaBA6oKJgiwDJeo5T3zrYfGHPWFYayMwtNDum",
+    "v3": "5zvR82QoaXYFyDEKLZ9t6v9adgnptxYpKpSbxtgVENFV"
+  },
+  "files": {
+    "v3.graphql": "9ecc005e82e509c03217372482f30dbf9626d63bc06714cc5c6e4de00354dc86",
+    "v2.graphql": "8d3cc6d3900ac69db7165c2b9290d2745dbea69d3c0cb7066bc3cff89405cce0",
+    "v2.json": "e291e88f4425d7a88ba11292c5ff076f575b0342fca50f398d69846dad266404",
+    "v3.json": "a1aef1455b33457d3b54fac6982abee4af412844286318884ea27ac65fbf007b"
+  }
+}

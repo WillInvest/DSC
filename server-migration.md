@@ -63,7 +63,8 @@ for dsc-data were verified. New extraction scripts, environments, pilot data,
 source checkout, and Git backup were preserved.
 
 Root filesystem usage fell from approximately 216 GiB to 37 GiB, leaving
-854 GiB available. No files or services on dsc-node were deleted or changed.
+854 GiB available. This database cleanup did not change dsc-node; its later,
+separately authorized cleanup is recorded below.
 The fao account on dsc-web remains required by the migrated application.
 
 ## Git preservation
@@ -72,3 +73,23 @@ Repository: https://github.com/WillInvest/DSC, branch `main`.
 Extraction commit: `9609619` (47 passing tests).
 A recoverable bundle is retained at
 `/home/dsc-data/backups/dsc-scripts-9609619.bundle`.
+
+## Scoped node cleanup
+
+After explicit authorization, removed only `/home/node/eth_warehouse_v2` and
+`/home/node/eth_warehouse_data`. Their old extraction/monitoring jobs and the
+legacy warehouse API were stopped and disabled first. The obsolete parquet
+nginx configuration was moved to `node-operations/retired-watchdogs` and nginx
+was tested and reloaded. The two retired V2 watchdog source files were also
+preserved there.
+
+The live `ethwh-nodewatch.service` remains active. Its source stays in
+`eth-data-warehouse`; its status output now goes to
+`/home/node/reth-data/node_status.json`. RETH and Lighthouse were not restarted.
+Both requested directories are absent. Disk usage decreased by about 154 GiB
+(the filesystem remained active during measurement).
+
+Savva's `/home/node/transferduck.py` and the
+`DSC-Data/accepted-compacted/output-manifest.jsonl` hashes were verified unchanged.
+His weekly transfer and all `DSC-Data` datasets remain protected. No additional
+node directory is authorized for deletion by this cleanup.

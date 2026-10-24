@@ -1,0 +1,1012 @@
+[
+  {
+    "protocol": "uniswap-v2",
+    "name": "WETH/USDT",
+    "address": "0x0d4a11d5eeaac28ec3f61d100daf4d40471f1852",
+    "token0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "token1": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+    "fee_pips": 3000,
+    "activity_rank": 1,
+    "tx_count": 7795386
+  },
+  {
+    "protocol": "uniswap-v2",
+    "name": "USDC/WETH",
+    "address": "0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc",
+    "token0": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 2,
+    "tx_count": 6875644
+  },
+  {
+    "protocol": "uniswap-v2",
+    "name": "DAI/WETH",
+    "address": "0xa478c2975ab1ea89e8196811f51a7b7ade33eb11",
+    "token0": "0x6b175474e89094c44da98b954eedeac495271d0f",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 3,
+    "tx_count": 1845107
+  },
+  {
+    "protocol": "uniswap-v2",
+    "name": "SHIB/WETH",
+    "address": "0x811beed0119b4afce20d2583eb608c6f7af1954f",
+    "token0": "0x95ad61b0a150d79219dcf64e1e6cc01f0b64c4ce",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 4,
+    "tx_count": 1675630
+  },
+  {
+    "protocol": "uniswap-v2",
+    "name": "PEPE/WETH",
+    "address": "0xa43fe16908251ee70ef74718545e4fe6c5ccec9f",
+    "token0": "0x6982508145454ce325ddbe47a25d4ec3d2311933",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 5,
+    "tx_count": 1268771
+  },
+  {
+    "protocol": "uniswap-v2",
+    "name": "SAITAMA/WETH",
+    "address": "0x9cbfb60a09a9a33a10312da0f39977cbdb7fde23",
+    "token0": "0x8b3192f5eebd8579568a2ed41e6feb402f93f73f",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 6,
+    "tx_count": 1030399
+  },
+  {
+    "protocol": "uniswap-v2",
+    "name": "UNI/WETH",
+    "address": "0xd3d2e2692501a5c9ca623199d38826e513033a17",
+    "token0": "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 7,
+    "tx_count": 951337
+  },
+  {
+    "protocol": "uniswap-v2",
+    "name": "HEX/WETH",
+    "address": "0x55d5c232d921b9eaa6b37b5845e439acd04b4dba",
+    "token0": "0x2b591e99afe9f32eaa6214f7b7629768c40eeb39",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 8,
+    "tx_count": 936692
+  },
+  {
+    "protocol": "uniswap-v2",
+    "name": "Mog/WETH",
+    "address": "0xc2eab7d33d3cb97692ecb231a5d0e4a649cb539d",
+    "token0": "0xaaee1a9723aadb7afa2810263653a34ba2c21c7a",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 9,
+    "tx_count": 871286
+  },
+  {
+    "protocol": "uniswap-v2",
+    "name": "WETH/SPX",
+    "address": "0x52c77b0cb827afbad022e6d6caf2c44452edbc39",
+    "token0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "token1": "0xe0f63a424a4439cbe457d80e4f4b51ad25b2c56c",
+    "fee_pips": 3000,
+    "activity_rank": 10,
+    "tx_count": 865874
+  },
+  {
+    "protocol": "uniswap-v2",
+    "name": "ELON/WETH",
+    "address": "0x7b73644935b8e68019ac6356c40661e1bc315860",
+    "token0": "0x761d38e5ddf6ccf6cf7c55759d5210750b5d60f3",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 11,
+    "tx_count": 672648
+  },
+  {
+    "protocol": "uniswap-v2",
+    "name": "KISHU/WETH",
+    "address": "0xf82d8ec196fb0d56c6b82a8b1870f09502a49f88",
+    "token0": "0xa2b4c0af19cc16a6cfacce81f192b024d625817d",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 12,
+    "tx_count": 657925
+  },
+  {
+    "protocol": "uniswap-v2",
+    "name": "USDC/USDT",
+    "address": "0x3041cbd36888becc7bbcbc0045e3b1f144466f5f",
+    "token0": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "token1": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+    "fee_pips": 3000,
+    "activity_rank": 13,
+    "tx_count": 655112
+  },
+  {
+    "protocol": "uniswap-v2",
+    "name": "WBTC/WETH",
+    "address": "0xbb2b8038a1640196fbe3e38816f3e67cba72d940",
+    "token0": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 14,
+    "tx_count": 626095
+  },
+  {
+    "protocol": "uniswap-v2",
+    "name": "Neiro/WETH",
+    "address": "0xc555d55279023e732ccd32d812114caf5838fd46",
+    "token0": "0x812ba41e071c7b7fa4ebcfb62df5f45f6fa853ee",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 15,
+    "tx_count": 582447
+  },
+  {
+    "protocol": "uniswap-v2",
+    "name": "WETH/FLOKI",
+    "address": "0xca7c2771d248dcbe09eabe0ce57a62e18da178c0",
+    "token0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "token1": "0xcf0c122c6b73ff809c693db761e7baebe62b6a2e",
+    "fee_pips": 3000,
+    "activity_rank": 16,
+    "tx_count": 559550
+  },
+  {
+    "protocol": "uniswap-v2",
+    "name": "LINK/WETH",
+    "address": "0xa2107fa5b38d9bbd2c461d6edf11b11a50f6b974",
+    "token0": "0x514910771af9ca656af840dff83e8264ecf986ca",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 17,
+    "tx_count": 546578
+  },
+  {
+    "protocol": "uniswap-v2",
+    "name": "WETH/AMPL",
+    "address": "0xc5be99a02c6857f9eac67bbce58df5572498f40c",
+    "token0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "token1": "0xd46ba6d942050d489dbd938a2c909a5d5039a161",
+    "fee_pips": 3000,
+    "activity_rank": 18,
+    "tx_count": 538308
+  },
+  {
+    "protocol": "uniswap-v2",
+    "name": "WETH/ASTEROID",
+    "address": "0x76a411f14a704099ba476ce8dffc288a53295218",
+    "token0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "token1": "0xf280b16ef293d8e534e370794ef26bf312694126",
+    "fee_pips": 3000,
+    "activity_rank": 19,
+    "tx_count": 522547
+  },
+  {
+    "protocol": "uniswap-v2",
+    "name": "WETH/SUPER",
+    "address": "0x25647e01bd0967c1b9599fa3521939871d1d0888",
+    "token0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "token1": "0xe53ec727dbdeb9e2d5456c3be40cff031ab40a55",
+    "fee_pips": 3000,
+    "activity_rank": 20,
+    "tx_count": 519780
+  },
+  {
+    "protocol": "uniswap-v2",
+    "name": "MATIC/WETH",
+    "address": "0x819f3450da6f110ba6ea52195b3beafa246062de",
+    "token0": "0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 21,
+    "tx_count": 512286
+  },
+  {
+    "protocol": "uniswap-v2",
+    "name": "PEIPEI/WETH",
+    "address": "0xbf16540c857b4e32ce6c37d2f7725c8eec869b8b",
+    "token0": "0x3ffeea07a27fab7ad1df5297fa75e77a43cb5790",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 22,
+    "tx_count": 494753
+  },
+  {
+    "protocol": "uniswap-v2",
+    "name": "$PAAL/WETH",
+    "address": "0x2a6c340bcbb0a79d3deecd3bc5cbc2605ea9259f",
+    "token0": "0x14fee680690900ba0cccfc76ad70fd1b95d10e16",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 23,
+    "tx_count": 471422
+  },
+  {
+    "protocol": "uniswap-v2",
+    "name": "MANYU/WETH",
+    "address": "0xc4704f13d5e08b27b039d53873e813dd2fad99d9",
+    "token0": "0x95af4af910c28e8ece4512bfe46f1f33687424ce",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 24,
+    "tx_count": 462457
+  },
+  {
+    "protocol": "uniswap-v2",
+    "name": "APU/WETH",
+    "address": "0x5ced44f03ff443bbe14d8ea23bc24425fb89e3ed",
+    "token0": "0x594daad7d77592a2b97b725a7ad59d7e188b5bfa",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 25,
+    "tx_count": 451383
+  },
+  {
+    "protocol": "uniswap-v2",
+    "name": "BITCOIN/WETH",
+    "address": "0x2cc846fff0b08fb3bffad71f53a60b4b6e6d6482",
+    "token0": "0x72e4f9f808c49a2a61de9c5896298920dc4eeea9",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 26,
+    "tx_count": 438462
+  },
+  {
+    "protocol": "uniswap-v2",
+    "name": "TRUMP/WETH",
+    "address": "0xe4b8583ccb95b25737c016ac88e539d0605949e8",
+    "token0": "0x576e2bed8f7b46d34016198911cdf9886f78bea7",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 27,
+    "tx_count": 437141
+  },
+  {
+    "protocol": "uniswap-v2",
+    "name": "DOGE/WETH",
+    "address": "0x308c6fbd6a14881af333649f17f2fde9cd75e2a6",
+    "token0": "0x1121acc14c63f3c872bfca497d10926a6098aac5",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 28,
+    "tx_count": 423005
+  },
+  {
+    "protocol": "uniswap-v2",
+    "name": "NPC/WETH",
+    "address": "0x69c7bd26512f52bf6f76fab834140d13dda673ca",
+    "token0": "0x8ed97a637a790be1feff5e888d43629dc05408f6",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 29,
+    "tx_count": 413765
+  },
+  {
+    "protocol": "uniswap-v2",
+    "name": "SAND/WETH",
+    "address": "0x3dd49f67e9d5bc4c5e6634b3f70bfd9dc1b6bd74",
+    "token0": "0x3845badade8e6dff049820680d1f14bd3903a5d0",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 30,
+    "tx_count": 413386
+  },
+  {
+    "protocol": "uniswap-v2",
+    "name": "ANDY/WETH",
+    "address": "0xa1bf0e900fb272089c9fd299ea14bfccb1d1c2c0",
+    "token0": "0x68bbed6a47194eff1cf514b50ea91895597fc91e",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 31,
+    "tx_count": 399323
+  },
+  {
+    "protocol": "uniswap-v2",
+    "name": "BEAM/WETH",
+    "address": "0x180efc1349a69390ade25667487a826164c9c6e4",
+    "token0": "0x62d0a8458ed7719fdaf978fe5929c6d342b0bfce",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 32,
+    "tx_count": 395447
+  },
+  {
+    "protocol": "uniswap-v2",
+    "name": "WETH/VRA",
+    "address": "0x60031819a16266d896268cfea5d5be0b6c2b5d75",
+    "token0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "token1": "0xf411903cbc70a74d22900a5de66a2dda66507255",
+    "fee_pips": 3000,
+    "activity_rank": 33,
+    "tx_count": 375685
+  },
+  {
+    "protocol": "uniswap-v2",
+    "name": "POLS/WETH",
+    "address": "0xffa98a091331df4600f87c9164cd27e8a5cd2405",
+    "token0": "0x83e6f1e41cdd28eaceb20cb649155049fac3d5aa",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 34,
+    "tx_count": 372056
+  },
+  {
+    "protocol": "uniswap-v2",
+    "name": "KEKIUS/WETH",
+    "address": "0xfff8d5fff6ee3226fa2f5d7d5d8c3ff785be9c74",
+    "token0": "0x26e550ac11b26f78a04489d5f20f24e3559f7dd9",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 35,
+    "tx_count": 371012
+  },
+  {
+    "protocol": "uniswap-v2",
+    "name": "WETH/NEIRO",
+    "address": "0x3885fbe4cd8aed7b7e9625923927fa1ce30662a3",
+    "token0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "token1": "0xee2a03aa6dacf51c18679c516ad5283d8e7c2637",
+    "fee_pips": 3000,
+    "activity_rank": 36,
+    "tx_count": 363659
+  },
+  {
+    "protocol": "uniswap-v2",
+    "name": "WETH/MAGA",
+    "address": "0x0c3fdf9c70835f9be9db9585ecb6a1ee3f20a6c7",
+    "token0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "token1": "0xd29da236dd4aac627346e1bba06a619e8c22d7c5",
+    "fee_pips": 3000,
+    "activity_rank": 37,
+    "tx_count": 362975
+  },
+  {
+    "protocol": "uniswap-v2",
+    "name": "eMax/WETH",
+    "address": "0xb6ca52c7916ad7960c12dc489fd93e5af7ca257f",
+    "token0": "0x15874d65e649880c2614e7a480cb7c9a55787ff6",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 38,
+    "tx_count": 355971
+  },
+  {
+    "protocol": "uniswap-v2",
+    "name": "XCN/WETH",
+    "address": "0x859f7092f56c43bb48bb46de7119d9c799716cdf",
+    "token0": "0xa2cd3d43c775978a96bdbf12d733d5a1ed94fb18",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 39,
+    "tx_count": 355766
+  },
+  {
+    "protocol": "uniswap-v2",
+    "name": "GROK/WETH",
+    "address": "0x69c66beafb06674db41b22cfc50c34a93b8d82a2",
+    "token0": "0x8390a1da07e376ef7add4be859ba74fb83aa02d5",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 40,
+    "tx_count": 355149
+  },
+  {
+    "protocol": "uniswap-v2",
+    "name": "WETH/CRV",
+    "address": "0x3da1313ae46132a397d90d95b1424a9a7e3e0fce",
+    "token0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "token1": "0xd533a949740bb3306d119cc777fa900ba034cd52",
+    "fee_pips": 3000,
+    "activity_rank": 41,
+    "tx_count": 345159
+  },
+  {
+    "protocol": "uniswap-v2",
+    "name": "STRONG/WETH",
+    "address": "0xc0bf97bffa94a50502265c579a3b7086d081664b",
+    "token0": "0x990f341946a3fdb507ae7e52d17851b87168017c",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 42,
+    "tx_count": 343022
+  },
+  {
+    "protocol": "uniswap-v2",
+    "name": "LEASH/WETH",
+    "address": "0x874376be8231dad99aabf9ef0767b3cc054c60ee",
+    "token0": "0x27c70cd1946795b66be9d954418546998b546634",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 43,
+    "tx_count": 342544
+  },
+  {
+    "protocol": "uniswap-v2",
+    "name": "Yee/WETH",
+    "address": "0xbc7ce7b6b5437d7d715fbb1cc7b4ec12399c5516",
+    "token0": "0x9ac9468e7e3e1d194080827226b45d0b892c77fd",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 44,
+    "tx_count": 337842
+  },
+  {
+    "protocol": "uniswap-v2",
+    "name": "YFI/WETH",
+    "address": "0x2fdbadf3c4d5a8666bc06645b8358ab803996e28",
+    "token0": "0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 45,
+    "tx_count": 334417
+  },
+  {
+    "protocol": "uniswap-v2",
+    "name": "SNX/WETH",
+    "address": "0x43ae24960e5534731fc831386c07755a2dc33d47",
+    "token0": "0xc011a73ee8576fb46f5e1c5751ca3b9fe0af2a6f",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 46,
+    "tx_count": 331928
+  },
+  {
+    "protocol": "uniswap-v2",
+    "name": "SUSHI/WETH",
+    "address": "0xce84867c3c02b05dc570d0135103d3fb9cc19433",
+    "token0": "0x6b3595068778dd592e39a122f4f5a5cf09c90fe2",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 47,
+    "tx_count": 330951
+  },
+  {
+    "protocol": "uniswap-v2",
+    "name": "WETH/puppies",
+    "address": "0x2325e3f261cadb1c30cebf66c9f95f6fb016c0d4",
+    "token0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "token1": "0xcf91b70017eabde82c9671e30e5502d312ea6eb2",
+    "fee_pips": 3000,
+    "activity_rank": 48,
+    "tx_count": 329073
+  },
+  {
+    "protocol": "uniswap-v2",
+    "name": "BOBO/WETH",
+    "address": "0xe945683b3462d2603a18bdfbb19261c6a4f03ad1",
+    "token0": "0xb90b2a35c65dbc466b04240097ca756ad2005295",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 49,
+    "tx_count": 328334
+  },
+  {
+    "protocol": "uniswap-v2",
+    "name": "WETH/DSync",
+    "address": "0x1ffec7119e315b15852557f654ae0052f76e6ae1",
+    "token0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "token1": "0xf94e7d0710709388bce3161c32b4eea56d3f91cc",
+    "fee_pips": 3000,
+    "activity_rank": 50,
+    "tx_count": 310576
+  },
+  {
+    "protocol": "uniswap-v3",
+    "name": "USDC/WETH",
+    "address": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+    "token0": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 500,
+    "activity_rank": 1,
+    "tx_count": 12392193
+  },
+  {
+    "protocol": "uniswap-v3",
+    "name": "WETH/USDT",
+    "address": "0xc7bbec68d12a0d1830360f8ec58fa599ba1b0e9b",
+    "token0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "token1": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+    "fee_pips": 100,
+    "activity_rank": 2,
+    "tx_count": 10817937
+  },
+  {
+    "protocol": "uniswap-v3",
+    "name": "USDC/WETH",
+    "address": "0xe0554a476a092703abdb3ef35c80e0d76d32939f",
+    "token0": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 100,
+    "activity_rank": 3,
+    "tx_count": 10276380
+  },
+  {
+    "protocol": "uniswap-v3",
+    "name": "WETH/USDT",
+    "address": "0x11b815efb8f581194ae79006d24e0d814b7697f6",
+    "token0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "token1": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+    "fee_pips": 500,
+    "activity_rank": 4,
+    "tx_count": 7194018
+  },
+  {
+    "protocol": "uniswap-v3",
+    "name": "WBTC/WETH",
+    "address": "0x4585fe77225b41b697c938b018e2ac67ac5a20c0",
+    "token0": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 500,
+    "activity_rank": 5,
+    "tx_count": 2445155
+  },
+  {
+    "protocol": "uniswap-v3",
+    "name": "USDC/USDT",
+    "address": "0x3416cf6c708da44db2624d63ea0aaef7113527c6",
+    "token0": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "token1": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+    "fee_pips": 100,
+    "activity_rank": 6,
+    "tx_count": 2023641
+  },
+  {
+    "protocol": "uniswap-v3",
+    "name": "DAI/WETH",
+    "address": "0x60594a405d53811d3bc4766596efd80fd545a270",
+    "token0": "0x6b175474e89094c44da98b954eedeac495271d0f",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 500,
+    "activity_rank": 7,
+    "tx_count": 2023345
+  },
+  {
+    "protocol": "uniswap-v3",
+    "name": "WETH/USDT",
+    "address": "0x4e68ccd3e89f51c3074ca5072bbac773960dfa36",
+    "token0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "token1": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+    "fee_pips": 3000,
+    "activity_rank": 8,
+    "tx_count": 1692672
+  },
+  {
+    "protocol": "uniswap-v3",
+    "name": "USDC/WETH",
+    "address": "0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8",
+    "token0": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 9,
+    "tx_count": 1253497
+  },
+  {
+    "protocol": "uniswap-v3",
+    "name": "WBTC/USDT",
+    "address": "0x56534741cd8b152df6d48adf7ac51f75169a83b2",
+    "token0": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+    "token1": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+    "fee_pips": 500,
+    "activity_rank": 10,
+    "tx_count": 1166290
+  },
+  {
+    "protocol": "uniswap-v3",
+    "name": "WBTC/USDC",
+    "address": "0x9a772018fbd77fcd2d25657e5c547baff3fd7d16",
+    "token0": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+    "token1": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "fee_pips": 500,
+    "activity_rank": 11,
+    "tx_count": 1064730
+  },
+  {
+    "protocol": "uniswap-v3",
+    "name": "PEPE/WETH",
+    "address": "0x11950d141ecb863f01007add7d1a342041227b58",
+    "token0": "0x6982508145454ce325ddbe47a25d4ec3d2311933",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 12,
+    "tx_count": 974435
+  },
+  {
+    "protocol": "uniswap-v3",
+    "name": "LINK/WETH",
+    "address": "0xa6cc3c2531fdaa6ae1a3ca84c2855806728693e8",
+    "token0": "0x514910771af9ca656af840dff83e8264ecf986ca",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 13,
+    "tx_count": 757788
+  },
+  {
+    "protocol": "uniswap-v3",
+    "name": "SHIB/WETH",
+    "address": "0x2f62f2b4c5fcd7570a709dec05d68ea19c82a9ec",
+    "token0": "0x95ad61b0a150d79219dcf64e1e6cc01f0b64c4ce",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 14,
+    "tx_count": 703623
+  },
+  {
+    "protocol": "uniswap-v3",
+    "name": "HEX/WETH",
+    "address": "0x9e0905249ceefffb9605e034b534544684a58be6",
+    "token0": "0x2b591e99afe9f32eaa6214f7b7629768c40eeb39",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 15,
+    "tx_count": 671004
+  },
+  {
+    "protocol": "uniswap-v3",
+    "name": "WBTC/USDC",
+    "address": "0x99ac8ca7087fa4a2a1fb6357269965a2014abc35",
+    "token0": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+    "token1": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "fee_pips": 3000,
+    "activity_rank": 16,
+    "tx_count": 667477
+  },
+  {
+    "protocol": "uniswap-v3",
+    "name": "WBTC/WETH",
+    "address": "0xe6ff8b9a37b0fab776134636d9981aa778c4e718",
+    "token0": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 100,
+    "activity_rank": 17,
+    "tx_count": 643305
+  },
+  {
+    "protocol": "uniswap-v3",
+    "name": "UNI/WETH",
+    "address": "0x1d42064fc4beb5f8aaf85f4617ae8b3b5b8bd801",
+    "token0": "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 18,
+    "tx_count": 618852
+  },
+  {
+    "protocol": "uniswap-v3",
+    "name": "WETH/ONDO",
+    "address": "0x7b1e5d984a43ee732de195628d20d05cfabc3cc7",
+    "token0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "token1": "0xfaba6f8e4a5e8ab82f62fe7c39859fa577269be3",
+    "fee_pips": 3000,
+    "activity_rank": 19,
+    "tx_count": 576116
+  },
+  {
+    "protocol": "uniswap-v3",
+    "name": "ENA/WETH",
+    "address": "0xc3db44adc1fcdfd5671f555236eae49f4a8eea18",
+    "token0": "0x57e114b691db790c35207b2e685d4a43181e6061",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 20,
+    "tx_count": 555865
+  },
+  {
+    "protocol": "uniswap-v3",
+    "name": "APE/WETH",
+    "address": "0xac4b3dacb91461209ae9d41ec517c2b9cb1b7daf",
+    "token0": "0x4d224452801aced8b2f0aebe155379bb5d594381",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 21,
+    "tx_count": 529078
+  },
+  {
+    "protocol": "uniswap-v3",
+    "name": "WBTC/WETH",
+    "address": "0xcbcdf9626bc03e24f779434178a73a0b4bad62ed",
+    "token0": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 22,
+    "tx_count": 506534
+  },
+  {
+    "protocol": "uniswap-v3",
+    "name": "LINK/WETH",
+    "address": "0x5d4f3c6fa16908609bac31ff148bd002aa6b8c83",
+    "token0": "0x514910771af9ca656af840dff83e8264ecf986ca",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 500,
+    "activity_rank": 23,
+    "tx_count": 497103
+  },
+  {
+    "protocol": "uniswap-v3",
+    "name": "DAI/USDC",
+    "address": "0x5777d92f208679db4b9778590fa3cab3ac9e2168",
+    "token0": "0x6b175474e89094c44da98b954eedeac495271d0f",
+    "token1": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "fee_pips": 100,
+    "activity_rank": 24,
+    "tx_count": 488846
+  },
+  {
+    "protocol": "uniswap-v3",
+    "name": "ADI/USDC",
+    "address": "0x41a561b972039a9ccb975a4c17b84c9f95099e15",
+    "token0": "0x8b1484d57abbe239bb280661377363b03c89caea",
+    "token1": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "fee_pips": 500,
+    "activity_rank": 25,
+    "tx_count": 487499
+  },
+  {
+    "protocol": "uniswap-v3",
+    "name": "wstETH/WETH",
+    "address": "0x109830a1aaad605bbf02a9dfa7b0b92ec2fb7daa",
+    "token0": "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 100,
+    "activity_rank": 26,
+    "tx_count": 455061
+  },
+  {
+    "protocol": "uniswap-v3",
+    "name": "WETH/SPX",
+    "address": "0x7c706586679af2ba6d1a9fc2da9c6af59883fdd3",
+    "token0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "token1": "0xe0f63a424a4439cbe457d80e4f4b51ad25b2c56c",
+    "fee_pips": 3000,
+    "activity_rank": 27,
+    "tx_count": 439198
+  },
+  {
+    "protocol": "uniswap-v3",
+    "name": "WETH/LOOKS",
+    "address": "0x4b5ab61593a2401b1075b90c04cbcdd3f87ce011",
+    "token0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "token1": "0xf4d2888d29d722226fafa5d9b24f9164c092421e",
+    "fee_pips": 3000,
+    "activity_rank": 28,
+    "tx_count": 438266
+  },
+  {
+    "protocol": "uniswap-v3",
+    "name": "WETH/TITANX",
+    "address": "0xc45a81bc23a64ea556ab4cdf08a86b61cdceea8b",
+    "token0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "token1": "0xf19308f923582a6f7c465e5ce7a9dc1bec6665b1",
+    "fee_pips": 10000,
+    "activity_rank": 29,
+    "tx_count": 437624
+  },
+  {
+    "protocol": "uniswap-v3",
+    "name": "DAI/WETH",
+    "address": "0xc2e9f25be6257c210d7adf0d4cd6e3e881ba25f8",
+    "token0": "0x6b175474e89094c44da98b954eedeac495271d0f",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 30,
+    "tx_count": 426371
+  },
+  {
+    "protocol": "uniswap-v3",
+    "name": "AAVE/WETH",
+    "address": "0x5ab53ee1d50eef2c1dd3d5402789cd27bb52c1bb",
+    "token0": "0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 31,
+    "tx_count": 421996
+  },
+  {
+    "protocol": "uniswap-v3",
+    "name": "HEX/USDC",
+    "address": "0x69d91b94f0aaf8e8a2586909fa77a5c2c89818d5",
+    "token0": "0x2b591e99afe9f32eaa6214f7b7629768c40eeb39",
+    "token1": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "fee_pips": 3000,
+    "activity_rank": 32,
+    "tx_count": 412228
+  },
+  {
+    "protocol": "uniswap-v3",
+    "name": "QNT/WETH",
+    "address": "0x24ee2c6b9597f035088cda8575e9d5e15a84b9df",
+    "token0": "0x4a220e6096b25eadb88358cb44068a3248254675",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 33,
+    "tx_count": 410885
+  },
+  {
+    "protocol": "uniswap-v3",
+    "name": "PAXG/USDC",
+    "address": "0x5ae13baaef0620fdae1d355495dc51a17adb4082",
+    "token0": "0x45804880de22913dafe09f4980848ece6ecbaf78",
+    "token1": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "fee_pips": 500,
+    "activity_rank": 34,
+    "tx_count": 403215
+  },
+  {
+    "protocol": "uniswap-v3",
+    "name": "XAUt/USDT",
+    "address": "0x6546055f46e866a4b9a4a13e81273e3152bae5da",
+    "token0": "0x68749665ff8d2d112fa859aa293f07a622782f38",
+    "token1": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+    "fee_pips": 500,
+    "activity_rank": 35,
+    "tx_count": 386663
+  },
+  {
+    "protocol": "uniswap-v3",
+    "name": "LDO/WETH",
+    "address": "0xa3f558aebaecaf0e11ca4b2199cc5ed341edfd74",
+    "token0": "0x5a98fcbea516cf06857215779fd812ca3bef1b32",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 36,
+    "tx_count": 374748
+  },
+  {
+    "protocol": "uniswap-v3",
+    "name": "MATIC/WETH",
+    "address": "0x290a6a7460b308ee3f19023d2d00de604bcf5b42",
+    "token0": "0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 37,
+    "tx_count": 373838
+  },
+  {
+    "protocol": "uniswap-v3",
+    "name": "ZAMA/USDT",
+    "address": "0x4d68b530920d26c3b01c99fecc19e21011b72bbd",
+    "token0": "0xa12cc123ba206d4031d1c7f6223d1c2ec249f4f3",
+    "token1": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+    "fee_pips": 500,
+    "activity_rank": 38,
+    "tx_count": 373634
+  },
+  {
+    "protocol": "uniswap-v3",
+    "name": "WETH/SOL",
+    "address": "0x127452f3f9cdc0389b0bf59ce6131aa3bd763598",
+    "token0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "token1": "0xd31a59c85ae9d8edefec411d448f90841571b89c",
+    "fee_pips": 3000,
+    "activity_rank": 39,
+    "tx_count": 371953
+  },
+  {
+    "protocol": "uniswap-v3",
+    "name": "wTAO/WETH",
+    "address": "0x2982d3295a0e1a99e6e88ece0e93ffdfc5c761ae",
+    "token0": "0x77e06c9eccf2e797fd462a92b6d7642ef85b0a44",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 40,
+    "tx_count": 356403
+  },
+  {
+    "protocol": "uniswap-v3",
+    "name": "DAI/USDT",
+    "address": "0x48da0965ab2d2cbf1c17c09cfb5cbe67ad5b1406",
+    "token0": "0x6b175474e89094c44da98b954eedeac495271d0f",
+    "token1": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+    "fee_pips": 100,
+    "activity_rank": 41,
+    "tx_count": 351124
+  },
+  {
+    "protocol": "uniswap-v3",
+    "name": "PORK/WETH",
+    "address": "0x331399c614ca67dee86733e5a2fba40dbb16827c",
+    "token0": "0xb9f599ce614feb2e1bbe58f180f370d05b39344e",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 10000,
+    "activity_rank": 42,
+    "tx_count": 349582
+  },
+  {
+    "protocol": "uniswap-v3",
+    "name": "WETH/CRV",
+    "address": "0x919fa96e88d67499339577fa202345436bcdaf79",
+    "token0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "token1": "0xd533a949740bb3306d119cc777fa900ba034cd52",
+    "fee_pips": 3000,
+    "activity_rank": 43,
+    "tx_count": 326628
+  },
+  {
+    "protocol": "uniswap-v3",
+    "name": "PEPU/WETH",
+    "address": "0x3ebec0a1b4055c8d1180fce64db2a8c068170880",
+    "token0": "0xadd39272e83895e7d3f244f696b7a25635f34234",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 44,
+    "tx_count": 326182
+  },
+  {
+    "protocol": "uniswap-v3",
+    "name": "USDC/USDT",
+    "address": "0x7858e59e0c01ea06df3af3d20ac7b0003275d4bf",
+    "token0": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "token1": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+    "fee_pips": 500,
+    "activity_rank": 45,
+    "tx_count": 308826
+  },
+  {
+    "protocol": "uniswap-v3",
+    "name": "WBTC/USDT",
+    "address": "0x9db9e0e53058c89e5b94e29621a205198648425b",
+    "token0": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+    "token1": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+    "fee_pips": 3000,
+    "activity_rank": 46,
+    "tx_count": 307978
+  },
+  {
+    "protocol": "uniswap-v3",
+    "name": "PENDLE/WETH",
+    "address": "0x57af956d3e2cca3b86f3d8c6772c03ddca3eaacb",
+    "token0": "0x808507121b80c02388fad14726482e061b8da827",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 47,
+    "tx_count": 306590
+  },
+  {
+    "protocol": "uniswap-v3",
+    "name": "WETH/ENS",
+    "address": "0x92560c178ce069cc014138ed3c2f5221ba71f58a",
+    "token0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "token1": "0xc18360217d8f7ab5e7c516566761ea12ce7f9d72",
+    "fee_pips": 3000,
+    "activity_rank": 48,
+    "tx_count": 303586
+  },
+  {
+    "protocol": "uniswap-v3",
+    "name": "RLB/WETH",
+    "address": "0x510100d5143e011db24e2aa38abe85d73d5b2177",
+    "token0": "0x046eee2cc3188071c02bfc1745a6b17c656e3f3d",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 49,
+    "tx_count": 301490
+  },
+  {
+    "protocol": "uniswap-v3",
+    "name": "ATH/WETH",
+    "address": "0xd31d41dffa3589bb0c0183e46a1eed983a5e5978",
+    "token0": "0xbe0ed4138121ecfc5c0e56b40517da27e6c5226b",
+    "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "fee_pips": 3000,
+    "activity_rank": 50,
+    "tx_count": 298732
+  },
+  {
+    "protocol": "aave-v2",
+    "name": "Ethereum main market",
+    "address": "0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9"
+  },
+  {
+    "protocol": "aave-v3",
+    "name": "Ethereum Core market",
+    "address": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2"
+  }
+]

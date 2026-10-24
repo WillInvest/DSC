@@ -1,0 +1,1 @@
+{ _meta(block: {number: 26259428}) { block { number hash } hasIndexingErrors deployment } pairs(first: 100, orderBy: txCount, orderDirection: desc, block: {number: 26259428}) { id txCount createdAtBlockNumber token0 { id symbol } token1 { id symbol }  } }

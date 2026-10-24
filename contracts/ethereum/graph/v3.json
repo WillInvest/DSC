@@ -1,0 +1,1414 @@
+{
+  "data": {
+    "pools": [
+      {
+        "id": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+        "txCount": "12392193",
+        "createdAtBlockNumber": "12376729",
+        "token0": {
+          "id": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          "symbol": "USDC"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "500"
+      },
+      {
+        "id": "0xc7bbec68d12a0d1830360f8ec58fa599ba1b0e9b",
+        "txCount": "10817937",
+        "createdAtBlockNumber": "16266586",
+        "token0": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "token1": {
+          "id": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+          "symbol": "USDT"
+        },
+        "feeTier": "100"
+      },
+      {
+        "id": "0xe0554a476a092703abdb3ef35c80e0d76d32939f",
+        "txCount": "10276380",
+        "createdAtBlockNumber": "13616454",
+        "token0": {
+          "id": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          "symbol": "USDC"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "100"
+      },
+      {
+        "id": "0x11b815efb8f581194ae79006d24e0d814b7697f6",
+        "txCount": "7194018",
+        "createdAtBlockNumber": "12376751",
+        "token0": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "token1": {
+          "id": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+          "symbol": "USDT"
+        },
+        "feeTier": "500"
+      },
+      {
+        "id": "0x4585fe77225b41b697c938b018e2ac67ac5a20c0",
+        "txCount": "2445155",
+        "createdAtBlockNumber": "12376387",
+        "token0": {
+          "id": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+          "symbol": "WBTC"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "500"
+      },
+      {
+        "id": "0x3416cf6c708da44db2624d63ea0aaef7113527c6",
+        "txCount": "2023641",
+        "createdAtBlockNumber": "13609065",
+        "token0": {
+          "id": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          "symbol": "USDC"
+        },
+        "token1": {
+          "id": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+          "symbol": "USDT"
+        },
+        "feeTier": "100"
+      },
+      {
+        "id": "0x60594a405d53811d3bc4766596efd80fd545a270",
+        "txCount": "2023345",
+        "createdAtBlockNumber": "12375738",
+        "token0": {
+          "id": "0x6b175474e89094c44da98b954eedeac495271d0f",
+          "symbol": "DAI"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "500"
+      },
+      {
+        "id": "0x4e68ccd3e89f51c3074ca5072bbac773960dfa36",
+        "txCount": "1692672",
+        "createdAtBlockNumber": "12375326",
+        "token0": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "token1": {
+          "id": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+          "symbol": "USDT"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8",
+        "txCount": "1253497",
+        "createdAtBlockNumber": "12370624",
+        "token0": {
+          "id": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          "symbol": "USDC"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0x56534741cd8b152df6d48adf7ac51f75169a83b2",
+        "txCount": "1166290",
+        "createdAtBlockNumber": "12601886",
+        "token0": {
+          "id": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+          "symbol": "WBTC"
+        },
+        "token1": {
+          "id": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+          "symbol": "USDT"
+        },
+        "feeTier": "500"
+      },
+      {
+        "id": "0x9a772018fbd77fcd2d25657e5c547baff3fd7d16",
+        "txCount": "1064730",
+        "createdAtBlockNumber": "12561607",
+        "token0": {
+          "id": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+          "symbol": "WBTC"
+        },
+        "token1": {
+          "id": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          "symbol": "USDC"
+        },
+        "feeTier": "500"
+      },
+      {
+        "id": "0x11950d141ecb863f01007add7d1a342041227b58",
+        "txCount": "974435",
+        "createdAtBlockNumber": "17083569",
+        "token0": {
+          "id": "0x6982508145454ce325ddbe47a25d4ec3d2311933",
+          "symbol": "PEPE"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0xa6cc3c2531fdaa6ae1a3ca84c2855806728693e8",
+        "txCount": "757788",
+        "createdAtBlockNumber": "12375680",
+        "token0": {
+          "id": "0x514910771af9ca656af840dff83e8264ecf986ca",
+          "symbol": "LINK"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0x2f62f2b4c5fcd7570a709dec05d68ea19c82a9ec",
+        "txCount": "703623",
+        "createdAtBlockNumber": "12376028",
+        "token0": {
+          "id": "0x95ad61b0a150d79219dcf64e1e6cc01f0b64c4ce",
+          "symbol": "SHIB"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0x9e0905249ceefffb9605e034b534544684a58be6",
+        "txCount": "671004",
+        "createdAtBlockNumber": "12376166",
+        "token0": {
+          "id": "0x2b591e99afe9f32eaa6214f7b7629768c40eeb39",
+          "symbol": "HEX"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0x99ac8ca7087fa4a2a1fb6357269965a2014abc35",
+        "txCount": "667477",
+        "createdAtBlockNumber": "12376048",
+        "token0": {
+          "id": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+          "symbol": "WBTC"
+        },
+        "token1": {
+          "id": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          "symbol": "USDC"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0xe6ff8b9a37b0fab776134636d9981aa778c4e718",
+        "txCount": "643305",
+        "createdAtBlockNumber": "13660296",
+        "token0": {
+          "id": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+          "symbol": "WBTC"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "100"
+      },
+      {
+        "id": "0x1d42064fc4beb5f8aaf85f4617ae8b3b5b8bd801",
+        "txCount": "618852",
+        "createdAtBlockNumber": "12369739",
+        "token0": {
+          "id": "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984",
+          "symbol": "UNI"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0x7b1e5d984a43ee732de195628d20d05cfabc3cc7",
+        "txCount": "576116",
+        "createdAtBlockNumber": "19033762",
+        "token0": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "token1": {
+          "id": "0xfaba6f8e4a5e8ab82f62fe7c39859fa577269be3",
+          "symbol": "ONDO"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0xc3db44adc1fcdfd5671f555236eae49f4a8eea18",
+        "txCount": "555865",
+        "createdAtBlockNumber": "19567223",
+        "token0": {
+          "id": "0x57e114b691db790c35207b2e685d4a43181e6061",
+          "symbol": "ENA"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0xac4b3dacb91461209ae9d41ec517c2b9cb1b7daf",
+        "txCount": "529078",
+        "createdAtBlockNumber": "14403763",
+        "token0": {
+          "id": "0x4d224452801aced8b2f0aebe155379bb5d594381",
+          "symbol": "APE"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0xcbcdf9626bc03e24f779434178a73a0b4bad62ed",
+        "txCount": "506534",
+        "createdAtBlockNumber": "12369821",
+        "token0": {
+          "id": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+          "symbol": "WBTC"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0x5d4f3c6fa16908609bac31ff148bd002aa6b8c83",
+        "txCount": "497103",
+        "createdAtBlockNumber": "12376368",
+        "token0": {
+          "id": "0x514910771af9ca656af840dff83e8264ecf986ca",
+          "symbol": "LINK"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "500"
+      },
+      {
+        "id": "0x5777d92f208679db4b9778590fa3cab3ac9e2168",
+        "txCount": "488846",
+        "createdAtBlockNumber": "13605124",
+        "token0": {
+          "id": "0x6b175474e89094c44da98b954eedeac495271d0f",
+          "symbol": "DAI"
+        },
+        "token1": {
+          "id": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          "symbol": "USDC"
+        },
+        "feeTier": "100"
+      },
+      {
+        "id": "0x41a561b972039a9ccb975a4c17b84c9f95099e15",
+        "txCount": "487499",
+        "createdAtBlockNumber": "24047769",
+        "token0": {
+          "id": "0x8b1484d57abbe239bb280661377363b03c89caea",
+          "symbol": "ADI"
+        },
+        "token1": {
+          "id": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          "symbol": "USDC"
+        },
+        "feeTier": "500"
+      },
+      {
+        "id": "0x109830a1aaad605bbf02a9dfa7b0b92ec2fb7daa",
+        "txCount": "455061",
+        "createdAtBlockNumber": "15384250",
+        "token0": {
+          "id": "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0",
+          "symbol": "wstETH"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "100"
+      },
+      {
+        "id": "0x7c706586679af2ba6d1a9fc2da9c6af59883fdd3",
+        "txCount": "439198",
+        "createdAtBlockNumber": "20808368",
+        "token0": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "token1": {
+          "id": "0xe0f63a424a4439cbe457d80e4f4b51ad25b2c56c",
+          "symbol": "SPX"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0x4b5ab61593a2401b1075b90c04cbcdd3f87ce011",
+        "txCount": "438266",
+        "createdAtBlockNumber": "13979832",
+        "token0": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "token1": {
+          "id": "0xf4d2888d29d722226fafa5d9b24f9164c092421e",
+          "symbol": "LOOKS"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0xc45a81bc23a64ea556ab4cdf08a86b61cdceea8b",
+        "txCount": "437624",
+        "createdAtBlockNumber": "18447210",
+        "token0": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "token1": {
+          "id": "0xf19308f923582a6f7c465e5ce7a9dc1bec6665b1",
+          "symbol": "TITANX"
+        },
+        "feeTier": "10000"
+      },
+      {
+        "id": "0xc2e9f25be6257c210d7adf0d4cd6e3e881ba25f8",
+        "txCount": "426371",
+        "createdAtBlockNumber": "12369854",
+        "token0": {
+          "id": "0x6b175474e89094c44da98b954eedeac495271d0f",
+          "symbol": "DAI"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0x5ab53ee1d50eef2c1dd3d5402789cd27bb52c1bb",
+        "txCount": "421996",
+        "createdAtBlockNumber": "12375644",
+        "token0": {
+          "id": "0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9",
+          "symbol": "AAVE"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0x69d91b94f0aaf8e8a2586909fa77a5c2c89818d5",
+        "txCount": "412228",
+        "createdAtBlockNumber": "12376598",
+        "token0": {
+          "id": "0x2b591e99afe9f32eaa6214f7b7629768c40eeb39",
+          "symbol": "HEX"
+        },
+        "token1": {
+          "id": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          "symbol": "USDC"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0x24ee2c6b9597f035088cda8575e9d5e15a84b9df",
+        "txCount": "410885",
+        "createdAtBlockNumber": "12377503",
+        "token0": {
+          "id": "0x4a220e6096b25eadb88358cb44068a3248254675",
+          "symbol": "QNT"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0x5ae13baaef0620fdae1d355495dc51a17adb4082",
+        "txCount": "403215",
+        "createdAtBlockNumber": "14965451",
+        "token0": {
+          "id": "0x45804880de22913dafe09f4980848ece6ecbaf78",
+          "symbol": "PAXG"
+        },
+        "token1": {
+          "id": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          "symbol": "USDC"
+        },
+        "feeTier": "500"
+      },
+      {
+        "id": "0x6546055f46e866a4b9a4a13e81273e3152bae5da",
+        "txCount": "386663",
+        "createdAtBlockNumber": "13663032",
+        "token0": {
+          "id": "0x68749665ff8d2d112fa859aa293f07a622782f38",
+          "symbol": "XAUt"
+        },
+        "token1": {
+          "id": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+          "symbol": "USDT"
+        },
+        "feeTier": "500"
+      },
+      {
+        "id": "0xa3f558aebaecaf0e11ca4b2199cc5ed341edfd74",
+        "txCount": "374748",
+        "createdAtBlockNumber": "12512163",
+        "token0": {
+          "id": "0x5a98fcbea516cf06857215779fd812ca3bef1b32",
+          "symbol": "LDO"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0x290a6a7460b308ee3f19023d2d00de604bcf5b42",
+        "txCount": "373838",
+        "createdAtBlockNumber": "12376420",
+        "token0": {
+          "id": "0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0",
+          "symbol": "MATIC"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0x4d68b530920d26c3b01c99fecc19e21011b72bbd",
+        "txCount": "373634",
+        "createdAtBlockNumber": "24369077",
+        "token0": {
+          "id": "0xa12cc123ba206d4031d1c7f6223d1c2ec249f4f3",
+          "symbol": "ZAMA"
+        },
+        "token1": {
+          "id": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+          "symbol": "USDT"
+        },
+        "feeTier": "500"
+      },
+      {
+        "id": "0x127452f3f9cdc0389b0bf59ce6131aa3bd763598",
+        "txCount": "371953",
+        "createdAtBlockNumber": "13585746",
+        "token0": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "token1": {
+          "id": "0xd31a59c85ae9d8edefec411d448f90841571b89c",
+          "symbol": "SOL"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0x2982d3295a0e1a99e6e88ece0e93ffdfc5c761ae",
+        "txCount": "356403",
+        "createdAtBlockNumber": "16589396",
+        "token0": {
+          "id": "0x77e06c9eccf2e797fd462a92b6d7642ef85b0a44",
+          "symbol": "wTAO"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0x48da0965ab2d2cbf1c17c09cfb5cbe67ad5b1406",
+        "txCount": "351124",
+        "createdAtBlockNumber": "15142784",
+        "token0": {
+          "id": "0x6b175474e89094c44da98b954eedeac495271d0f",
+          "symbol": "DAI"
+        },
+        "token1": {
+          "id": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+          "symbol": "USDT"
+        },
+        "feeTier": "100"
+      },
+      {
+        "id": "0x331399c614ca67dee86733e5a2fba40dbb16827c",
+        "txCount": "349582",
+        "createdAtBlockNumber": "19117504",
+        "token0": {
+          "id": "0xb9f599ce614feb2e1bbe58f180f370d05b39344e",
+          "symbol": "PORK"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "10000"
+      },
+      {
+        "id": "0x919fa96e88d67499339577fa202345436bcdaf79",
+        "txCount": "326628",
+        "createdAtBlockNumber": "12376283",
+        "token0": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "token1": {
+          "id": "0xd533a949740bb3306d119cc777fa900ba034cd52",
+          "symbol": "CRV"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0x3ebec0a1b4055c8d1180fce64db2a8c068170880",
+        "txCount": "326182",
+        "createdAtBlockNumber": "21372560",
+        "token0": {
+          "id": "0xadd39272e83895e7d3f244f696b7a25635f34234",
+          "symbol": "PEPU"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0x7858e59e0c01ea06df3af3d20ac7b0003275d4bf",
+        "txCount": "308826",
+        "createdAtBlockNumber": "12369863",
+        "token0": {
+          "id": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          "symbol": "USDC"
+        },
+        "token1": {
+          "id": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+          "symbol": "USDT"
+        },
+        "feeTier": "500"
+      },
+      {
+        "id": "0x9db9e0e53058c89e5b94e29621a205198648425b",
+        "txCount": "307978",
+        "createdAtBlockNumber": "12376091",
+        "token0": {
+          "id": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+          "symbol": "WBTC"
+        },
+        "token1": {
+          "id": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+          "symbol": "USDT"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0x57af956d3e2cca3b86f3d8c6772c03ddca3eaacb",
+        "txCount": "306590",
+        "createdAtBlockNumber": "12376066",
+        "token0": {
+          "id": "0x808507121b80c02388fad14726482e061b8da827",
+          "symbol": "PENDLE"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0x92560c178ce069cc014138ed3c2f5221ba71f58a",
+        "txCount": "303586",
+        "createdAtBlockNumber": "13578816",
+        "token0": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "token1": {
+          "id": "0xc18360217d8f7ab5e7c516566761ea12ce7f9d72",
+          "symbol": "ENS"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0x510100d5143e011db24e2aa38abe85d73d5b2177",
+        "txCount": "301490",
+        "createdAtBlockNumber": "17580248",
+        "token0": {
+          "id": "0x046eee2cc3188071c02bfc1745a6b17c656e3f3d",
+          "symbol": "RLB"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0xd31d41dffa3589bb0c0183e46a1eed983a5e5978",
+        "txCount": "298732",
+        "createdAtBlockNumber": "20075133",
+        "token0": {
+          "id": "0xbe0ed4138121ecfc5c0e56b40517da27e6c5226b",
+          "symbol": "ATH"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0xc2c390c6cd3c4e6c2b70727d35a45e8a072f18ca",
+        "txCount": "295300",
+        "createdAtBlockNumber": "19947296",
+        "token0": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "token1": {
+          "id": "0xec53bf9167f50cdeb3ae105f56099aaab9061f83",
+          "symbol": "EIGEN"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0x7baece5d47f1bc5e1953fbe0e9931d54dab6d810",
+        "txCount": "294913",
+        "createdAtBlockNumber": "17168073",
+        "token0": {
+          "id": "0xa35923162c49cf95e6bf26623385eb431ad920d3",
+          "symbol": "TURBO"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "10000"
+      },
+      {
+        "id": "0xd1d5a4c0ea98971894772dcd6d2f1dc71083c44e",
+        "txCount": "288276",
+        "createdAtBlockNumber": "12369922",
+        "token0": {
+          "id": "0x6dea81c8171d0ba574754ef6f8b412f2ed88c54d",
+          "symbol": "LQTY"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0xf359492d26764481002ed88bd2acae83ca50b5c9",
+        "txCount": "283773",
+        "createdAtBlockNumber": "12581219",
+        "token0": {
+          "id": "0x467bccd9d29f223bce8043b84e8c8b282827790f",
+          "symbol": "TEL"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0xbf85f94d3233ee588f0907a9147fbb59d7246b54",
+        "txCount": "277894",
+        "createdAtBlockNumber": "16988081",
+        "token0": {
+          "id": "0xa0ef786bf476fe0810408caba05e536ac800ff86",
+          "symbol": "MYRIA"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0xe8c6c9227491c0a8156a0106a0204d881bb7e531",
+        "txCount": "276259",
+        "createdAtBlockNumber": "12371099",
+        "token0": {
+          "id": "0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2",
+          "symbol": "MKR"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0xae4045ffeddf61d570e6d1fe2d71ded1a2e85a88",
+        "txCount": "272624",
+        "createdAtBlockNumber": "20009305",
+        "token0": {
+          "id": "0x57e114b691db790c35207b2e685d4a43181e6061",
+          "symbol": "ENA"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "500"
+      },
+      {
+        "id": "0x2a9d2ba41aba912316d16742f259412b681898db",
+        "txCount": "271134",
+        "createdAtBlockNumber": "15712267",
+        "token0": {
+          "id": "0x06450dee7fd2fb8e39061434babcfc05599a6fb8",
+          "symbol": "XEN"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "10000"
+      },
+      {
+        "id": "0x06f00544c0bc62e6db10f46d370dfccdc23d8189",
+        "txCount": "267315",
+        "createdAtBlockNumber": "19462017",
+        "token0": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "token1": {
+          "id": "0xfe0c30065b384f05761f15d0cc899d4f9f9cc0eb",
+          "symbol": "ETHFI"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0x2c2226a6381e68a86c1a8dcb8d9fdab050959dd5",
+        "txCount": "262799",
+        "createdAtBlockNumber": "25238186",
+        "token0": {
+          "id": "0x28d4e499c4cde621e1cea7c9cbf9d43bf75a9525",
+          "symbol": "HLX"
+        },
+        "token1": {
+          "id": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          "symbol": "USDC"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0x7f63306a62c345365881e0fff85cb2c8baaa13d5",
+        "txCount": "261377",
+        "createdAtBlockNumber": "12552373",
+        "token0": {
+          "id": "0x40fd72257597aa14c7231a7b1aaa29fce868f677",
+          "symbol": "XOR"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "10000"
+      },
+      {
+        "id": "0xf8e349d1d827a6edf17ee673664cfad4ca78c533",
+        "txCount": "259812",
+        "createdAtBlockNumber": "21817097",
+        "token0": {
+          "id": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          "symbol": "USDC"
+        },
+        "token1": {
+          "id": "0xbdf43ecadc5cef51b7d1772f722e40596bc1788b",
+          "symbol": "SEI"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0x435664008f38b0650fbc1c9fc971d0a3bc2f1e47",
+        "txCount": "257026",
+        "createdAtBlockNumber": "18634804",
+        "token0": {
+          "id": "0x4c9edd5852cd905f086c759e8383e09bff1e68b3",
+          "symbol": "USDe"
+        },
+        "token1": {
+          "id": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+          "symbol": "USDT"
+        },
+        "feeTier": "100"
+      },
+      {
+        "id": "0xfad57d2039c21811c8f2b5d5b65308aa99d31559",
+        "txCount": "253479",
+        "createdAtBlockNumber": "12390598",
+        "token0": {
+          "id": "0x514910771af9ca656af840dff83e8264ecf986ca",
+          "symbol": "LINK"
+        },
+        "token1": {
+          "id": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          "symbol": "USDC"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0x4674abc5796e1334b5075326b39b748bee9eaa34",
+        "txCount": "252358",
+        "createdAtBlockNumber": "12383122",
+        "token0": {
+          "id": "0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9",
+          "symbol": "AAVE"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "500"
+      },
+      {
+        "id": "0x53ead11073fc0651dce70572666f0ed0752abfea",
+        "txCount": "251598",
+        "createdAtBlockNumber": "22923322",
+        "token0": {
+          "id": "0x45e02bc2875a2914c4f585bbf92a6f28bc07cb70",
+          "symbol": "$MBG"
+        },
+        "token1": {
+          "id": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+          "symbol": "USDT"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0x1c98562a2fab5af19d8fb3291a36ac3c618835d9",
+        "txCount": "251102",
+        "createdAtBlockNumber": "12425960",
+        "token0": {
+          "id": "0x9e32b13ce7f2e80a01932b42553652e053d6ed8e",
+          "symbol": "Metis"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0x4628a0a564debfc8798eb55db5c91f2200486c24",
+        "txCount": "249551",
+        "createdAtBlockNumber": "12375996",
+        "token0": {
+          "id": "0x6de037ef9ad2725eb40118bb1702ebb27e4aeb24",
+          "symbol": "RNDR"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0xfaa318479b7755b2dbfdd34dc306cb28b420ad12",
+        "txCount": "248741",
+        "createdAtBlockNumber": "12376138",
+        "token0": {
+          "id": "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984",
+          "symbol": "UNI"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "500"
+      },
+      {
+        "id": "0xc64350c0eab6faed8f17cc2cdff0761c53fb4152",
+        "txCount": "245923",
+        "createdAtBlockNumber": "17845222",
+        "token0": {
+          "id": "0x423f4e6138e475d85cf7ea071ac92097ed631eea",
+          "symbol": "PNDC"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "10000"
+      },
+      {
+        "id": "0x98409d8ca9629fbe01ab1b914ebf304175e384c8",
+        "txCount": "242422",
+        "createdAtBlockNumber": "12388387",
+        "token0": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "token1": {
+          "id": "0xf411903cbc70a74d22900a5de66a2dda66507255",
+          "symbol": "VRA"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0xe8f7c89c5efa061e340f2d2f206ec78fd8f7e124",
+        "txCount": "231301",
+        "createdAtBlockNumber": "20729513",
+        "token0": {
+          "id": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+          "symbol": "WBTC"
+        },
+        "token1": {
+          "id": "0xcbb7c0000ab88b473b1f5afd9ef808440eed33bf",
+          "symbol": "cbBTC"
+        },
+        "feeTier": "100"
+      },
+      {
+        "id": "0xe42318ea3b998e8355a3da364eb9d48ec725eb45",
+        "txCount": "230166",
+        "createdAtBlockNumber": "13598687",
+        "token0": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "token1": {
+          "id": "0xd33526068d116ce69f19a9ee46f0bd304f21a51f",
+          "symbol": "RPL"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0x16588709ca8f7b84829b43cc1c5cb7e84a321b16",
+        "txCount": "229912",
+        "createdAtBlockNumber": "16841205",
+        "token0": {
+          "id": "0xb23d80f5fefcddaa212212f028021b41ded428cf",
+          "symbol": "PRIME"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0x1385fc1fe0418ea0b4fcf7adc61fc7535ab7f80d",
+        "txCount": "226985",
+        "createdAtBlockNumber": "19475819",
+        "token0": {
+          "id": "0x1495bc9e44af1f8bcb62278d2bec4540cf0c05ea",
+          "symbol": "DEAI"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0x6c063a6e8cd45869b5eb75291e65a3de298f3aa8",
+        "txCount": "226931",
+        "createdAtBlockNumber": "12583193",
+        "token0": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "token1": {
+          "id": "0xe28b3b32b6c345a34ff64674606124dd5aceca30",
+          "symbol": "INJ"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0x844eb5c280f38c7462316aad3f338ef9bda62668",
+        "txCount": "224879",
+        "createdAtBlockNumber": "18568160",
+        "token0": {
+          "id": "0x38e382f74dfb84608f3c1f10187f6bef5951de93",
+          "symbol": "MUBI"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "10000"
+      },
+      {
+        "id": "0x3019d4e366576a88d28b623afaf3ecb9ec9d9580",
+        "txCount": "220314",
+        "createdAtBlockNumber": "12572997",
+        "token0": {
+          "id": "0xbb0e17ef65f82ab018d8edd776e8dd940327b28b",
+          "symbol": "AXS"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0xb011e4eb4111ef00b620a5ed195836dcd69db1ff",
+        "txCount": "214141",
+        "createdAtBlockNumber": "12883957",
+        "token0": {
+          "id": "0x9813037ee2218799597d83d4a5b6f3b6778218d9",
+          "symbol": "BONE"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0x5764a6f2212d502bc5970f9f129ffcd61e5d7563",
+        "txCount": "207106",
+        "createdAtBlockNumber": "12376297",
+        "token0": {
+          "id": "0x95ad61b0a150d79219dcf64e1e6cc01f0b64c4ce",
+          "symbol": "SHIB"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "10000"
+      },
+      {
+        "id": "0xe3fe800b0de664bf0bca8ad58ecbc73b259047b0",
+        "txCount": "205499",
+        "createdAtBlockNumber": "14216460",
+        "token0": {
+          "id": "0x595832f8fc6bf59c85c527fec3740a1b7a361269",
+          "symbol": "POWR"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "500"
+      },
+      {
+        "id": "0x0c30062368eefb96bf3ade1218e685306b8e89fa",
+        "txCount": "205092",
+        "createdAtBlockNumber": "17240796",
+        "token0": {
+          "id": "0x72e4f9f808c49a2a61de9c5896298920dc4eeea9",
+          "symbol": "BITCOIN"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "10000"
+      },
+      {
+        "id": "0x0cfbed8f2248d2735203f602be0cae5a3131ec68",
+        "txCount": "203582",
+        "createdAtBlockNumber": "12564689",
+        "token0": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "token1": {
+          "id": "0xcc8fa225d80b9c7d42f96e9570156c65d6caaa25",
+          "symbol": "SLP"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0x3470447f3cecffac709d3e783a307790b0208d60",
+        "txCount": "202675",
+        "createdAtBlockNumber": "12378852",
+        "token0": {
+          "id": "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984",
+          "symbol": "UNI"
+        },
+        "token1": {
+          "id": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+          "symbol": "USDT"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0x73a38006d23517a1d383c88929b2014f8835b38b",
+        "txCount": "202087",
+        "createdAtBlockNumber": "19787520",
+        "token0": {
+          "id": "0x18084fba666a33d37592fa2633fd49a74dd93a88",
+          "symbol": "tBTC"
+        },
+        "token1": {
+          "id": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+          "symbol": "WBTC"
+        },
+        "feeTier": "100"
+      },
+      {
+        "id": "0x95a45a87dd4d3a1803039072f37e075f37b23d75",
+        "txCount": "201839",
+        "createdAtBlockNumber": "18856460",
+        "token0": {
+          "id": "0x44ff8620b8ca30902395a7bd3f2407e1a091bf73",
+          "symbol": "VIRTUAL"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "10000"
+      },
+      {
+        "id": "0x553e9c493678d8606d6a5ba284643db2110df823",
+        "txCount": "199646",
+        "createdAtBlockNumber": "15384461",
+        "token0": {
+          "id": "0xae78736cd615f374d3085123a210448e74fc6393",
+          "symbol": "rETH"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "100"
+      },
+      {
+        "id": "0x8107fca5494375fc743a9fc4d4844353a1af3d94",
+        "txCount": "198719",
+        "createdAtBlockNumber": "17177272",
+        "token0": {
+          "id": "0xa35923162c49cf95e6bf26623385eb431ad920d3",
+          "symbol": "TURBO"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0x168e9b3c9ddfb013a4130276f9c500a3ce50fde7",
+        "txCount": "196671",
+        "createdAtBlockNumber": "24910265",
+        "token0": {
+          "id": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          "symbol": "USDC"
+        },
+        "token1": {
+          "id": "0xf280b16ef293d8e534e370794ef26bf312694126",
+          "symbol": "ASTEROID"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0xf8a95b2409c27678a6d18d950c5d913d5c38ab03",
+        "txCount": "195348",
+        "createdAtBlockNumber": "12379095",
+        "token0": {
+          "id": "0x15d4c048f83bd7e37d49ea4c83a07267ec4203da",
+          "symbol": "GALA"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0xb1914469141ebb6e244e75cee3f35d43bf6b85e5",
+        "txCount": "193273",
+        "createdAtBlockNumber": "12383469",
+        "token0": {
+          "id": "0xaa7a9ca87d3694b5755f213b5d04094b8d0f0a6f",
+          "symbol": "TRAC"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0x744159757cac173a7a3ecf5e97adb10d1a725377",
+        "txCount": "188218",
+        "createdAtBlockNumber": "12391411",
+        "token0": {
+          "id": "0xaea46a60368a7bd060eec7df8cba43b7ef41ad85",
+          "symbol": "FET"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0x3198ca64ebff6d008860f2c450cfcbf1faac7677",
+        "txCount": "187876",
+        "createdAtBlockNumber": "24980191",
+        "token0": {
+          "id": "0x4d7078ddd6ccfed2f85db5b7d3ff16828d378d48",
+          "symbol": "AI"
+        },
+        "token1": {
+          "id": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          "symbol": "USDC"
+        },
+        "feeTier": "100"
+      },
+      {
+        "id": "0xdce93ed9ae7c53143e19cf799d156b72d1cc2777",
+        "txCount": "186241",
+        "createdAtBlockNumber": "17197501",
+        "token0": {
+          "id": "0x9bf1d7d63dd7a4ce167cf4866388226eeefa702e",
+          "symbol": "BEN"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0x4c54ff7f1c424ff5487a32aad0b48b19cbaf087f",
+        "txCount": "185934",
+        "createdAtBlockNumber": "12376925",
+        "token0": {
+          "id": "0xb62132e35a6c13ee1ee0f84dc5d40bad8d815206",
+          "symbol": "NEXO"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0xfa45c879fd120d6cc493113ae212a853531f3d91",
+        "txCount": "184798",
+        "createdAtBlockNumber": "20406449",
+        "token0": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "token1": {
+          "id": "0xee2a03aa6dacf51c18679c516ad5283d8e7c2637",
+          "symbol": "NEIRO"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0x7b3ed3a3444144ff526554d5f4aa463d1759f51a",
+        "txCount": "184322",
+        "createdAtBlockNumber": "19219259",
+        "token0": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "token1": {
+          "id": "0xdd66781d0e9a08d4fbb5ec7bac80b691be27f21d",
+          "symbol": "AXGT"
+        },
+        "feeTier": "10000"
+      },
+      {
+        "id": "0x32d9259e6792b2150fd50395d971864647fa27b2",
+        "txCount": "180884",
+        "createdAtBlockNumber": "14271875",
+        "token0": {
+          "id": "0x320623b8e4ff03373931769a31fc52a4e78b5d70",
+          "symbol": "RSR"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "3000"
+      },
+      {
+        "id": "0x433a00819c771b33fa7223a5b3499b24fbcd1bbc",
+        "txCount": "180482",
+        "createdAtBlockNumber": "16523422",
+        "token0": {
+          "id": "0x77e06c9eccf2e797fd462a92b6d7642ef85b0a44",
+          "symbol": "wTAO"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "10000"
+      },
+      {
+        "id": "0x360acf12e72044ba3eaaa654e51e4725c699dcb1",
+        "txCount": "180264",
+        "createdAtBlockNumber": "20131568",
+        "token0": {
+          "id": "0x6985884c4392d348587b19cb9eaaf157f13271cd",
+          "symbol": "ZRO"
+        },
+        "token1": {
+          "id": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "symbol": "WETH"
+        },
+        "feeTier": "3000"
+      }
+    ],
+    "_meta": {
+      "block": {
+        "number": 26259428,
+        "hash": null
+      },
+      "hasIndexingErrors": false,
+      "deployment": "QmTZ8ejXJxRo7vDBS4uwqBeGoxLSWbhaA7oXa1RvxunLy7"
+    }
+  }
+}

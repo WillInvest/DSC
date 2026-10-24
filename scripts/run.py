@@ -1,0 +1,37 @@
+#!/usr/bin/env python3
+"""Coordinate resumable extraction from dsc-data; CLI block limits are inclusive."""
+import argparse
+import fcntl
+from pathlib import Path
+from orchestration.coordinator import Coordinator
+
+
+def main():
+    p = argparse.ArgumentParser(description=__doc__)
+    p.add_argument('--contracts', type=Path, required=True)
+    p.add_argument('--data-root', type=Path, default=Path('/home/dsc-data/data'))
+    p.add_argument('--servers', type=Path, help='JSON overriding node/revert deployment paths')
+    p.add_argument('--profiles', type=Path, help='Directory of reviewed Aave deployment profiles')
+    p.add_argument('--from-block', type=int)
+    p.add_argument('--to-block', type=int)
+    p.add_argument('--dry-run', action='store_true')
+    p.add_argument('--status', action='store_true')
+    p.add_argument('--matrix', action='store_true', help='Export bounded block-by-address CSV; requires --from-block and --to-block')
+    p.add_argument('--cleanup', action='store_true', help='Delete acknowledged node staging only')
+    args = p.parse_args()
+    args.data_root.mkdir(parents=True, exist_ok=True)
+    if args.status or args.matrix:
+        Coordinator(args).run()
+        return
+    with (args.data_root / 'coordinator.lock').open('w') as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        from orchestration.reporting import heartbeat
+        if args.dry_run:
+            Coordinator(args).run()
+        else:
+            with heartbeat(args.data_root):
+                Coordinator(args).run()
+
+
+if __name__ == '__main__':
+    main()

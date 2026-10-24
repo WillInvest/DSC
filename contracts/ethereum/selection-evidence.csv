@@ -1,0 +1,8 @@
+protocol,address,liquidity_usd_approx,volume_24h_usd_approx,source_asof_utc,source
+uniswap-v2,0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc,19750000,368330,2026-10-23 03:48,https://dexpaprika.com/ethereum/uniswap_v2
+uniswap-v2,0x0d4a11d5eeaac28ec3f61d100daf4d40471f1852,14240000,299900,2026-10-23 03:48,https://dexpaprika.com/ethereum/uniswap_v2
+uniswap-v2,0xa478c2975ab1ea89e8196811f51a7b7ade33eb11,8950000,319790,2026-10-23 03:48,https://dexpaprika.com/ethereum/uniswap_v2
+uniswap-v3,0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640,82270000,29320000,2026-10-23 03:56,https://dexpaprika.com/ethereum/uniswap_v3
+uniswap-v3,0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8,54520000,7770000,2026-10-20 06:03,https://dexpaprika.com/ethereum/pool/0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8
+uniswap-v3,0x4585fe77225b41b697c938b018e2ac67ac5a20c0,43300000,9380000,2026-10-24 02:40,https://dexpaprika.com/ethereum/pool/0x4585fe77225b41b697c938b018e2ac67ac5a20c0
+uniswap-v3,0x3416cf6c708da44db2624d63ea0aaef7113527c6,34180000,26170000,2026-10-23 03:56,https://dexpaprika.com/ethereum/uniswap_v3
