@@ -15,3 +15,8 @@ State: `getReservesList()` at each requested end-of-block state, then
 `getReserveData(asset)` for every returned reserve. This includes configuration,
 indices, rates, token addresses, and accounting values exposed by that getter;
 it is not a complete balance sheet or user-position snapshot.
+
+Historical production extraction selects a profile-specific ABI under `history/`;
+the package ABI above remains the default for earlier isolated pilots. Verified
+source records and derived extraction ABIs are kept separately. See
+[historical profiles](../../../../../contracts/ethereum/aave-profiles/README.md).

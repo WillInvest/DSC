@@ -16,3 +16,8 @@ own schema. Do not decode V2 with the V3 ABI.
 User-position getters and aToken/debt-token events are excluded.
 A reviewed, bounded deployment/ABI profile is required for historical extraction;
 no production address or block range is selected by this configuration.
+
+Historical production extraction selects a profile-specific ABI under `history/`;
+the package ABI above remains the default for earlier isolated pilots. Verified
+source records and derived extraction ABIs are kept separately. See
+[historical profiles](../../../../../contracts/ethereum/aave-profiles/README.md).

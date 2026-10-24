@@ -1,0 +1,22 @@
+{
+  "protocol": "aave-v3",
+  "chain_id": 1,
+  "address": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
+  "from_block": 16291127,
+  "to_block": 17214196,
+  "implementation": "0xfCc00A1e250644d89AF0df661bC6f04891E21585",
+  "previous_implementation": "0x0000000000000000000000000000000000000000",
+  "boundary_upgrades": [],
+  "implementation_code_sha256": "de44306083a7c4709f4de11b197c77276bed7f0bfa6d9672ce950b95acabb63f",
+  "abi": "history/16291127.json",
+  "abi_sha256": "ee41f760756130cbe8c5e0fa71e4bfd8030a7093d198a43b5f19b10db3649376",
+  "schema_version": 1,
+  "sources": [
+    {
+      "address": "0xfCc00A1e250644d89AF0df661bC6f04891E21585",
+      "url": "https://sourcify.dev/server/v2/contract/1/0xfCc00A1e250644d89AF0df661bC6f04891E21585?fields=abi,runtimeBytecode.onchainBytecode,metadata",
+      "record_sha256": "38475fa9a9c8acb1eb0cc3204a8a199ef43e6846d510cc4c7b796918e4cdab3b",
+      "runtime_sha256": "de44306083a7c4709f4de11b197c77276bed7f0bfa6d9672ce950b95acabb63f"
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "protocol": "aave-v3",
+  "chain_id": 1,
+  "address": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
+  "from_block": 20920979,
+  "to_block": 20977092,
+  "implementation": "0x1f64488c2C4686771dafA75915274d27878B667a",
+  "previous_implementation": "0x34339f94350EC5274ea44d0C37DAe9e968c44081",
+  "boundary_upgrades": [
+    {
+      "block": 20920979,
+      "log_index": 112,
+      "transaction_hash": "0xefcf3c57b91d919da3f2e7e8d6af041d9cb5c1a4b58e913ebc9aaeba238947eb",
+      "implementation": "0x1f64488c2C4686771dafA75915274d27878B667a"
+    }
+  ],
+  "implementation_code_sha256": "351cf687c348ac1076fbd02a428c17549217a031d6f9b34971521a82a50fe174",
+  "abi": "history/20920979.json",
+  "abi_sha256": "5677a54b2b4e8417c4bec06514f83d1f3e3c0cbfa01dfd4ac77da3b31fb6e98f",
+  "schema_version": 5,
+  "sources": [
+    {
+      "address": "0x1f64488c2C4686771dafA75915274d27878B667a",
+      "url": "https://sourcify.dev/server/v2/contract/1/0x1f64488c2C4686771dafA75915274d27878B667a?fields=abi,runtimeBytecode.onchainBytecode,metadata",
+      "record_sha256": "ca04d77f8ad88c09f05f2880f6480607a41ccae1dbf45a069681fbd7cc29eedd",
+      "runtime_sha256": "351cf687c348ac1076fbd02a428c17549217a031d6f9b34971521a82a50fe174"
+    },
+    {
+      "address": "0x34339f94350EC5274ea44d0C37DAe9e968c44081",
+      "url": "https://sourcify.dev/server/v2/contract/1/0x34339f94350EC5274ea44d0C37DAe9e968c44081?fields=abi,runtimeBytecode.onchainBytecode,metadata",
+      "record_sha256": "9f5d53a1bc6efcf5b7cd244577d27162742efefc2cd905fd4669042f9e703484",
+      "runtime_sha256": "9211e98c0b6f77a69699612b710c9ff86f46e8de97ea2a27fbc1f58b44b7fe73"
+    }
+  ]
+}

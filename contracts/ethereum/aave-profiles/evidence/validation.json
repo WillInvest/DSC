@@ -1,0 +1,285 @@
+{
+  "cutoff": 26259811,
+  "cutoff_hash": "0x8773195f52295d650943d6b86c736c56c796f4d9aba975b99d3d25fea536cee9",
+  "pools": [
+    {
+      "protocol": "aave-v2",
+      "address": "0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9",
+      "proxy_source": {
+        "address": "0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9",
+        "url": "https://sourcify.dev/server/v2/contract/1/0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9?fields=abi,runtimeBytecode.onchainBytecode,metadata",
+        "record_sha256": "78bf8f23cddb7b9b90d0d533d231d38e1b394c7de9ccd5456a1ecfdf1eea0c35",
+        "runtime_sha256": "20d8c103f691647837952adf434af2d628cbe74c2c84a01ba07186b978131991"
+      },
+      "profiles": [
+        {
+          "file": "aave-v2-11362579.json",
+          "samples": [
+            {
+              "block": 11362579,
+              "reserves": 0,
+              "events": 0,
+              "block_hash": "0x4cd4a59cf5d63b9c3001ecd5ae41df7fee780f00eac796fa105cf49b6f3bd786"
+            },
+            {
+              "block": 11502876,
+              "reserves": 20,
+              "events": 0,
+              "block_hash": "0x815c91ae38e3da2c001e527420ba06942050619c6980cb7337c615df11cef9fd"
+            }
+          ]
+        },
+        {
+          "file": "aave-v2-11502877.json",
+          "samples": [
+            {
+              "block": 11502877,
+              "reserves": 20,
+              "events": 4,
+              "block_hash": "0x81aa8c7815ca6252bf60264e998c4407407194304f62a0bc18ea63b53ae4ceb9"
+            },
+            {
+              "block": 18195704,
+              "reserves": 37,
+              "events": 0,
+              "block_hash": "0x6a97c0954f6dbee7f18dfbf8eb9996fef72ba8a6721d1b7e77cfafc7e5a4e2eb"
+            }
+          ]
+        },
+        {
+          "file": "aave-v2-18195705.json",
+          "samples": [
+            {
+              "block": 18195705,
+              "reserves": 37,
+              "events": 5,
+              "block_hash": "0xad211ce77255641cf4f15bc5b3e514a4e79e5c30047e3d482b594f6e58d788b8"
+            },
+            {
+              "block": 19754260,
+              "reserves": 37,
+              "events": 0,
+              "block_hash": "0x9cc92ede262452f16559bb7847ba6bbadc10a4d51313fa6d29609ef68a1e953e"
+            }
+          ]
+        },
+        {
+          "file": "aave-v2-19754261.json",
+          "samples": [
+            {
+              "block": 19754261,
+              "reserves": 37,
+              "events": 1,
+              "block_hash": "0x03f5a1f65f97b7a4840837cea2102aee4f0ab46aa3bb8a5fe5c99c2107420179"
+            },
+            {
+              "block": 26259811,
+              "reserves": 37,
+              "events": 0,
+              "block_hash": "0x8773195f52295d650943d6b86c736c56c796f4d9aba975b99d3d25fea536cee9"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "protocol": "aave-v3",
+      "address": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
+      "proxy_source": {
+        "address": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
+        "url": "https://sourcify.dev/server/v2/contract/1/0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2?fields=abi,runtimeBytecode.onchainBytecode,metadata",
+        "record_sha256": "756c686dac547de6738db08d7fb8d4d714fc4724a8019c66784bdca533c3eddc",
+        "runtime_sha256": "bf8a408a1f5440c167d91fa2d972deb23bb4d809e8dd089009885ec88a826f88"
+      },
+      "profiles": [
+        {
+          "file": "aave-v3-16291127.json",
+          "samples": [
+            {
+              "block": 16291127,
+              "reserves": 0,
+              "events": 0,
+              "block_hash": "0xb5cc06eb5df1e84f6c9a6a72efe9f083fc0dec6bfcfdb2f8f01085e46bf354f5"
+            },
+            {
+              "block": 17214195,
+              "reserves": 17,
+              "events": 0,
+              "block_hash": "0x87d859e6d620fef6f19796ef30aff355b4de3929d645cdf6aece6a8da21f8dbf"
+            }
+          ]
+        },
+        {
+          "file": "aave-v3-17214196.json",
+          "samples": [
+            {
+              "block": 17214196,
+              "reserves": 17,
+              "events": 1,
+              "block_hash": "0x1c2afd61dd3b0974865a5a528141934091978ec294865423c24ab198ba2847c2"
+            },
+            {
+              "block": 18979694,
+              "reserves": 27,
+              "events": 0,
+              "block_hash": "0x3147bdc31956e6de6865bc3aa33d5f87b7c0157dea479019aa251001f447c7ee"
+            }
+          ]
+        },
+        {
+          "file": "aave-v3-18979695.json",
+          "samples": [
+            {
+              "block": 18979695,
+              "reserves": 27,
+              "events": 1,
+              "block_hash": "0xc510814e4f88b243dc575654ac2b771f64f32010bbe7a4bc076c3c9284564a0d"
+            },
+            {
+              "block": 20398673,
+              "reserves": 33,
+              "events": 3,
+              "block_hash": "0xfdb1e13b4a5c134387430c753cb16c98449f195b82be67110da7dba0250641cb"
+            }
+          ]
+        },
+        {
+          "file": "aave-v3-20398674.json",
+          "samples": [
+            {
+              "block": 20398674,
+              "reserves": 33,
+              "events": 34,
+              "block_hash": "0x48fef4fc63d4b344e0f8ee8c8a729d511c2e11882b4325a369fccf857003e863"
+            },
+            {
+              "block": 20920978,
+              "reserves": 36,
+              "events": 0,
+              "block_hash": "0xebbef53306f468a07f6abd66ba4d4a52d8079174a2d51219fb5296323bd4f6dc"
+            }
+          ]
+        },
+        {
+          "file": "aave-v3-20920979.json",
+          "samples": [
+            {
+              "block": 20920979,
+              "reserves": 36,
+              "events": 40,
+              "block_hash": "0x634a450c714587a12d6a9ea3d30375edbe17aae3eec6a998893bbe03d6d6fca5"
+            },
+            {
+              "block": 20977091,
+              "reserves": 36,
+              "events": 0,
+              "block_hash": "0x52fe2ebc2ed982af2ed64fbb433408dfa9066196e84c26b52f5850454524bed5"
+            }
+          ]
+        },
+        {
+          "file": "aave-v3-20977092.json",
+          "samples": [
+            {
+              "block": 20977092,
+              "reserves": 36,
+              "events": 1,
+              "block_hash": "0x1968fb7314b1f92dfe2c6894c6c9b55457a4e65efdc96c8e329cf1ecffc2ed5e"
+            },
+            {
+              "block": 21917055,
+              "reserves": 38,
+              "events": 0,
+              "block_hash": "0x65b2a14b5e7e8bb574d3bc434f3e5c54424cd5e14efde3f8f1f44ee607673160"
+            }
+          ]
+        },
+        {
+          "file": "aave-v3-21917056.json",
+          "samples": [
+            {
+              "block": 21917056,
+              "reserves": 38,
+              "events": 1,
+              "block_hash": "0x08125259f669820a7162853f4963e357e88799c05926299b6d57963f31b407ef"
+            },
+            {
+              "block": 22839361,
+              "reserves": 48,
+              "events": 0,
+              "block_hash": "0x04a4c54bd090dd59f932e8f16524a5003ddaac5187f0db4ef96e6eb5bdf98b38"
+            }
+          ]
+        },
+        {
+          "file": "aave-v3-22839362.json",
+          "samples": [
+            {
+              "block": 22839362,
+              "reserves": 48,
+              "events": 10,
+              "block_hash": "0xbf7b6ae562060883f3a8f92a62cf072d94e80e4862de02c5bd31c98dbd236120"
+            },
+            {
+              "block": 23088583,
+              "reserves": 50,
+              "events": 1,
+              "block_hash": "0x4b58876ab8bced83dd8a8bc11d6520aa398e03926061895910b2879eb2a476f6"
+            }
+          ]
+        },
+        {
+          "file": "aave-v3-23088584.json",
+          "samples": [
+            {
+              "block": 23088584,
+              "reserves": 50,
+              "events": 2,
+              "block_hash": "0xc698c93cdbe7ab12221088ec36e9ee86f85e11048876814b84cb0a5d558d3314"
+            },
+            {
+              "block": 24247926,
+              "reserves": 60,
+              "events": 2,
+              "block_hash": "0xcd07c1e946e3ee50d0046120a5fa6da9ec681958ebf284888a44b3d18453bbe6"
+            }
+          ]
+        },
+        {
+          "file": "aave-v3-24247927.json",
+          "samples": [
+            {
+              "block": 24247927,
+              "reserves": 60,
+              "events": 1,
+              "block_hash": "0xd5088efe6541a8447f4a6d78b9d3372599b2dfaa80962e52c27df52de1132a77"
+            },
+            {
+              "block": 25199938,
+              "reserves": 66,
+              "events": 0,
+              "block_hash": "0x2a671815b468aa657c4b8f4866f0acb5d091fe6fe96a95c2d41259b9ef5564b0"
+            }
+          ]
+        },
+        {
+          "file": "aave-v3-25199939.json",
+          "samples": [
+            {
+              "block": 25199939,
+              "reserves": 66,
+              "events": 12,
+              "block_hash": "0x35eca1fe76611d0ab4116bc0df57acf702e39ff750de0ae07df15122171560e6"
+            },
+            {
+              "block": 26259811,
+              "reserves": 67,
+              "events": 2,
+              "block_hash": "0x8773195f52295d650943d6b86c736c56c796f4d9aba975b99d3d25fea536cee9"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,317 @@
+{
+  "url": "https://eth.blockscout.com/api/v2/addresses/0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9/logs",
+  "start": 11362579,
+  "stop": 26259812,
+  "pages": [
+    {
+      "items": [
+        {
+          "address": {
+            "ens_domain_name": null,
+            "hash": "0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9",
+            "implementations": [
+              {
+                "address_hash": "0x02D84abD89Ee9DB409572f19B6e1596c301F3c81",
+                "name": "LendingPool"
+              }
+            ],
+            "is_contract": true,
+            "is_scam": false,
+            "is_verified": true,
+            "metadata": {
+              "tags": [
+                {
+                  "meta": {
+                    "projectName": "Aave",
+                    "tagIcon ": "https://blockscout-icons.s3.us-east-1.amazonaws.com/OLI_tag_logo.svg",
+                    "tagUrl": "https://scout-app.kleros.io/single-tags/0xa7faa6db3596109b60c5ebb05d4138f2c47d7665762030ed66fe03cd032d8126",
+                    "textColor": "#C163D4",
+                    "tooltipAttribution": "https://www.openlabelsinitiative.org?utm_source=blockscout",
+                    "tooltipAttributionIcon": "https://blockscout-icons.s3.us-east-1.amazonaws.com/OLI_tag_logo.svg",
+                    "tooltipDescription": "The Lending Pool contract is the main contract of the Aave protocol",
+                    "tooltipUrl": "https://aave.com/",
+                    "verifiedDomains": [
+                      "app.aave.com"
+                    ]
+                  },
+                  "name": "Lending Pool V2",
+                  "ordinal": 10,
+                  "slug": "lending-pool-v2-1",
+                  "tagType": "name"
+                },
+                {
+                  "meta": {},
+                  "name": "V2",
+                  "ordinal": 0,
+                  "slug": "v2",
+                  "tagType": "generic"
+                },
+                {
+                  "meta": {
+                    "appActionButtonText": "Aave",
+                    "appID": "aave"
+                  },
+                  "name": "Aave",
+                  "ordinal": 0,
+                  "slug": "aave",
+                  "tagType": "protocol"
+                }
+              ]
+            },
+            "name": "InitializableImmutableAdminUpgradeabilityProxy",
+            "private_tags": [],
+            "proxy_type": "eip1967",
+            "public_tags": [],
+            "reputation": "ok",
+            "watchlist_names": []
+          },
+          "block_hash": "0x03f5a1f65f97b7a4840837cea2102aee4f0ab46aa3bb8a5fe5c99c2107420179",
+          "block_number": 19754261,
+          "block_timestamp": "2024-04-28T13:57:35.000000Z",
+          "data": "0x",
+          "decoded": {
+            "method_call": "Upgraded(address indexed implementation)",
+            "method_id": "bc7cd75a",
+            "parameters": [
+              {
+                "indexed": true,
+                "name": "implementation",
+                "type": "address",
+                "value": "0x02D84abD89Ee9DB409572f19B6e1596c301F3c81"
+              }
+            ]
+          },
+          "index": 163,
+          "smart_contract": {
+            "ens_domain_name": null,
+            "hash": "0x02777053d6764996e594c3E88AF1D58D5363a2e6",
+            "implementations": [],
+            "is_contract": true,
+            "is_scam": false,
+            "is_verified": true,
+            "metadata": null,
+            "name": null,
+            "private_tags": [],
+            "proxy_type": null,
+            "public_tags": [],
+            "reputation": "ok",
+            "watchlist_names": []
+          },
+          "topics": [
+            "0xbc7cd75a20ee27fd9adebab32041f755214dbc6bffa90cc0225b39da2e5c2d3b",
+            "0x00000000000000000000000002d84abd89ee9db409572f19b6e1596c301f3c81",
+            null,
+            null
+          ],
+          "transaction_hash": "0x0df3216ab6ce96dba6a0c7ba09c5e639de69971cc140d01fc89f7a862289b565"
+        },
+        {
+          "address": {
+            "ens_domain_name": null,
+            "hash": "0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9",
+            "implementations": [
+              {
+                "address_hash": "0x02D84abD89Ee9DB409572f19B6e1596c301F3c81",
+                "name": "LendingPool"
+              }
+            ],
+            "is_contract": true,
+            "is_scam": false,
+            "is_verified": true,
+            "metadata": {
+              "tags": [
+                {
+                  "meta": {
+                    "projectName": "Aave",
+                    "tagIcon ": "https://blockscout-icons.s3.us-east-1.amazonaws.com/OLI_tag_logo.svg",
+                    "tagUrl": "https://scout-app.kleros.io/single-tags/0xa7faa6db3596109b60c5ebb05d4138f2c47d7665762030ed66fe03cd032d8126",
+                    "textColor": "#C163D4",
+                    "tooltipAttribution": "https://www.openlabelsinitiative.org?utm_source=blockscout",
+                    "tooltipAttributionIcon": "https://blockscout-icons.s3.us-east-1.amazonaws.com/OLI_tag_logo.svg",
+                    "tooltipDescription": "The Lending Pool contract is the main contract of the Aave protocol",
+                    "tooltipUrl": "https://aave.com/",
+                    "verifiedDomains": [
+                      "app.aave.com"
+                    ]
+                  },
+                  "name": "Lending Pool V2",
+                  "ordinal": 10,
+                  "slug": "lending-pool-v2-1",
+                  "tagType": "name"
+                },
+                {
+                  "meta": {},
+                  "name": "V2",
+                  "ordinal": 0,
+                  "slug": "v2",
+                  "tagType": "generic"
+                },
+                {
+                  "meta": {
+                    "appActionButtonText": "Aave",
+                    "appID": "aave"
+                  },
+                  "name": "Aave",
+                  "ordinal": 0,
+                  "slug": "aave",
+                  "tagType": "protocol"
+                }
+              ]
+            },
+            "name": "InitializableImmutableAdminUpgradeabilityProxy",
+            "private_tags": [],
+            "proxy_type": "eip1967",
+            "public_tags": [],
+            "reputation": "ok",
+            "watchlist_names": []
+          },
+          "block_hash": "0xad211ce77255641cf4f15bc5b3e514a4e79e5c30047e3d482b594f6e58d788b8",
+          "block_number": 18195705,
+          "block_timestamp": "2023-09-23T03:01:35.000000Z",
+          "data": "0x",
+          "decoded": {
+            "method_call": "Upgraded(address indexed implementation)",
+            "method_id": "bc7cd75a",
+            "parameters": [
+              {
+                "indexed": true,
+                "name": "implementation",
+                "type": "address",
+                "value": "0x085E34722e04567Df9E6d2c32e82fd74f3342e79"
+              }
+            ]
+          },
+          "index": 152,
+          "smart_contract": {
+            "ens_domain_name": null,
+            "hash": "0x02777053d6764996e594c3E88AF1D58D5363a2e6",
+            "implementations": [],
+            "is_contract": true,
+            "is_scam": false,
+            "is_verified": true,
+            "metadata": null,
+            "name": null,
+            "private_tags": [],
+            "proxy_type": null,
+            "public_tags": [],
+            "reputation": "ok",
+            "watchlist_names": []
+          },
+          "topics": [
+            "0xbc7cd75a20ee27fd9adebab32041f755214dbc6bffa90cc0225b39da2e5c2d3b",
+            "0x000000000000000000000000085e34722e04567df9e6d2c32e82fd74f3342e79",
+            null,
+            null
+          ],
+          "transaction_hash": "0x604a54970ad073dadec1d94ed1e5e993767033f06db2e3fbd80b0066f651311b"
+        },
+        {
+          "address": {
+            "ens_domain_name": null,
+            "hash": "0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9",
+            "implementations": [
+              {
+                "address_hash": "0x02D84abD89Ee9DB409572f19B6e1596c301F3c81",
+                "name": "LendingPool"
+              }
+            ],
+            "is_contract": true,
+            "is_scam": false,
+            "is_verified": true,
+            "metadata": {
+              "tags": [
+                {
+                  "meta": {
+                    "projectName": "Aave",
+                    "tagIcon ": "https://blockscout-icons.s3.us-east-1.amazonaws.com/OLI_tag_logo.svg",
+                    "tagUrl": "https://scout-app.kleros.io/single-tags/0xa7faa6db3596109b60c5ebb05d4138f2c47d7665762030ed66fe03cd032d8126",
+                    "textColor": "#C163D4",
+                    "tooltipAttribution": "https://www.openlabelsinitiative.org?utm_source=blockscout",
+                    "tooltipAttributionIcon": "https://blockscout-icons.s3.us-east-1.amazonaws.com/OLI_tag_logo.svg",
+                    "tooltipDescription": "The Lending Pool contract is the main contract of the Aave protocol",
+                    "tooltipUrl": "https://aave.com/",
+                    "verifiedDomains": [
+                      "app.aave.com"
+                    ]
+                  },
+                  "name": "Lending Pool V2",
+                  "ordinal": 10,
+                  "slug": "lending-pool-v2-1",
+                  "tagType": "name"
+                },
+                {
+                  "meta": {},
+                  "name": "V2",
+                  "ordinal": 0,
+                  "slug": "v2",
+                  "tagType": "generic"
+                },
+                {
+                  "meta": {
+                    "appActionButtonText": "Aave",
+                    "appID": "aave"
+                  },
+                  "name": "Aave",
+                  "ordinal": 0,
+                  "slug": "aave",
+                  "tagType": "protocol"
+                }
+              ]
+            },
+            "name": "InitializableImmutableAdminUpgradeabilityProxy",
+            "private_tags": [],
+            "proxy_type": "eip1967",
+            "public_tags": [],
+            "reputation": "ok",
+            "watchlist_names": []
+          },
+          "block_hash": "0x81aa8c7815ca6252bf60264e998c4407407194304f62a0bc18ea63b53ae4ceb9",
+          "block_number": 11502877,
+          "block_timestamp": "2020-12-22T10:59:26.000000Z",
+          "data": "0x",
+          "decoded": {
+            "method_call": "Upgraded(address indexed implementation)",
+            "method_id": "bc7cd75a",
+            "parameters": [
+              {
+                "indexed": true,
+                "name": "implementation",
+                "type": "address",
+                "value": "0xC6845a5C768BF8D7681249f8927877Efda425baf"
+              }
+            ]
+          },
+          "index": 209,
+          "smart_contract": {
+            "ens_domain_name": null,
+            "hash": "0xB9062896ec3A615a4e4444DF183F0531a77218AE",
+            "implementations": [
+              {
+                "address_hash": "0x41675C099F32341bf84BFc5382aF534df5C7461a",
+                "name": "Safe"
+              }
+            ],
+            "is_contract": true,
+            "is_scam": false,
+            "is_verified": true,
+            "metadata": null,
+            "name": null,
+            "private_tags": [],
+            "proxy_type": "master_copy",
+            "public_tags": [],
+            "reputation": "ok",
+            "watchlist_names": []
+          },
+          "topics": [
+            "0xbc7cd75a20ee27fd9adebab32041f755214dbc6bffa90cc0225b39da2e5c2d3b",
+            "0x000000000000000000000000c6845a5c768bf8d7681249f8927877efda425baf",
+            null,
+            null
+          ],
+          "transaction_hash": "0x669b9620bcaf8325765bb0256f4bb4a0f5a89ed8348b9912331589189edd2c4e"
+        }
+      ],
+      "next_page_params": null
+    }
+  ]
+}

@@ -29,9 +29,12 @@ def run(kind, source, output, abi_path, address, protocol="uniswap-v3", deployme
         raise ValueError('input and output directories must be separate, not nested')
     profile = None
     if protocol_config.get('requires_deployment'):
-        if abi_path != protocol_config['abi'].resolve():
-            raise ValueError('deployment-pinned protocols do not allow ABI overrides')
+        default_abi = protocol_config['abi'].resolve()
         profile = load_deployment(deployment or source / 'deployment.json', protocol_config, address)
+        protocol_config = load_protocol(protocol, profile)
+        if abi_path not in (default_abi, protocol_config['abi'].resolve()):
+            raise ValueError('deployment-pinned protocols do not allow ABI overrides')
+        abi_path = protocol_config['abi'].resolve()
     inputs = inventory(source)
     if profile and kind == 'state':
         settings = json.loads((source / 'extraction.json').read_text())

@@ -8,7 +8,7 @@ CONFIGS = {json.loads(path.read_text())['protocol']: path for path in ROOT.glob(
 PROTOCOLS = tuple(sorted(CONFIGS))
 
 
-def load_protocol(name):
+def load_protocol(name, deployment=None):
     if name not in CONFIGS:
         raise ValueError('Use ' + ', '.join(PROTOCOLS))
     path = CONFIGS[name]
@@ -16,6 +16,12 @@ def load_protocol(name):
     for key in ('abi', 'catalog'):
         if key in config:
             config[key] = path.parent / config[key]
+    if deployment and deployment.get("abi"):
+        abi = (path.parent / deployment["abi"]).resolve()
+        if path.parent.resolve() not in abi.parents:
+            raise ValueError("deployment ABI must be inside protocol directory")
+        config["abi"] = abi
+        config["schema_version"] = deployment["schema_version"]
     return config
 
 

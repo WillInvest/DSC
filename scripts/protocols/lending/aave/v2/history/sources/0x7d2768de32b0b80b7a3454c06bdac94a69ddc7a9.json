@@ -1,0 +1,339 @@
+{
+  "abi": [
+    {
+      "type": "constructor",
+      "inputs": [
+        {
+          "name": "admin",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "name": "Upgraded",
+      "type": "event",
+      "inputs": [
+        {
+          "name": "implementation",
+          "type": "address",
+          "indexed": true,
+          "internalType": "address"
+        }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "fallback",
+      "stateMutability": "payable"
+    },
+    {
+      "name": "admin",
+      "type": "function",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "name": "implementation",
+      "type": "function",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "name": "initialize",
+      "type": "function",
+      "inputs": [
+        {
+          "name": "_logic",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "_data",
+          "type": "bytes",
+          "internalType": "bytes"
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "payable"
+    },
+    {
+      "name": "upgradeTo",
+      "type": "function",
+      "inputs": [
+        {
+          "name": "newImplementation",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "name": "upgradeToAndCall",
+      "type": "function",
+      "inputs": [
+        {
+          "name": "newImplementation",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "data",
+          "type": "bytes",
+          "internalType": "bytes"
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "payable"
+    }
+  ],
+  "runtimeBytecode": {
+    "onchainBytecode": "0x60806040526004361061004a5760003560e01c80633659cfe6146100545780634f1ef286146100875780635c60da1b14610107578063d1f5789414610138578063f851a440146101ee575b610052610203565b005b34801561006057600080fd5b506100526004803603602081101561007757600080fd5b50356001600160a01b031661021d565b6100526004803603604081101561009d57600080fd5b6001600160a01b0382351691908101906040810160208201356401000000008111156100c857600080fd5b8201836020820111156100da57600080fd5b803590602001918460018302840111640100000000831117156100fc57600080fd5b509092509050610267565b34801561011357600080fd5b5061011c610324565b604080516001600160a01b039092168252519081900360200190f35b6100526004803603604081101561014e57600080fd5b6001600160a01b03823516919081019060408101602082013564010000000081111561017957600080fd5b82018360208201111561018b57600080fd5b803590602001918460018302840111640100000000831117156101ad57600080fd5b91908080601f016020809104026020016040519081016040528093929190818152602001838380828437600092019190915250929550610371945050505050565b3480156101fa57600080fd5b5061011c610451565b61020b6104ab565b61021b6102166104b3565b6104d8565b565b336001600160a01b037f000000000000000000000000b53c1a33016b2dc2ff3653530bff1848a515c8c516141561025c57610257816104fc565b610264565b610264610203565b50565b336001600160a01b037f000000000000000000000000b53c1a33016b2dc2ff3653530bff1848a515c8c5161415610317576102a1836104fc565b6000836001600160a01b031683836040518083838082843760405192019450600093509091505080830381855af49150503d80600081146102fe576040519150601f19603f3d011682016040523d82523d6000602084013e610303565b606091505b505090508061031157600080fd5b5061031f565b61031f610203565b505050565b6000336001600160a01b037f000000000000000000000000b53c1a33016b2dc2ff3653530bff1848a515c8c51614156103665761035f6104b3565b905061036e565b61036e610203565b90565b600061037b6104b3565b6001600160a01b03161461038e57600080fd5b6103978261053c565b80511561044d576000826001600160a01b0316826040518082805190602001908083835b602083106103da5780518252601f1990920191602091820191016103bb565b6001836020036101000a038019825116818451168082178552505050505050905001915050600060405180830381855af49150503d806000811461043a576040519150601f19603f3d011682016040523d82523d6000602084013e61043f565b606091505b505090508061031f57600080fd5b5050565b6000336001600160a01b037f000000000000000000000000b53c1a33016b2dc2ff3653530bff1848a515c8c516141561036657507f000000000000000000000000b53c1a33016b2dc2ff3653530bff1848a515c8c561036e565b61021b6105a4565b7f360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc5490565b3660008037600080366000845af43d6000803e8080156104f7573d6000f35b3d6000fd5b6105058161053c565b6040516001600160a01b038216907fbc7cd75a20ee27fd9adebab32041f755214dbc6bffa90cc0225b39da2e5c2d3b90600090a250565b61054581610614565b6105805760405162461bcd60e51b815260040180806020018281038252603b815260200180610683603b913960400191505060405180910390fd5b7f360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc55565b336001600160a01b037f000000000000000000000000b53c1a33016b2dc2ff3653530bff1848a515c8c516141561060c5760405162461bcd60e51b81526004018080602001828103825260328152602001806106516032913960400191505060405180910390fd5b61021b61021b565b6000813f7fc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a47081811480159061064857508115155b94935050505056fe43616e6e6f742063616c6c2066616c6c6261636b2066756e6374696f6e2066726f6d207468652070726f78792061646d696e43616e6e6f742073657420612070726f787920696d706c656d656e746174696f6e20746f2061206e6f6e2d636f6e74726163742061646472657373a2646970667358221220d2bb1664f8e88a49788d74ca9ce8fbe0ea4b9ee981435553ed807e63cd50ce0264736f6c634300060c0033"
+  },
+  "metadata": {
+    "compiler": {
+      "version": "0.6.12+commit.27d51765"
+    },
+    "language": "Solidity",
+    "output": {
+      "abi": [
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "admin",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "constructor"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "implementation",
+              "type": "address"
+            }
+          ],
+          "name": "Upgraded",
+          "type": "event"
+        },
+        {
+          "stateMutability": "payable",
+          "type": "fallback"
+        },
+        {
+          "inputs": [],
+          "name": "admin",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "implementation",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "_logic",
+              "type": "address"
+            },
+            {
+              "internalType": "bytes",
+              "name": "_data",
+              "type": "bytes"
+            }
+          ],
+          "name": "initialize",
+          "outputs": [],
+          "stateMutability": "payable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "newImplementation",
+              "type": "address"
+            }
+          ],
+          "name": "upgradeTo",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "newImplementation",
+              "type": "address"
+            },
+            {
+              "internalType": "bytes",
+              "name": "data",
+              "type": "bytes"
+            }
+          ],
+          "name": "upgradeToAndCall",
+          "outputs": [],
+          "stateMutability": "payable",
+          "type": "function"
+        }
+      ],
+      "devdoc": {
+        "details": "Extends BaseAdminUpgradeabilityProxy with an initializer function",
+        "kind": "dev",
+        "methods": {
+          "admin()": {
+            "returns": {
+              "_0": "The address of the proxy admin."
+            }
+          },
+          "implementation()": {
+            "returns": {
+              "_0": "The address of the implementation."
+            }
+          },
+          "initialize(address,bytes)": {
+            "details": "Contract initializer.",
+            "params": {
+              "_data": "Data to send as msg.data to the implementation to initialize the proxied contract. It should include the signature and the parameters of the function to be called, as described in https://solidity.readthedocs.io/en/v0.4.24/abi-spec.html#function-selector-and-argument-encoding. This parameter is optional, if no data is given the initialization call to proxied contract will be skipped.",
+              "_logic": "Address of the initial implementation."
+            }
+          },
+          "upgradeTo(address)": {
+            "details": "Upgrade the backing implementation of the proxy. Only the admin can call this function.",
+            "params": {
+              "newImplementation": "Address of the new implementation."
+            }
+          },
+          "upgradeToAndCall(address,bytes)": {
+            "details": "Upgrade the backing implementation of the proxy and call a function on the new implementation. This is useful to initialize the proxied contract.",
+            "params": {
+              "data": "Data to send as msg.data in the low level call. It should include the signature and the parameters of the function to be called, as described in https://solidity.readthedocs.io/en/v0.4.24/abi-spec.html#function-selector-and-argument-encoding.",
+              "newImplementation": "Address of the new implementation."
+            }
+          }
+        },
+        "title": "InitializableAdminUpgradeabilityProxy",
+        "version": 1
+      },
+      "userdoc": {
+        "kind": "user",
+        "methods": {},
+        "version": 1
+      }
+    },
+    "settings": {
+      "compilationTarget": {
+        "contracts/protocol/libraries/aave-upgradeability/InitializableImmutableAdminUpgradeabilityProxy.sol": "InitializableImmutableAdminUpgradeabilityProxy"
+      },
+      "evmVersion": "istanbul",
+      "libraries": {},
+      "metadata": {
+        "bytecodeHash": "ipfs"
+      },
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "remappings": []
+    },
+    "sources": {
+      "contracts/dependencies/openzeppelin/contracts/Address.sol": {
+        "keccak256": "0xb7f2cd193efe93976d7b473fc4fa27dda83bd4db5b81889cbcd4701f3b7023ae",
+        "license": "agpl-3.0",
+        "urls": [
+          "bzz-raw://2275632637acd2f30d576612dcddc1c6ba78d81af4d044fafe870e6a809a8b6e",
+          "dweb:/ipfs/QmW3uMzrLbjzP45zVpP8e9V6o8WFSceHiHq8WDMJ8YjCeL"
+        ]
+      },
+      "contracts/dependencies/openzeppelin/upgradeability/BaseUpgradeabilityProxy.sol": {
+        "keccak256": "0x75517e3bdd0a4f103f53237a19d1abffb39ff2a8ebad2792230c1f0f587f1bf5",
+        "license": "agpl-3.0",
+        "urls": [
+          "bzz-raw://35fd3205fbc046b63d017410d0c8f5b3182d0322ad55d442e8477913a282dbb8",
+          "dweb:/ipfs/QmUbA9cppTqiAnx9rkbXfnfpbEhCgN2PEck21DmSWEBPmw"
+        ]
+      },
+      "contracts/dependencies/openzeppelin/upgradeability/InitializableUpgradeabilityProxy.sol": {
+        "keccak256": "0x9a0b77e7d43d1515e36f4acf849481b7aba27e526e631c9dda707a7c89a4ccb7",
+        "license": "agpl-3.0",
+        "urls": [
+          "bzz-raw://0ec09f5f893734be3fa59f997b976d09efcc8354b05d0e53170cd33f85e52aae",
+          "dweb:/ipfs/QmQDxnkhnTCGno1BtQiHDvFAjPyvVd4EMyQbCtgEuiQrve"
+        ]
+      },
+      "contracts/dependencies/openzeppelin/upgradeability/Proxy.sol": {
+        "keccak256": "0xe2897855b94630fdf8e957692f3ceedbcd72db16bd0811d748329c3c99756926",
+        "license": "agpl-3.0",
+        "urls": [
+          "bzz-raw://318fcdaff3723fa2bd3b426c3ef3411cb12cdcbaf76b4131d7e77c5b416de5cf",
+          "dweb:/ipfs/QmcKKfY9PJzM7T3KYpNjhohXh6mGayGhcxK7ASwgAnzzXA"
+        ]
+      },
+      "contracts/protocol/libraries/aave-upgradeability/BaseImmutableAdminUpgradeabilityProxy.sol": {
+        "keccak256": "0xe1904d68e61d3e57217f3369dccc64886e8bc40ecc5124a99a439eb080118a28",
+        "license": "agpl-3.0",
+        "urls": [
+          "bzz-raw://7aa664d7a4744eb8266b13386bcde7f7886ade50ef632ec3b8eb96a450ef6a63",
+          "dweb:/ipfs/QmPW6YiM9ZiMbXFHNz6HCt9ZhLeiWYtFqGoMgYcQTPahZx"
+        ]
+      },
+      "contracts/protocol/libraries/aave-upgradeability/InitializableImmutableAdminUpgradeabilityProxy.sol": {
+        "keccak256": "0xbace2c18e58fdb57d0069ea63f3a4a64bffa098451313fd4a722f623aed6f9b3",
+        "license": "agpl-3.0",
+        "urls": [
+          "bzz-raw://5e8c1fdd2dc536497be88943682add25516dae7f7ca8510af8450a2a6868c97c",
+          "dweb:/ipfs/QmSZH9oepZiVn4gp6yrByPMe4msLAEcME5ULm7CrNGjXbF"
+        ]
+      }
+    },
+    "version": 1
+  },
+  "matchId": "2022333",
+  "creationMatch": "exact_match",
+  "runtimeMatch": "exact_match",
+  "verifiedAt": "2025-06-23T02:27:26Z",
+  "match": "exact_match",
+  "chainId": "1",
+  "address": "0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9"
+}

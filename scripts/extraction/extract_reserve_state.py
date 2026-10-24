@@ -61,6 +61,7 @@ def main():
     if config['state_mode'] != 'reserves':
         parser.error('protocol does not use reserve discovery')
     profile = load_deployment(args.deployment, config, args.address)
+    config = load_protocol(args.protocol, profile)
     output = Path(os.environ.get('OUTPUT_DIR', f'/home/node/dsc-extraction/data/{args.protocol}/{args.address.lower()}/state-raw'))
     w3 = Web3(Web3.HTTPProvider(os.environ.get('ETH_RPC_URL', 'http://127.0.0.1:8545'), request_kwargs={'timeout': 60}))
     extract(config, args.address, args.blocks, output, profile, w3)

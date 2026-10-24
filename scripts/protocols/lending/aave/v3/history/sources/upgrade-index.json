@@ -1,0 +1,1137 @@
+{
+  "url": "https://eth.blockscout.com/api/v2/addresses/0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2/logs",
+  "start": 16291127,
+  "stop": 26259812,
+  "pages": [
+    {
+      "items": [
+        {
+          "address": {
+            "ens_domain_name": null,
+            "hash": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
+            "implementations": [
+              {
+                "address_hash": "0x728a138A4823392C2EFA55e028d434F526fE03CF",
+                "name": "PoolInstance"
+              }
+            ],
+            "is_contract": true,
+            "is_scam": false,
+            "is_verified": true,
+            "metadata": {
+              "tags": [
+                {
+                  "meta": {
+                    "tooltipUrl": "https://aave.com/"
+                  },
+                  "name": "Aave: Pool V3",
+                  "ordinal": 10,
+                  "slug": "aave-pool-v3",
+                  "tagType": "name"
+                },
+                {
+                  "meta": {
+                    "projectName": "Aave V3",
+                    "tagIcon ": "https://blockscout-icons.s3.us-east-1.amazonaws.com/OLI_tag_logo.svg",
+                    "tagUrl": "https://scout-app.kleros.io/single-tags/0x9058d6ea300e1dd6b300ecdabb653dda43dabcca5810f92b1e344dec112f8f4e",
+                    "textColor": "#C163D4",
+                    "tooltipAttribution": "https://www.openlabelsinitiative.org?utm_source=blockscout",
+                    "tooltipAttributionIcon": "https://blockscout-icons.s3.us-east-1.amazonaws.com/OLI_tag_logo.svg",
+                    "tooltipDescription": "Aave V3's official Pool Proxy contract",
+                    "tooltipUrl": "https://aave.com/",
+                    "verifiedDomains": [
+                      "app.aave.com"
+                    ]
+                  },
+                  "name": "Pool Proxy",
+                  "ordinal": 10,
+                  "slug": "pool-proxy-1",
+                  "tagType": "name"
+                },
+                {
+                  "meta": {},
+                  "name": "DeFi",
+                  "ordinal": 0,
+                  "slug": "defi",
+                  "tagType": "generic"
+                },
+                {
+                  "meta": {
+                    "appActionButtonText": "Aave",
+                    "appID": "aave"
+                  },
+                  "name": "Aave",
+                  "ordinal": 0,
+                  "slug": "aave",
+                  "tagType": "protocol"
+                }
+              ]
+            },
+            "name": "InitializableImmutableAdminUpgradeabilityProxy",
+            "private_tags": [],
+            "proxy_type": "eip1967",
+            "public_tags": [],
+            "reputation": "ok",
+            "watchlist_names": []
+          },
+          "block_hash": "0x35eca1fe76611d0ab4116bc0df57acf702e39ff750de0ae07df15122171560e6",
+          "block_number": 25199939,
+          "block_timestamp": "2026-05-29T08:50:47.000000Z",
+          "data": "0x",
+          "decoded": {
+            "method_call": "Upgraded(address indexed implementation)",
+            "method_id": "bc7cd75a",
+            "parameters": [
+              {
+                "indexed": true,
+                "name": "implementation",
+                "type": "address",
+                "value": "0x728a138A4823392C2EFA55e028d434F526fE03CF"
+              }
+            ]
+          },
+          "index": 1041,
+          "smart_contract": {
+            "ens_domain_name": null,
+            "hash": "0xdAbad81aF85554E9ae636395611C58F7eC1aAEc5",
+            "implementations": [
+              {
+                "address_hash": "0x7222182cB9c5320587b5148BF03eeE107AD64578",
+                "name": "PayloadsController"
+              }
+            ],
+            "is_contract": true,
+            "is_scam": false,
+            "is_verified": true,
+            "metadata": null,
+            "name": null,
+            "private_tags": [],
+            "proxy_type": "eip1967",
+            "public_tags": [],
+            "reputation": "ok",
+            "watchlist_names": []
+          },
+          "topics": [
+            "0xbc7cd75a20ee27fd9adebab32041f755214dbc6bffa90cc0225b39da2e5c2d3b",
+            "0x000000000000000000000000728a138a4823392c2efa55e028d434f526fe03cf",
+            null,
+            null
+          ],
+          "transaction_hash": "0xe9949c36e86fc9f481897dbac8de33d655bff20b267955a303e2e5643fbc2b35"
+        },
+        {
+          "address": {
+            "ens_domain_name": null,
+            "hash": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
+            "implementations": [
+              {
+                "address_hash": "0x728a138A4823392C2EFA55e028d434F526fE03CF",
+                "name": "PoolInstance"
+              }
+            ],
+            "is_contract": true,
+            "is_scam": false,
+            "is_verified": true,
+            "metadata": {
+              "tags": [
+                {
+                  "meta": {
+                    "tooltipUrl": "https://aave.com/"
+                  },
+                  "name": "Aave: Pool V3",
+                  "ordinal": 10,
+                  "slug": "aave-pool-v3",
+                  "tagType": "name"
+                },
+                {
+                  "meta": {
+                    "projectName": "Aave V3",
+                    "tagIcon ": "https://blockscout-icons.s3.us-east-1.amazonaws.com/OLI_tag_logo.svg",
+                    "tagUrl": "https://scout-app.kleros.io/single-tags/0x9058d6ea300e1dd6b300ecdabb653dda43dabcca5810f92b1e344dec112f8f4e",
+                    "textColor": "#C163D4",
+                    "tooltipAttribution": "https://www.openlabelsinitiative.org?utm_source=blockscout",
+                    "tooltipAttributionIcon": "https://blockscout-icons.s3.us-east-1.amazonaws.com/OLI_tag_logo.svg",
+                    "tooltipDescription": "Aave V3's official Pool Proxy contract",
+                    "tooltipUrl": "https://aave.com/",
+                    "verifiedDomains": [
+                      "app.aave.com"
+                    ]
+                  },
+                  "name": "Pool Proxy",
+                  "ordinal": 10,
+                  "slug": "pool-proxy-1",
+                  "tagType": "name"
+                },
+                {
+                  "meta": {},
+                  "name": "DeFi",
+                  "ordinal": 0,
+                  "slug": "defi",
+                  "tagType": "generic"
+                },
+                {
+                  "meta": {
+                    "appActionButtonText": "Aave",
+                    "appID": "aave"
+                  },
+                  "name": "Aave",
+                  "ordinal": 0,
+                  "slug": "aave",
+                  "tagType": "protocol"
+                }
+              ]
+            },
+            "name": "InitializableImmutableAdminUpgradeabilityProxy",
+            "private_tags": [],
+            "proxy_type": "eip1967",
+            "public_tags": [],
+            "reputation": "ok",
+            "watchlist_names": []
+          },
+          "block_hash": "0xd5088efe6541a8447f4a6d78b9d3372599b2dfaa80962e52c27df52de1132a77",
+          "block_number": 24247927,
+          "block_timestamp": "2026-01-16T14:36:11.000000Z",
+          "data": "0x",
+          "decoded": {
+            "method_call": "Upgraded(address indexed implementation)",
+            "method_id": "bc7cd75a",
+            "parameters": [
+              {
+                "indexed": true,
+                "name": "implementation",
+                "type": "address",
+                "value": "0x8147b99DF7672A21809c9093E6F6CE1a60F119Bd"
+              }
+            ]
+          },
+          "index": 123,
+          "smart_contract": {
+            "ens_domain_name": null,
+            "hash": "0xdAbad81aF85554E9ae636395611C58F7eC1aAEc5",
+            "implementations": [
+              {
+                "address_hash": "0x7222182cB9c5320587b5148BF03eeE107AD64578",
+                "name": "PayloadsController"
+              }
+            ],
+            "is_contract": true,
+            "is_scam": false,
+            "is_verified": true,
+            "metadata": null,
+            "name": null,
+            "private_tags": [],
+            "proxy_type": "eip1967",
+            "public_tags": [],
+            "reputation": "ok",
+            "watchlist_names": []
+          },
+          "topics": [
+            "0xbc7cd75a20ee27fd9adebab32041f755214dbc6bffa90cc0225b39da2e5c2d3b",
+            "0x0000000000000000000000008147b99df7672a21809c9093e6f6ce1a60f119bd",
+            null,
+            null
+          ],
+          "transaction_hash": "0x675614a89363292b6e21adb878b830ff1987bee5e33ba9c34021a14a93b89b3f"
+        },
+        {
+          "address": {
+            "ens_domain_name": null,
+            "hash": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
+            "implementations": [
+              {
+                "address_hash": "0x728a138A4823392C2EFA55e028d434F526fE03CF",
+                "name": "PoolInstance"
+              }
+            ],
+            "is_contract": true,
+            "is_scam": false,
+            "is_verified": true,
+            "metadata": {
+              "tags": [
+                {
+                  "meta": {
+                    "tooltipUrl": "https://aave.com/"
+                  },
+                  "name": "Aave: Pool V3",
+                  "ordinal": 10,
+                  "slug": "aave-pool-v3",
+                  "tagType": "name"
+                },
+                {
+                  "meta": {
+                    "projectName": "Aave V3",
+                    "tagIcon ": "https://blockscout-icons.s3.us-east-1.amazonaws.com/OLI_tag_logo.svg",
+                    "tagUrl": "https://scout-app.kleros.io/single-tags/0x9058d6ea300e1dd6b300ecdabb653dda43dabcca5810f92b1e344dec112f8f4e",
+                    "textColor": "#C163D4",
+                    "tooltipAttribution": "https://www.openlabelsinitiative.org?utm_source=blockscout",
+                    "tooltipAttributionIcon": "https://blockscout-icons.s3.us-east-1.amazonaws.com/OLI_tag_logo.svg",
+                    "tooltipDescription": "Aave V3's official Pool Proxy contract",
+                    "tooltipUrl": "https://aave.com/",
+                    "verifiedDomains": [
+                      "app.aave.com"
+                    ]
+                  },
+                  "name": "Pool Proxy",
+                  "ordinal": 10,
+                  "slug": "pool-proxy-1",
+                  "tagType": "name"
+                },
+                {
+                  "meta": {},
+                  "name": "DeFi",
+                  "ordinal": 0,
+                  "slug": "defi",
+                  "tagType": "generic"
+                },
+                {
+                  "meta": {
+                    "appActionButtonText": "Aave",
+                    "appID": "aave"
+                  },
+                  "name": "Aave",
+                  "ordinal": 0,
+                  "slug": "aave",
+                  "tagType": "protocol"
+                }
+              ]
+            },
+            "name": "InitializableImmutableAdminUpgradeabilityProxy",
+            "private_tags": [],
+            "proxy_type": "eip1967",
+            "public_tags": [],
+            "reputation": "ok",
+            "watchlist_names": []
+          },
+          "block_hash": "0xc698c93cdbe7ab12221088ec36e9ee86f85e11048876814b84cb0a5d558d3314",
+          "block_number": 23088584,
+          "block_timestamp": "2025-08-07T10:27:23.000000Z",
+          "data": "0x",
+          "decoded": {
+            "method_call": "Upgraded(address indexed implementation)",
+            "method_id": "bc7cd75a",
+            "parameters": [
+              {
+                "indexed": true,
+                "name": "implementation",
+                "type": "address",
+                "value": "0x97287a4F35E583D924f78AD88DB8AFcE1379189A"
+              }
+            ]
+          },
+          "index": 180,
+          "smart_contract": {
+            "ens_domain_name": null,
+            "hash": "0xdAbad81aF85554E9ae636395611C58F7eC1aAEc5",
+            "implementations": [
+              {
+                "address_hash": "0x7222182cB9c5320587b5148BF03eeE107AD64578",
+                "name": "PayloadsController"
+              }
+            ],
+            "is_contract": true,
+            "is_scam": false,
+            "is_verified": true,
+            "metadata": null,
+            "name": null,
+            "private_tags": [],
+            "proxy_type": "eip1967",
+            "public_tags": [],
+            "reputation": "ok",
+            "watchlist_names": []
+          },
+          "topics": [
+            "0xbc7cd75a20ee27fd9adebab32041f755214dbc6bffa90cc0225b39da2e5c2d3b",
+            "0x00000000000000000000000097287a4f35e583d924f78ad88db8afce1379189a",
+            null,
+            null
+          ],
+          "transaction_hash": "0xa17567fa201a78b66c43e6ab178559f8c1d5d308fe944c0bd2c39b5e585097dc"
+        },
+        {
+          "address": {
+            "ens_domain_name": null,
+            "hash": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
+            "implementations": [
+              {
+                "address_hash": "0x728a138A4823392C2EFA55e028d434F526fE03CF",
+                "name": "PoolInstance"
+              }
+            ],
+            "is_contract": true,
+            "is_scam": false,
+            "is_verified": true,
+            "metadata": {
+              "tags": [
+                {
+                  "meta": {
+                    "tooltipUrl": "https://aave.com/"
+                  },
+                  "name": "Aave: Pool V3",
+                  "ordinal": 10,
+                  "slug": "aave-pool-v3",
+                  "tagType": "name"
+                },
+                {
+                  "meta": {
+                    "projectName": "Aave V3",
+                    "tagIcon ": "https://blockscout-icons.s3.us-east-1.amazonaws.com/OLI_tag_logo.svg",
+                    "tagUrl": "https://scout-app.kleros.io/single-tags/0x9058d6ea300e1dd6b300ecdabb653dda43dabcca5810f92b1e344dec112f8f4e",
+                    "textColor": "#C163D4",
+                    "tooltipAttribution": "https://www.openlabelsinitiative.org?utm_source=blockscout",
+                    "tooltipAttributionIcon": "https://blockscout-icons.s3.us-east-1.amazonaws.com/OLI_tag_logo.svg",
+                    "tooltipDescription": "Aave V3's official Pool Proxy contract",
+                    "tooltipUrl": "https://aave.com/",
+                    "verifiedDomains": [
+                      "app.aave.com"
+                    ]
+                  },
+                  "name": "Pool Proxy",
+                  "ordinal": 10,
+                  "slug": "pool-proxy-1",
+                  "tagType": "name"
+                },
+                {
+                  "meta": {},
+                  "name": "DeFi",
+                  "ordinal": 0,
+                  "slug": "defi",
+                  "tagType": "generic"
+                },
+                {
+                  "meta": {
+                    "appActionButtonText": "Aave",
+                    "appID": "aave"
+                  },
+                  "name": "Aave",
+                  "ordinal": 0,
+                  "slug": "aave",
+                  "tagType": "protocol"
+                }
+              ]
+            },
+            "name": "InitializableImmutableAdminUpgradeabilityProxy",
+            "private_tags": [],
+            "proxy_type": "eip1967",
+            "public_tags": [],
+            "reputation": "ok",
+            "watchlist_names": []
+          },
+          "block_hash": "0xbf7b6ae562060883f3a8f92a62cf072d94e80e4862de02c5bd31c98dbd236120",
+          "block_number": 22839362,
+          "block_timestamp": "2025-07-03T14:42:23.000000Z",
+          "data": "0x",
+          "decoded": {
+            "method_call": "Upgraded(address indexed implementation)",
+            "method_id": "bc7cd75a",
+            "parameters": [
+              {
+                "indexed": true,
+                "name": "implementation",
+                "type": "address",
+                "value": "0x947f0054fAEd3481FF4e76CA35f12fbE36cc665B"
+              }
+            ]
+          },
+          "index": 179,
+          "smart_contract": {
+            "ens_domain_name": null,
+            "hash": "0xdAbad81aF85554E9ae636395611C58F7eC1aAEc5",
+            "implementations": [
+              {
+                "address_hash": "0x7222182cB9c5320587b5148BF03eeE107AD64578",
+                "name": "PayloadsController"
+              }
+            ],
+            "is_contract": true,
+            "is_scam": false,
+            "is_verified": true,
+            "metadata": null,
+            "name": null,
+            "private_tags": [],
+            "proxy_type": "eip1967",
+            "public_tags": [],
+            "reputation": "ok",
+            "watchlist_names": []
+          },
+          "topics": [
+            "0xbc7cd75a20ee27fd9adebab32041f755214dbc6bffa90cc0225b39da2e5c2d3b",
+            "0x000000000000000000000000947f0054faed3481ff4e76ca35f12fbe36cc665b",
+            null,
+            null
+          ],
+          "transaction_hash": "0x6f45f51fa5dd0246298f2e6284c43e0c57ef5e6b646ee1dfcd67f3f4f11dacd9"
+        },
+        {
+          "address": {
+            "ens_domain_name": null,
+            "hash": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
+            "implementations": [
+              {
+                "address_hash": "0x728a138A4823392C2EFA55e028d434F526fE03CF",
+                "name": "PoolInstance"
+              }
+            ],
+            "is_contract": true,
+            "is_scam": false,
+            "is_verified": true,
+            "metadata": {
+              "tags": [
+                {
+                  "meta": {
+                    "tooltipUrl": "https://aave.com/"
+                  },
+                  "name": "Aave: Pool V3",
+                  "ordinal": 10,
+                  "slug": "aave-pool-v3",
+                  "tagType": "name"
+                },
+                {
+                  "meta": {
+                    "projectName": "Aave V3",
+                    "tagIcon ": "https://blockscout-icons.s3.us-east-1.amazonaws.com/OLI_tag_logo.svg",
+                    "tagUrl": "https://scout-app.kleros.io/single-tags/0x9058d6ea300e1dd6b300ecdabb653dda43dabcca5810f92b1e344dec112f8f4e",
+                    "textColor": "#C163D4",
+                    "tooltipAttribution": "https://www.openlabelsinitiative.org?utm_source=blockscout",
+                    "tooltipAttributionIcon": "https://blockscout-icons.s3.us-east-1.amazonaws.com/OLI_tag_logo.svg",
+                    "tooltipDescription": "Aave V3's official Pool Proxy contract",
+                    "tooltipUrl": "https://aave.com/",
+                    "verifiedDomains": [
+                      "app.aave.com"
+                    ]
+                  },
+                  "name": "Pool Proxy",
+                  "ordinal": 10,
+                  "slug": "pool-proxy-1",
+                  "tagType": "name"
+                },
+                {
+                  "meta": {},
+                  "name": "DeFi",
+                  "ordinal": 0,
+                  "slug": "defi",
+                  "tagType": "generic"
+                },
+                {
+                  "meta": {
+                    "appActionButtonText": "Aave",
+                    "appID": "aave"
+                  },
+                  "name": "Aave",
+                  "ordinal": 0,
+                  "slug": "aave",
+                  "tagType": "protocol"
+                }
+              ]
+            },
+            "name": "InitializableImmutableAdminUpgradeabilityProxy",
+            "private_tags": [],
+            "proxy_type": "eip1967",
+            "public_tags": [],
+            "reputation": "ok",
+            "watchlist_names": []
+          },
+          "block_hash": "0x08125259f669820a7162853f4963e357e88799c05926299b6d57963f31b407ef",
+          "block_number": 21917056,
+          "block_timestamp": "2025-02-24T15:23:59.000000Z",
+          "data": "0x",
+          "decoded": {
+            "method_call": "Upgraded(address indexed implementation)",
+            "method_id": "bc7cd75a",
+            "parameters": [
+              {
+                "indexed": true,
+                "name": "implementation",
+                "type": "address",
+                "value": "0x9aEb8aAA1cA38634Aa8C0c8933E7fB4D61091327"
+              }
+            ]
+          },
+          "index": 4,
+          "smart_contract": {
+            "ens_domain_name": null,
+            "hash": "0x6593c7De001fC8542bB1703532EE1E5aA0D458fD",
+            "implementations": [],
+            "is_contract": true,
+            "is_scam": false,
+            "is_verified": true,
+            "metadata": null,
+            "name": null,
+            "private_tags": [],
+            "proxy_type": null,
+            "public_tags": [],
+            "reputation": "ok",
+            "watchlist_names": []
+          },
+          "topics": [
+            "0xbc7cd75a20ee27fd9adebab32041f755214dbc6bffa90cc0225b39da2e5c2d3b",
+            "0x0000000000000000000000009aeb8aaa1ca38634aa8c0c8933e7fb4d61091327",
+            null,
+            null
+          ],
+          "transaction_hash": "0x8e51d324a562bf6ad767f10bff457e310d5b89f76482bc68c05e977ad4c5100b"
+        },
+        {
+          "address": {
+            "ens_domain_name": null,
+            "hash": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
+            "implementations": [
+              {
+                "address_hash": "0x728a138A4823392C2EFA55e028d434F526fE03CF",
+                "name": "PoolInstance"
+              }
+            ],
+            "is_contract": true,
+            "is_scam": false,
+            "is_verified": true,
+            "metadata": {
+              "tags": [
+                {
+                  "meta": {
+                    "tooltipUrl": "https://aave.com/"
+                  },
+                  "name": "Aave: Pool V3",
+                  "ordinal": 10,
+                  "slug": "aave-pool-v3",
+                  "tagType": "name"
+                },
+                {
+                  "meta": {
+                    "projectName": "Aave V3",
+                    "tagIcon ": "https://blockscout-icons.s3.us-east-1.amazonaws.com/OLI_tag_logo.svg",
+                    "tagUrl": "https://scout-app.kleros.io/single-tags/0x9058d6ea300e1dd6b300ecdabb653dda43dabcca5810f92b1e344dec112f8f4e",
+                    "textColor": "#C163D4",
+                    "tooltipAttribution": "https://www.openlabelsinitiative.org?utm_source=blockscout",
+                    "tooltipAttributionIcon": "https://blockscout-icons.s3.us-east-1.amazonaws.com/OLI_tag_logo.svg",
+                    "tooltipDescription": "Aave V3's official Pool Proxy contract",
+                    "tooltipUrl": "https://aave.com/",
+                    "verifiedDomains": [
+                      "app.aave.com"
+                    ]
+                  },
+                  "name": "Pool Proxy",
+                  "ordinal": 10,
+                  "slug": "pool-proxy-1",
+                  "tagType": "name"
+                },
+                {
+                  "meta": {},
+                  "name": "DeFi",
+                  "ordinal": 0,
+                  "slug": "defi",
+                  "tagType": "generic"
+                },
+                {
+                  "meta": {
+                    "appActionButtonText": "Aave",
+                    "appID": "aave"
+                  },
+                  "name": "Aave",
+                  "ordinal": 0,
+                  "slug": "aave",
+                  "tagType": "protocol"
+                }
+              ]
+            },
+            "name": "InitializableImmutableAdminUpgradeabilityProxy",
+            "private_tags": [],
+            "proxy_type": "eip1967",
+            "public_tags": [],
+            "reputation": "ok",
+            "watchlist_names": []
+          },
+          "block_hash": "0x1968fb7314b1f92dfe2c6894c6c9b55457a4e65efdc96c8e329cf1ecffc2ed5e",
+          "block_number": 20977092,
+          "block_timestamp": "2024-10-16T09:00:59.000000Z",
+          "data": "0x",
+          "decoded": {
+            "method_call": "Upgraded(address indexed implementation)",
+            "method_id": "bc7cd75a",
+            "parameters": [
+              {
+                "indexed": true,
+                "name": "implementation",
+                "type": "address",
+                "value": "0xeF434E4573b90b6ECd4a00f4888381e4D0CC5Ccd"
+              }
+            ]
+          },
+          "index": 57,
+          "smart_contract": {
+            "ens_domain_name": null,
+            "hash": "0x6593c7De001fC8542bB1703532EE1E5aA0D458fD",
+            "implementations": [],
+            "is_contract": true,
+            "is_scam": false,
+            "is_verified": true,
+            "metadata": null,
+            "name": null,
+            "private_tags": [],
+            "proxy_type": null,
+            "public_tags": [],
+            "reputation": "ok",
+            "watchlist_names": []
+          },
+          "topics": [
+            "0xbc7cd75a20ee27fd9adebab32041f755214dbc6bffa90cc0225b39da2e5c2d3b",
+            "0x000000000000000000000000ef434e4573b90b6ecd4a00f4888381e4d0cc5ccd",
+            null,
+            null
+          ],
+          "transaction_hash": "0x201ee5baadd6b86834fa16ed403c8a8227e8de2c6b914607757c2582fbe45ea0"
+        },
+        {
+          "address": {
+            "ens_domain_name": null,
+            "hash": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
+            "implementations": [
+              {
+                "address_hash": "0x728a138A4823392C2EFA55e028d434F526fE03CF",
+                "name": "PoolInstance"
+              }
+            ],
+            "is_contract": true,
+            "is_scam": false,
+            "is_verified": true,
+            "metadata": {
+              "tags": [
+                {
+                  "meta": {
+                    "tooltipUrl": "https://aave.com/"
+                  },
+                  "name": "Aave: Pool V3",
+                  "ordinal": 10,
+                  "slug": "aave-pool-v3",
+                  "tagType": "name"
+                },
+                {
+                  "meta": {
+                    "projectName": "Aave V3",
+                    "tagIcon ": "https://blockscout-icons.s3.us-east-1.amazonaws.com/OLI_tag_logo.svg",
+                    "tagUrl": "https://scout-app.kleros.io/single-tags/0x9058d6ea300e1dd6b300ecdabb653dda43dabcca5810f92b1e344dec112f8f4e",
+                    "textColor": "#C163D4",
+                    "tooltipAttribution": "https://www.openlabelsinitiative.org?utm_source=blockscout",
+                    "tooltipAttributionIcon": "https://blockscout-icons.s3.us-east-1.amazonaws.com/OLI_tag_logo.svg",
+                    "tooltipDescription": "Aave V3's official Pool Proxy contract",
+                    "tooltipUrl": "https://aave.com/",
+                    "verifiedDomains": [
+                      "app.aave.com"
+                    ]
+                  },
+                  "name": "Pool Proxy",
+                  "ordinal": 10,
+                  "slug": "pool-proxy-1",
+                  "tagType": "name"
+                },
+                {
+                  "meta": {},
+                  "name": "DeFi",
+                  "ordinal": 0,
+                  "slug": "defi",
+                  "tagType": "generic"
+                },
+                {
+                  "meta": {
+                    "appActionButtonText": "Aave",
+                    "appID": "aave"
+                  },
+                  "name": "Aave",
+                  "ordinal": 0,
+                  "slug": "aave",
+                  "tagType": "protocol"
+                }
+              ]
+            },
+            "name": "InitializableImmutableAdminUpgradeabilityProxy",
+            "private_tags": [],
+            "proxy_type": "eip1967",
+            "public_tags": [],
+            "reputation": "ok",
+            "watchlist_names": []
+          },
+          "block_hash": "0x634a450c714587a12d6a9ea3d30375edbe17aae3eec6a998893bbe03d6d6fca5",
+          "block_number": 20920979,
+          "block_timestamp": "2024-10-08T12:52:23.000000Z",
+          "data": "0x",
+          "decoded": {
+            "method_call": "Upgraded(address indexed implementation)",
+            "method_id": "bc7cd75a",
+            "parameters": [
+              {
+                "indexed": true,
+                "name": "implementation",
+                "type": "address",
+                "value": "0x1f64488c2C4686771dafA75915274d27878B667a"
+              }
+            ]
+          },
+          "index": 112,
+          "smart_contract": {
+            "ens_domain_name": null,
+            "hash": "0xdAbad81aF85554E9ae636395611C58F7eC1aAEc5",
+            "implementations": [
+              {
+                "address_hash": "0x7222182cB9c5320587b5148BF03eeE107AD64578",
+                "name": "PayloadsController"
+              }
+            ],
+            "is_contract": true,
+            "is_scam": false,
+            "is_verified": true,
+            "metadata": null,
+            "name": null,
+            "private_tags": [],
+            "proxy_type": "eip1967",
+            "public_tags": [],
+            "reputation": "ok",
+            "watchlist_names": []
+          },
+          "topics": [
+            "0xbc7cd75a20ee27fd9adebab32041f755214dbc6bffa90cc0225b39da2e5c2d3b",
+            "0x0000000000000000000000001f64488c2c4686771dafa75915274d27878b667a",
+            null,
+            null
+          ],
+          "transaction_hash": "0xefcf3c57b91d919da3f2e7e8d6af041d9cb5c1a4b58e913ebc9aaeba238947eb"
+        },
+        {
+          "address": {
+            "ens_domain_name": null,
+            "hash": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
+            "implementations": [
+              {
+                "address_hash": "0x728a138A4823392C2EFA55e028d434F526fE03CF",
+                "name": "PoolInstance"
+              }
+            ],
+            "is_contract": true,
+            "is_scam": false,
+            "is_verified": true,
+            "metadata": {
+              "tags": [
+                {
+                  "meta": {
+                    "tooltipUrl": "https://aave.com/"
+                  },
+                  "name": "Aave: Pool V3",
+                  "ordinal": 10,
+                  "slug": "aave-pool-v3",
+                  "tagType": "name"
+                },
+                {
+                  "meta": {
+                    "projectName": "Aave V3",
+                    "tagIcon ": "https://blockscout-icons.s3.us-east-1.amazonaws.com/OLI_tag_logo.svg",
+                    "tagUrl": "https://scout-app.kleros.io/single-tags/0x9058d6ea300e1dd6b300ecdabb653dda43dabcca5810f92b1e344dec112f8f4e",
+                    "textColor": "#C163D4",
+                    "tooltipAttribution": "https://www.openlabelsinitiative.org?utm_source=blockscout",
+                    "tooltipAttributionIcon": "https://blockscout-icons.s3.us-east-1.amazonaws.com/OLI_tag_logo.svg",
+                    "tooltipDescription": "Aave V3's official Pool Proxy contract",
+                    "tooltipUrl": "https://aave.com/",
+                    "verifiedDomains": [
+                      "app.aave.com"
+                    ]
+                  },
+                  "name": "Pool Proxy",
+                  "ordinal": 10,
+                  "slug": "pool-proxy-1",
+                  "tagType": "name"
+                },
+                {
+                  "meta": {},
+                  "name": "DeFi",
+                  "ordinal": 0,
+                  "slug": "defi",
+                  "tagType": "generic"
+                },
+                {
+                  "meta": {
+                    "appActionButtonText": "Aave",
+                    "appID": "aave"
+                  },
+                  "name": "Aave",
+                  "ordinal": 0,
+                  "slug": "aave",
+                  "tagType": "protocol"
+                }
+              ]
+            },
+            "name": "InitializableImmutableAdminUpgradeabilityProxy",
+            "private_tags": [],
+            "proxy_type": "eip1967",
+            "public_tags": [],
+            "reputation": "ok",
+            "watchlist_names": []
+          },
+          "block_hash": "0x48fef4fc63d4b344e0f8ee8c8a729d511c2e11882b4325a369fccf857003e863",
+          "block_number": 20398674,
+          "block_timestamp": "2024-07-27T15:06:35.000000Z",
+          "data": "0x",
+          "decoded": {
+            "method_call": "Upgraded(address indexed implementation)",
+            "method_id": "bc7cd75a",
+            "parameters": [
+              {
+                "indexed": true,
+                "name": "implementation",
+                "type": "address",
+                "value": "0x34339f94350EC5274ea44d0C37DAe9e968c44081"
+              }
+            ]
+          },
+          "index": 9,
+          "smart_contract": {
+            "ens_domain_name": null,
+            "hash": "0xdAbad81aF85554E9ae636395611C58F7eC1aAEc5",
+            "implementations": [
+              {
+                "address_hash": "0x7222182cB9c5320587b5148BF03eeE107AD64578",
+                "name": "PayloadsController"
+              }
+            ],
+            "is_contract": true,
+            "is_scam": false,
+            "is_verified": true,
+            "metadata": null,
+            "name": null,
+            "private_tags": [],
+            "proxy_type": "eip1967",
+            "public_tags": [],
+            "reputation": "ok",
+            "watchlist_names": []
+          },
+          "topics": [
+            "0xbc7cd75a20ee27fd9adebab32041f755214dbc6bffa90cc0225b39da2e5c2d3b",
+            "0x00000000000000000000000034339f94350ec5274ea44d0c37dae9e968c44081",
+            null,
+            null
+          ],
+          "transaction_hash": "0x65b6eb75203176f6ee38823219f4e46c0d1c56230dfb82d98964c089fc3ef174"
+        },
+        {
+          "address": {
+            "ens_domain_name": null,
+            "hash": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
+            "implementations": [
+              {
+                "address_hash": "0x728a138A4823392C2EFA55e028d434F526fE03CF",
+                "name": "PoolInstance"
+              }
+            ],
+            "is_contract": true,
+            "is_scam": false,
+            "is_verified": true,
+            "metadata": {
+              "tags": [
+                {
+                  "meta": {
+                    "tooltipUrl": "https://aave.com/"
+                  },
+                  "name": "Aave: Pool V3",
+                  "ordinal": 10,
+                  "slug": "aave-pool-v3",
+                  "tagType": "name"
+                },
+                {
+                  "meta": {
+                    "projectName": "Aave V3",
+                    "tagIcon ": "https://blockscout-icons.s3.us-east-1.amazonaws.com/OLI_tag_logo.svg",
+                    "tagUrl": "https://scout-app.kleros.io/single-tags/0x9058d6ea300e1dd6b300ecdabb653dda43dabcca5810f92b1e344dec112f8f4e",
+                    "textColor": "#C163D4",
+                    "tooltipAttribution": "https://www.openlabelsinitiative.org?utm_source=blockscout",
+                    "tooltipAttributionIcon": "https://blockscout-icons.s3.us-east-1.amazonaws.com/OLI_tag_logo.svg",
+                    "tooltipDescription": "Aave V3's official Pool Proxy contract",
+                    "tooltipUrl": "https://aave.com/",
+                    "verifiedDomains": [
+                      "app.aave.com"
+                    ]
+                  },
+                  "name": "Pool Proxy",
+                  "ordinal": 10,
+                  "slug": "pool-proxy-1",
+                  "tagType": "name"
+                },
+                {
+                  "meta": {},
+                  "name": "DeFi",
+                  "ordinal": 0,
+                  "slug": "defi",
+                  "tagType": "generic"
+                },
+                {
+                  "meta": {
+                    "appActionButtonText": "Aave",
+                    "appID": "aave"
+                  },
+                  "name": "Aave",
+                  "ordinal": 0,
+                  "slug": "aave",
+                  "tagType": "protocol"
+                }
+              ]
+            },
+            "name": "InitializableImmutableAdminUpgradeabilityProxy",
+            "private_tags": [],
+            "proxy_type": "eip1967",
+            "public_tags": [],
+            "reputation": "ok",
+            "watchlist_names": []
+          },
+          "block_hash": "0xc510814e4f88b243dc575654ac2b771f64f32010bbe7a4bc076c3c9284564a0d",
+          "block_number": 18979695,
+          "block_timestamp": "2024-01-10T23:02:59.000000Z",
+          "data": "0x",
+          "decoded": {
+            "method_call": "Upgraded(address indexed implementation)",
+            "method_id": "bc7cd75a",
+            "parameters": [
+              {
+                "indexed": true,
+                "name": "implementation",
+                "type": "address",
+                "value": "0x5FAab9E1adbddaD0a08734BE8a52185Fd6558E14"
+              }
+            ]
+          },
+          "index": 226,
+          "smart_contract": {
+            "ens_domain_name": null,
+            "hash": "0xdAbad81aF85554E9ae636395611C58F7eC1aAEc5",
+            "implementations": [
+              {
+                "address_hash": "0x7222182cB9c5320587b5148BF03eeE107AD64578",
+                "name": "PayloadsController"
+              }
+            ],
+            "is_contract": true,
+            "is_scam": false,
+            "is_verified": true,
+            "metadata": null,
+            "name": null,
+            "private_tags": [],
+            "proxy_type": "eip1967",
+            "public_tags": [],
+            "reputation": "ok",
+            "watchlist_names": []
+          },
+          "topics": [
+            "0xbc7cd75a20ee27fd9adebab32041f755214dbc6bffa90cc0225b39da2e5c2d3b",
+            "0x0000000000000000000000005faab9e1adbddad0a08734be8a52185fd6558e14",
+            null,
+            null
+          ],
+          "transaction_hash": "0x22bf91c32a91bcd1a5450038847613b0f11cc6a580d0538bd65618fde9b7294a"
+        },
+        {
+          "address": {
+            "ens_domain_name": null,
+            "hash": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
+            "implementations": [
+              {
+                "address_hash": "0x728a138A4823392C2EFA55e028d434F526fE03CF",
+                "name": "PoolInstance"
+              }
+            ],
+            "is_contract": true,
+            "is_scam": false,
+            "is_verified": true,
+            "metadata": {
+              "tags": [
+                {
+                  "meta": {
+                    "tooltipUrl": "https://aave.com/"
+                  },
+                  "name": "Aave: Pool V3",
+                  "ordinal": 10,
+                  "slug": "aave-pool-v3",
+                  "tagType": "name"
+                },
+                {
+                  "meta": {
+                    "projectName": "Aave V3",
+                    "tagIcon ": "https://blockscout-icons.s3.us-east-1.amazonaws.com/OLI_tag_logo.svg",
+                    "tagUrl": "https://scout-app.kleros.io/single-tags/0x9058d6ea300e1dd6b300ecdabb653dda43dabcca5810f92b1e344dec112f8f4e",
+                    "textColor": "#C163D4",
+                    "tooltipAttribution": "https://www.openlabelsinitiative.org?utm_source=blockscout",
+                    "tooltipAttributionIcon": "https://blockscout-icons.s3.us-east-1.amazonaws.com/OLI_tag_logo.svg",
+                    "tooltipDescription": "Aave V3's official Pool Proxy contract",
+                    "tooltipUrl": "https://aave.com/",
+                    "verifiedDomains": [
+                      "app.aave.com"
+                    ]
+                  },
+                  "name": "Pool Proxy",
+                  "ordinal": 10,
+                  "slug": "pool-proxy-1",
+                  "tagType": "name"
+                },
+                {
+                  "meta": {},
+                  "name": "DeFi",
+                  "ordinal": 0,
+                  "slug": "defi",
+                  "tagType": "generic"
+                },
+                {
+                  "meta": {
+                    "appActionButtonText": "Aave",
+                    "appID": "aave"
+                  },
+                  "name": "Aave",
+                  "ordinal": 0,
+                  "slug": "aave",
+                  "tagType": "protocol"
+                }
+              ]
+            },
+            "name": "InitializableImmutableAdminUpgradeabilityProxy",
+            "private_tags": [],
+            "proxy_type": "eip1967",
+            "public_tags": [],
+            "reputation": "ok",
+            "watchlist_names": []
+          },
+          "block_hash": "0x1c2afd61dd3b0974865a5a528141934091978ec294865423c24ab198ba2847c2",
+          "block_number": 17214196,
+          "block_timestamp": "2023-05-08T07:09:11.000000Z",
+          "data": "0x",
+          "decoded": {
+            "method_call": "Upgraded(address indexed implementation)",
+            "method_id": "bc7cd75a",
+            "parameters": [
+              {
+                "indexed": true,
+                "name": "implementation",
+                "type": "address",
+                "value": "0xF1Cd4193bbc1aD4a23E833170f49d60f3D35a621"
+              }
+            ]
+          },
+          "index": 118,
+          "smart_contract": {
+            "ens_domain_name": null,
+            "hash": "0xEC568fffba86c094cf06b22134B23074DFE2252c",
+            "implementations": [],
+            "is_contract": true,
+            "is_scam": false,
+            "is_verified": true,
+            "metadata": null,
+            "name": null,
+            "private_tags": [],
+            "proxy_type": null,
+            "public_tags": [],
+            "reputation": "ok",
+            "watchlist_names": []
+          },
+          "topics": [
+            "0xbc7cd75a20ee27fd9adebab32041f755214dbc6bffa90cc0225b39da2e5c2d3b",
+            "0x000000000000000000000000f1cd4193bbc1ad4a23e833170f49d60f3d35a621",
+            null,
+            null
+          ],
+          "transaction_hash": "0x012b6d5e9be9ae815f6d4af51adc11aed782a6979eca66f9afbf4d122245f342"
+        }
+      ],
+      "next_page_params": null
+    }
+  ]
+}

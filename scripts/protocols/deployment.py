@@ -30,6 +30,8 @@ def load_deployment(path, config, address):
         raise ValueError('invalid deployment implementation')
     if not isinstance(profile['from_block'], int) or not isinstance(profile['to_block'], int) or not 0 <= profile['from_block'] < profile['to_block']:
         raise ValueError('deployment requires a bounded historical block interval')
+    from protocols.protocol_config import load_protocol
+    config = load_protocol(config['protocol'], profile)
     if profile['abi_sha256'] != hashlib.sha256(config['abi'].read_bytes()).hexdigest():
         raise ValueError('deployment ABI pin mismatch')
     if len(bytes.fromhex(profile['implementation_code_sha256'])) != 32:
@@ -42,8 +44,15 @@ def check_block(profile, block):
         raise ValueError(f'block {block} is outside supported deployment/ABI range')
 
 
+def boundary_event(log):
+    from web3 import Web3
+    return dict(block=log['blockNumber'], log_index=log['logIndex'],
+                transaction_hash=Web3.to_hex(log['transactionHash']),
+                implementation=Web3.to_checksum_address(bytes(log['topics'][1])[-20:]))
+
+
 def verify_deployment(w3, profile, blocks):
-    """Reject upgrade blocks as well as ranges crossing a proxy upgrade."""
+    """Verify the implementation interval, including explicitly reviewed boundary logs."""
     from web3 import Web3
     start, end = blocks[0], blocks[-1]
     check_block(profile, start)
@@ -54,12 +63,17 @@ def verify_deployment(w3, profile, blocks):
     expected = profile['implementation'].lower()
     for height in {max(0, start - 1), start, end}:
         slot = w3.eth.get_storage_at(address, IMPLEMENTATION_SLOT, block_identifier=height)
-        if '0x' + bytes(slot)[-20:].hex() != expected:
+        at_height = profile.get('previous_implementation', expected).lower() if height == profile['from_block'] - 1 else expected
+        if '0x' + bytes(slot)[-20:].hex() != at_height:
             raise ValueError('unsupported proxy implementation or upgrade boundary')
     upgrades = w3.eth.get_logs({'address': address, 'fromBlock': start, 'toBlock': end,
                                'topics': ['0x' + Web3.keccak(text='Upgraded(address)').hex()]})
-    if upgrades:
-        raise ValueError('range contains a proxy upgrade; split and verify ABI profiles')
+    reviewed = [e for e in profile.get('boundary_upgrades', []) if start <= e['block'] <= end]
+    if len(upgrades) != len(reviewed):
+        raise ValueError('range contains an unreviewed proxy upgrade')
+    for log, event in zip(upgrades, reviewed):
+        if boundary_event(log) != event:
+            raise ValueError('proxy upgrade differs from reviewed boundary')
     code = w3.eth.get_code(Web3.to_checksum_address(expected), block_identifier=start)
     if not code or hashlib.sha256(bytes(code)).hexdigest() != profile['implementation_code_sha256']:
         raise ValueError('implementation bytecode pin mismatch')
