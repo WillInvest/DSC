@@ -18,6 +18,15 @@ block-by-address matrix; pre-deployment entries are N/A.
 An unfinished run retains its cutoff. A successful subsequent run catches up.
 The registry's `through_block` is provenance, not a permanent extraction cap.
 
+`--pool-workers 1|2|4` bounds concurrent contracts in the events/state lane
+(default 1; production uses 4). Each pool processes events then state with its
+own SQLite connection. `--rpc-requests 8|16|32` sets Cryo request concurrency
+per process (default and production: 8). Four pool workers can therefore issue
+up to 32 concurrent Cryo requests, plus validation/header RPCs and the separate
+trace lane. These runtime settings do not change accepted-data identities.
+Remote shared lane locks and exclusive per-pool locks allow different pools
+together while excluding duplicate work or cleanup for the same pool.
+
 Default SQLite location: `/home/dsc-data/data/tracker.sqlite`. Use `--data-root`
 for isolated pilots. Production uses `--lane events-state` and `--lane reverted`
 with the same explicit `--to-block`. Each lane advances independently. The

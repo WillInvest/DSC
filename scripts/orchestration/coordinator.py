@@ -1,5 +1,6 @@
 """Single coordinator on dsc-data, reusing the existing extraction programs."""
 import base64
+from concurrent.futures import ThreadPoolExecutor
 import csv
 from functools import lru_cache
 import json
@@ -9,6 +10,7 @@ import shlex
 import subprocess
 import sys
 import time
+from types import SimpleNamespace
 
 from orchestration.artifacts import checksum, digest, verify, write_json
 from orchestration.tracker import Tracker
@@ -28,11 +30,22 @@ def shell(args):
 def remote(server, request):
     encoded = base64.b64encode(json.dumps(request).encode()).decode()
     command = [server['python'], server['scripts'] + '/orchestration/worker.py', encoded]
+    dataset = request.get('spec', {}).get('kind') in ('events', 'state')
+    if request['action'] == 'extract' and dataset:
+        requests = request.get('rpc_requests', 8)
+        if type(requests) is not int or requests not in (8, 16, 32):
+            raise ValueError('RPC request concurrency must be 8, 16 or 32')
+        command = ['env', f'MAX_CONCURRENT_REQUESTS={requests}', *command]
     if request['action'] in ('extract', 'select', 'cleanup', 'archive_index', 'archive_reuse'):
         # flock survives an SSH client disconnect and excludes overlapping workers.
-        lane = 'events-state' if request.get('spec', {}).get('kind') in ('events','state') else 'reverted'
+        lane = 'events-state' if dataset else 'reverted'
+        if dataset:
+            # One persistent lock per pool, rather than per historical batch.
+            spec = request['spec']
+            pool_id = digest({'chain_id': spec.get('chain_id', 1), 'address': spec['address'].lower()})
+            command = ['flock', '-w', '5', server['root'] + '.' + pool_id + '.lock', *command]
         command = ['flock', '-s', '-w', '5', server['root'] + '.lock',
-                   'flock', '-w', '5', server['root'] + f'.{lane}.lock', *command]
+                   'flock', *(['-s'] if dataset else []), '-w', '5', server['root'] + f'.{lane}.lock', *command]
     result = subprocess.run([*SSH, server['host'], shell(command)], check=True, capture_output=True, text=True)
     if result.stderr:
         print(result.stderr, file=sys.stderr, end='')
@@ -101,6 +114,7 @@ class Coordinator:
     def __init__(self, args):
         self.args = args
         self.lane = getattr(args, 'lane', 'all')
+        self.pool_workers = getattr(args, 'pool_workers', 1)
         self.root = args.data_root.resolve()
         self.servers = json.loads(args.servers.read_text()) if args.servers else DEFAULTS
         self.rows = registry(args.contracts)
@@ -146,7 +160,8 @@ class Coordinator:
             verify(raw, spec, hashes)
         else:
             self.tracker.stage(ident, 'extracting')
-            remote(server, {'action': 'extract', 'spec': spec, 'output': source})
+            remote(server, {'action': 'extract', 'spec': spec, 'output': source,
+                            'rpc_requests': getattr(self.args, 'rpc_requests', 8)})
             self.tracker.stage(ident, 'transferring')
             pull(server['host'], source, raw)
             verify(raw, spec, hashes)
@@ -285,12 +300,29 @@ class Coordinator:
                         self.tracker.invalidate(address, spec['start'], spec['stop'], str(exc), (bit,))
                 raise ValueError('accepted data damaged; affected flags cleared, inspect before retrying') from exc
 
+    def process_pool(self, row, start, stop, hashes):
+        # Construct the connection in its owning thread; only main updates run status.
+        child = Coordinator(SimpleNamespace(**vars(self.args)))
+        child.tracker.run_id = getattr(self.tracker, 'run_id', None)
+        try:
+            for kind, bit in [('events', 1), ('state', 2)]:
+                child.dataset(row, kind, bit, max(start, row['creation_block']), stop, hashes)
+            return child.failed
+        finally:
+            child.tracker.db.close()
+
     def process_batch(self, start, stop, hashes):
         active = [r for r in self.rows if r['creation_block'] < stop]
         if self.lane in ('all', 'events-state'):
-            for row in active:
-                for kind, bit in [('events', 1), ('state', 2)]:
-                    self.dataset(row, kind, bit, max(start, row['creation_block']), stop, hashes)
+            if getattr(self, 'pool_workers', 1) == 1:
+                for row in active:
+                    for kind, bit in [('events', 1), ('state', 2)]:
+                        self.dataset(row, kind, bit, max(start, row['creation_block']), stop, hashes)
+            else:
+                with ThreadPoolExecutor(max_workers=self.pool_workers) as pool:
+                    futures = [pool.submit(self.process_pool, row, start, stop, hashes) for row in active]
+                    failures = [future.result() for future in futures]
+                self.failed = self.failed or any(failures)
         if self.lane in ('all', 'reverted'):
             self.reverted(start, stop, active, hashes)
 

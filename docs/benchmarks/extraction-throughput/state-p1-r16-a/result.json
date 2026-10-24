@@ -1,0 +1,65 @@
+{
+  "settings": {
+    "kind": "state",
+    "root": "/home/node/dsc-extraction/data/benchmarks/20261024/state-p1-r16-a",
+    "start": 20000000,
+    "blocks": 200,
+    "pool_workers": 1,
+    "requests": 16,
+    "chunk": 1000,
+    "trace_workers": 2
+  },
+  "cases": [
+    {
+      "address": "0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc",
+      "seconds": 0.7680911291390657,
+      "rows": 1000,
+      "digest": "4eb0416bddbf4551a76f5c79190b4f46effa148af07f712e6dc9366f0e5bd184"
+    },
+    {
+      "address": "0x0d4a11d5eeaac28ec3f61d100daf4d40471f1852",
+      "seconds": 0.768064858391881,
+      "rows": 1000,
+      "digest": "1858e9aec7cd781016ace4fced715cb07c38eed3b1e0f1171869fc70abd4a333"
+    },
+    {
+      "address": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+      "seconds": 0.8187644258141518,
+      "rows": 1000,
+      "digest": "5d880ec5df274b780d72b1c08eb0a85d3ed20891bf098ae1cc41a9dc7569ab87"
+    },
+    {
+      "address": "0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8",
+      "seconds": 0.8185661118477583,
+      "rows": 1000,
+      "digest": "108da4b4612f22562e86de193bde280492974f29be177653f1eaff9df3f7da43"
+    }
+  ],
+  "valid": true,
+  "units_per_second": 237.7387940802853,
+  "seconds": 3.365044539794326,
+  "samples": [
+    {
+      "cpu_busy_pct": 9.649952696310311,
+      "iowait_pct": 5.298013245033113,
+      "disk_busy_pct": 82.55243732687043,
+      "disk_await_ms": 3.76877246075279,
+      "available_gib": 191.50275421142578
+    },
+    {
+      "cpu_busy_pct": 8.383233532934131,
+      "iowait_pct": 2.4582414119130163,
+      "disk_busy_pct": 19.963575785864684,
+      "disk_await_ms": 33.61764705882353,
+      "available_gib": 191.50051498413086
+    },
+    {
+      "cpu_busy_pct": 14.916430148218227,
+      "iowait_pct": 1.7029328287606433,
+      "disk_busy_pct": 42.590012413894186,
+      "disk_await_ms": 17.058823529411764,
+      "available_gib": 191.5084571838379
+    }
+  ],
+  "healthy": true
+}

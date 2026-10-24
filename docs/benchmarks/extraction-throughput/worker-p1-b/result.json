@@ -1,0 +1,244 @@
+{
+  "settings": {
+    "root": "/home/node/dsc-extraction/data/benchmarks/20261024/worker-p1-b",
+    "workers": 1,
+    "start": 20000000,
+    "blocks": 250
+  },
+  "workload": "complete-node-state-workers",
+  "cases": [
+    {
+      "address": "0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc",
+      "seconds": 6.893722889944911,
+      "rows": 1250,
+      "digest": "9b2ed03c8b61794eb3bc0787d48dc717b1cf68c749643869fd65802b87ba4846"
+    },
+    {
+      "address": "0x0d4a11d5eeaac28ec3f61d100daf4d40471f1852",
+      "seconds": 6.996763011440635,
+      "rows": 1250,
+      "digest": "29b7af8df335f4b45a40f20ea021e54a0422b2522dfbb8a95e5de6bcd470b405"
+    },
+    {
+      "address": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+      "seconds": 8.44906280003488,
+      "rows": 1250,
+      "digest": "531e607a08cb2373ffc61d1754e9b884ea5ed85406d438aa7e6381ada3012298"
+    },
+    {
+      "address": "0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8",
+      "seconds": 6.996707059442997,
+      "rows": 1250,
+      "digest": "acb509b250a8c307e8ac1b020f897b7a5fc2a4ea1e1e0d02993c487320d37788"
+    }
+  ],
+  "valid": true,
+  "seconds": 29.48622808046639,
+  "samples": [
+    {
+      "cpu_busy_pct": 5.040701314965561,
+      "iowait_pct": 0.2817783343769568,
+      "disk_busy_pct": 11.580333268193638,
+      "disk_await_ms": 4.258241758241758,
+      "available_gib": 191.4986572265625
+    },
+    {
+      "cpu_busy_pct": 4.951425885302413,
+      "iowait_pct": 0.0940144155437167,
+      "disk_busy_pct": 3.5923276664492816,
+      "disk_await_ms": 0.4125,
+      "available_gib": 191.4900779724121
+    },
+    {
+      "cpu_busy_pct": 18.063903827902564,
+      "iowait_pct": 9.047769693135084,
+      "disk_busy_pct": 48.00227135097893,
+      "disk_await_ms": 2.181030332209918,
+      "available_gib": 191.45720291137695
+    },
+    {
+      "cpu_busy_pct": 21.286811779769526,
+      "iowait_pct": 14.308578745198464,
+      "disk_busy_pct": 48.306935771530476,
+      "disk_await_ms": 1.1418382233749391,
+      "available_gib": 191.4135513305664
+    },
+    {
+      "cpu_busy_pct": 21.860170832015186,
+      "iowait_pct": 0.22144890857323632,
+      "disk_busy_pct": 4.590957282387349,
+      "disk_await_ms": 2.4,
+      "available_gib": 191.39321899414062
+    },
+    {
+      "cpu_busy_pct": 5.334170065892689,
+      "iowait_pct": 0.0,
+      "disk_busy_pct": 0.19961912659494666,
+      "disk_await_ms": 0.3333333333333333,
+      "available_gib": 191.3987808227539
+    },
+    {
+      "cpu_busy_pct": 4.987452948557089,
+      "iowait_pct": 0.2823086574654956,
+      "disk_busy_pct": 10.38088585682784,
+      "disk_await_ms": 5.3,
+      "available_gib": 191.43679809570312
+    },
+    {
+      "cpu_busy_pct": 17.49133312322723,
+      "iowait_pct": 0.06303183107469272,
+      "disk_busy_pct": 1.5973409481988856,
+      "disk_await_ms": 1.3333333333333333,
+      "available_gib": 191.41368865966797
+    },
+    {
+      "cpu_busy_pct": 5.20702634880803,
+      "iowait_pct": 0.03136762860727729,
+      "disk_busy_pct": 0.7986196697558124,
+      "disk_await_ms": 1.3333333333333333,
+      "available_gib": 191.4134292602539
+    },
+    {
+      "cpu_busy_pct": 5.017246785826278,
+      "iowait_pct": 0.03135779241141424,
+      "disk_busy_pct": 1.8964400242493327,
+      "disk_await_ms": 2.5714285714285716,
+      "available_gib": 191.43056106567383
+    },
+    {
+      "cpu_busy_pct": 6.1813617822403515,
+      "iowait_pct": 0.031377470975839344,
+      "disk_busy_pct": 0.998104903426529,
+      "disk_await_ms": 1.25,
+      "available_gib": 191.38599014282227
+    },
+    {
+      "cpu_busy_pct": 13.527180783817952,
+      "iowait_pct": 1.4222503160556257,
+      "disk_busy_pct": 46.01163436365588,
+      "disk_await_ms": 3.957046332046332,
+      "available_gib": 191.4005126953125
+    },
+    {
+      "cpu_busy_pct": 22.345132743362832,
+      "iowait_pct": 2.8445006321112514,
+      "disk_busy_pct": 20.377044048439256,
+      "disk_await_ms": 2.636890951276102,
+      "available_gib": 191.40640258789062
+    },
+    {
+      "cpu_busy_pct": 12.598425196850394,
+      "iowait_pct": 0.1889763779527559,
+      "disk_busy_pct": 6.786102083508227,
+      "disk_await_ms": 4.0588235294117645,
+      "available_gib": 191.45374298095703
+    },
+    {
+      "cpu_busy_pct": 5.684673366834171,
+      "iowait_pct": 0.0,
+      "disk_busy_pct": 0.49910436173316586,
+      "disk_await_ms": 0.5555555555555556,
+      "available_gib": 191.45548629760742
+    },
+    {
+      "cpu_busy_pct": 6.6603832862079795,
+      "iowait_pct": 0.06283380458686773,
+      "disk_busy_pct": 1.497356274127631,
+      "disk_await_ms": 2.0,
+      "available_gib": 191.44433212280273
+    },
+    {
+      "cpu_busy_pct": 7.479572595851666,
+      "iowait_pct": 0.7228158390949089,
+      "disk_busy_pct": 23.361568898512992,
+      "disk_await_ms": 3.5113230035756855,
+      "available_gib": 191.46236419677734
+    },
+    {
+      "cpu_busy_pct": 10.732323232323232,
+      "iowait_pct": 2.619949494949495,
+      "disk_busy_pct": 82.55343058251468,
+      "disk_await_ms": 4.749137549756745,
+      "available_gib": 191.45941925048828
+    },
+    {
+      "cpu_busy_pct": 9.056603773584905,
+      "iowait_pct": 3.270440251572327,
+      "disk_busy_pct": 84.98133657943929,
+      "disk_await_ms": 6.471785209609044,
+      "available_gib": 191.4478874206543
+    },
+    {
+      "cpu_busy_pct": 7.389937106918239,
+      "iowait_pct": 3.018867924528302,
+      "disk_busy_pct": 85.54928407927711,
+      "disk_await_ms": 6.031448157669237,
+      "available_gib": 191.45059204101562
+    },
+    {
+      "cpu_busy_pct": 2.7899686520376177,
+      "iowait_pct": 3.103448275862069,
+      "disk_busy_pct": 52.11299192297076,
+      "disk_await_ms": 5.270069808027923,
+      "available_gib": 191.45565032958984
+    },
+    {
+      "cpu_busy_pct": 1.598746081504702,
+      "iowait_pct": 3.134796238244514,
+      "disk_busy_pct": 0.9979525083671299,
+      "disk_await_ms": 1.0,
+      "available_gib": 191.46290969848633
+    },
+    {
+      "cpu_busy_pct": 5.673981191222571,
+      "iowait_pct": 0.5956112852664577,
+      "disk_busy_pct": 75.26329963860958,
+      "disk_await_ms": 89.5,
+      "available_gib": 191.4522590637207
+    },
+    {
+      "cpu_busy_pct": 7.641716254306295,
+      "iowait_pct": 0.03131850923896023,
+      "disk_busy_pct": 0.09978881060396959,
+      "disk_await_ms": 0.6666666666666666,
+      "available_gib": 191.44038772583008
+    },
+    {
+      "cpu_busy_pct": 22.345483359746435,
+      "iowait_pct": 7.22662440570523,
+      "disk_busy_pct": 16.258295198206017,
+      "disk_await_ms": 2.9275642797898813,
+      "available_gib": 191.43696212768555
+    },
+    {
+      "cpu_busy_pct": 23.333333333333332,
+      "iowait_pct": 1.5873015873015872,
+      "disk_busy_pct": 51.098156874071584,
+      "disk_await_ms": 0.7681818181818182,
+      "available_gib": 191.4322052001953
+    },
+    {
+      "cpu_busy_pct": 13.223663397658969,
+      "iowait_pct": 1.9297690604239164,
+      "disk_busy_pct": 62.58513426056459,
+      "disk_await_ms": 0.8272841051314143,
+      "available_gib": 191.44097900390625
+    },
+    {
+      "cpu_busy_pct": 10.85246932997798,
+      "iowait_pct": 0.6605850896508336,
+      "disk_busy_pct": 22.060932651784967,
+      "disk_await_ms": 0.6141732283464567,
+      "available_gib": 191.44005966186523
+    },
+    {
+      "cpu_busy_pct": 7.721280602636535,
+      "iowait_pct": 2.1343377275580666,
+      "disk_busy_pct": 67.77298926354435,
+      "disk_await_ms": 0.6914995224450812,
+      "available_gib": 191.4474220275879
+    }
+  ],
+  "healthy": true,
+  "units_per_second": 33.91413772121181
+}

@@ -1,0 +1,90 @@
+{
+  "settings": {
+    "root": "/home/node/dsc-extraction/data/benchmarks/20261024/worker-p4-b",
+    "workers": 4,
+    "start": 20000000,
+    "blocks": 250
+  },
+  "workload": "complete-node-state-workers",
+  "cases": [
+    {
+      "address": "0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc",
+      "seconds": 7.598136551678181,
+      "rows": 1250,
+      "digest": "9b2ed03c8b61794eb3bc0787d48dc717b1cf68c749643869fd65802b87ba4846"
+    },
+    {
+      "address": "0x0d4a11d5eeaac28ec3f61d100daf4d40471f1852",
+      "seconds": 7.39236163534224,
+      "rows": 1250,
+      "digest": "29b7af8df335f4b45a40f20ea021e54a0422b2522dfbb8a95e5de6bcd470b405"
+    },
+    {
+      "address": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+      "seconds": 7.544396363198757,
+      "rows": 1250,
+      "digest": "531e607a08cb2373ffc61d1754e9b884ea5ed85406d438aa7e6381ada3012298"
+    },
+    {
+      "address": "0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8",
+      "seconds": 7.4428280629217625,
+      "rows": 1250,
+      "digest": "acb509b250a8c307e8ac1b020f897b7a5fc2a4ea1e1e0d02993c487320d37788"
+    }
+  ],
+  "valid": true,
+  "seconds": 7.658243956044316,
+  "samples": [
+    {
+      "cpu_busy_pct": 14.401749453295846,
+      "iowait_pct": 0.062480474851608875,
+      "disk_busy_pct": 3.4935033584813513,
+      "disk_await_ms": 3.4545454545454546,
+      "available_gib": 191.45756149291992
+    },
+    {
+      "cpu_busy_pct": 18.67924528301887,
+      "iowait_pct": 0.0,
+      "disk_busy_pct": 0.09981267071094545,
+      "disk_await_ms": 0.0,
+      "available_gib": 191.39874267578125
+    },
+    {
+      "cpu_busy_pct": 14.814814814814815,
+      "iowait_pct": 0.031387319522912745,
+      "disk_busy_pct": 0.5988071169488564,
+      "disk_await_ms": 3.5,
+      "available_gib": 191.40277862548828
+    },
+    {
+      "cpu_busy_pct": 14.330511132016307,
+      "iowait_pct": 0.0,
+      "disk_busy_pct": 0.6986345710402472,
+      "disk_await_ms": 3.0,
+      "available_gib": 191.40413284301758
+    },
+    {
+      "cpu_busy_pct": 27.994875080076874,
+      "iowait_pct": 0.032030749519538756,
+      "disk_busy_pct": 1.1979055353340868,
+      "disk_await_ms": 0.625,
+      "available_gib": 191.33292388916016
+    },
+    {
+      "cpu_busy_pct": 20.63541994337842,
+      "iowait_pct": 0.2201950298836112,
+      "disk_busy_pct": 6.890594131022786,
+      "disk_await_ms": 1.1774193548387097,
+      "available_gib": 191.3578109741211
+    },
+    {
+      "cpu_busy_pct": 15.792778649921507,
+      "iowait_pct": 0.09419152276295134,
+      "disk_busy_pct": 3.392498034171461,
+      "disk_await_ms": 1.0555555555555556,
+      "available_gib": 191.3620491027832
+    }
+  ],
+  "healthy": true,
+  "units_per_second": 130.57823774479576
+}

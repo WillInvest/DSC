@@ -1,0 +1,246 @@
+{
+  "settings": {
+    "kind": "trace",
+    "root": "/home/node/dsc-extraction/data/benchmarks/20261024/trace-w2-b",
+    "start": 20000000,
+    "blocks": 32,
+    "pool_workers": 1,
+    "requests": 8,
+    "chunk": 1000,
+    "trace_workers": 2
+  },
+  "cases": [
+    {
+      "block": 20000000,
+      "digest": "00c4dfce853c9b4dfdf4bf603e1a4a3ee79516a195f26f8f3bf4aed03aea6f65"
+    },
+    {
+      "block": 20000001,
+      "digest": "48fc6608d6f76dc8d36200cd82009d327952cee52977aa70579a6969b5242ffe"
+    },
+    {
+      "block": 20000002,
+      "digest": "d4bf067a292f914a9b25ff610d2c3485199840a11d9bbd2fc06957e9624c469d"
+    },
+    {
+      "block": 20000003,
+      "digest": "698c3e27fb6e2a107b7368d7773287c43e3b315a62843e4621960d9fdd9f56a8"
+    },
+    {
+      "block": 20000004,
+      "digest": "7f4f736d92e1263a3bb1414a0a442a7c242ec4cc4b0dbd547d072723fd006e6c"
+    },
+    {
+      "block": 20000005,
+      "digest": "73aed62157c8840b9598bd234f1f8c406cd1063958449f67c1ccf479ea29cb62"
+    },
+    {
+      "block": 20000006,
+      "digest": "8cf6bd5cc1538faeadfada7dc53d907ab62548781e1f80502bb4ea584b98edc3"
+    },
+    {
+      "block": 20000007,
+      "digest": "299dd834cf023d31c3df317ae95022162fb8c0726efd03e913ce4e725a71eac4"
+    },
+    {
+      "block": 20000008,
+      "digest": "e1d3e83dd28c35508289e60ac49e8b1f1c05d83490e015043ab0e7ea13345b89"
+    },
+    {
+      "block": 20000009,
+      "digest": "9987cf2c363997746c9e0b6a598a5342bc81f28707e2abd55ad58ac3e886f058"
+    },
+    {
+      "block": 20000010,
+      "digest": "38d29e21d5bcd3dc4efe84547ad228d08c807b83d0dab0c3ad27f8f5985ae29a"
+    },
+    {
+      "block": 20000011,
+      "digest": "608006ea84316793e55a77cbce071d40b3f58216c00e896cad03d01ff3d8ddc2"
+    },
+    {
+      "block": 20000012,
+      "digest": "1d12968470d1fdc4657f69b121615816b9a68341c6d9b7b287fca03dbd3452b0"
+    },
+    {
+      "block": 20000013,
+      "digest": "c00d8eb74a6c5d91c33950711cd780a90bddb062b871b77516b5ee88e5766710"
+    },
+    {
+      "block": 20000014,
+      "digest": "eb2f11cf37d21300d01c7eb0506e3ff4632f019302165a579e25f3b57f059b6e"
+    },
+    {
+      "block": 20000015,
+      "digest": "fab24a92ee217e8fa9cd65b1a5567c91e37de4076293f65a2a7a8f1eb04a8461"
+    },
+    {
+      "block": 20000016,
+      "digest": "7e0060c1420dca16039a78d06785dd3acec64a1689b1e6e6aea0a3a53c4120a1"
+    },
+    {
+      "block": 20000017,
+      "digest": "f13daac7e276ec82a075bd37033ad2296ca1121480617b08b6cfca0aeb9d6b29"
+    },
+    {
+      "block": 20000018,
+      "digest": "793ca81d66cf75633cffc3c6245a0f61e94ae50c799c75292f402a5b50c27ffb"
+    },
+    {
+      "block": 20000019,
+      "digest": "5e0c2d45855704cb4db30a9f9733f43a30b8a971fffe4d69d289326ca58d9596"
+    },
+    {
+      "block": 20000020,
+      "digest": "9b726b153c33a29f0655e4dad2f043961d6ebf7e0ae609744bc0102e0685d511"
+    },
+    {
+      "block": 20000021,
+      "digest": "1bb650a0ca7f9ef12cbc2c0396841494e7a91c4ecac25c8b18e42046dfddd4db"
+    },
+    {
+      "block": 20000022,
+      "digest": "302183a490f2d3cc54b60ba07058154490abef6eed10ac15c2b37a0b08590226"
+    },
+    {
+      "block": 20000023,
+      "digest": "6b2ad7d12ae639cc2fd86d595a05696a088157dd43c893b7788eb415aae84441"
+    },
+    {
+      "block": 20000024,
+      "digest": "96b78344824912497c361793b2720782aae1be7cbd99df4b926b9e37a40a3cde"
+    },
+    {
+      "block": 20000025,
+      "digest": "67f7bc02a2510e54ef96834e3311415c39ab73ade1d49abb2a8808239f2a995e"
+    },
+    {
+      "block": 20000026,
+      "digest": "8c721f76dd76820d014e7dbaee9bb6d1e54ebd69b6307ca4e9b5d8e2130c5a59"
+    },
+    {
+      "block": 20000027,
+      "digest": "050236bcda328caecbd6e6f47166119d87d2214087e45fd38a5085b61e5ca359"
+    },
+    {
+      "block": 20000028,
+      "digest": "1e311e40f37daaa827c978e53e3d7dbdb7974c94747628e19b1b0fc235bfdea6"
+    },
+    {
+      "block": 20000029,
+      "digest": "44203c3c58fb3848c4ad2ea99e355f0f50013cb8d2f212e2f00d63ae2122f8ae"
+    },
+    {
+      "block": 20000030,
+      "digest": "ca8e6f63009842de3f197173a8dca6a16c03ffcd309afcde07939056a12209cd"
+    },
+    {
+      "block": 20000031,
+      "digest": "36292fb0fff94fd7bec532a36fae3c537641e1c471e855d404ab0e1c93155cd8"
+    }
+  ],
+  "valid": true,
+  "units_per_second": 2.1717186581418546,
+  "seconds": 14.73487695492804,
+  "samples": [
+    {
+      "cpu_busy_pct": 6.318767683118516,
+      "iowait_pct": 1.351776171015404,
+      "disk_busy_pct": 39.936016119879554,
+      "disk_await_ms": 5.22976,
+      "available_gib": 191.3938331604004
+    },
+    {
+      "cpu_busy_pct": 5.395232120451694,
+      "iowait_pct": 1.5370138017565873,
+      "disk_busy_pct": 15.36820452785294,
+      "disk_await_ms": 6.185185185185185,
+      "available_gib": 191.3857879638672
+    },
+    {
+      "cpu_busy_pct": 9.933983024206224,
+      "iowait_pct": 0.9430996541967934,
+      "disk_busy_pct": 31.641795744364515,
+      "disk_await_ms": 11.722222222222221,
+      "available_gib": 191.37278366088867
+    },
+    {
+      "cpu_busy_pct": 9.374016986473734,
+      "iowait_pct": 0.8493236866939289,
+      "disk_busy_pct": 26.152453102093187,
+      "disk_await_ms": 5.611111111111111,
+      "available_gib": 191.37786102294922
+    },
+    {
+      "cpu_busy_pct": 5.618330194601381,
+      "iowait_pct": 0.6591337099811676,
+      "disk_busy_pct": 21.161668934210343,
+      "disk_await_ms": 6.228571428571429,
+      "available_gib": 191.3726692199707
+    },
+    {
+      "cpu_busy_pct": 6.130747575852362,
+      "iowait_pct": 2.283390678761339,
+      "disk_busy_pct": 38.726871136237456,
+      "disk_await_ms": 5.771922246220303,
+      "available_gib": 191.3747215270996
+    },
+    {
+      "cpu_busy_pct": 2.257761053621825,
+      "iowait_pct": 5.801191596111634,
+      "disk_busy_pct": 87.98063889643149,
+      "disk_await_ms": 6.738359421438478,
+      "available_gib": 191.3722267150879
+    },
+    {
+      "cpu_busy_pct": 4.351909830933,
+      "iowait_pct": 7.451471509079524,
+      "disk_busy_pct": 90.22018910077016,
+      "disk_await_ms": 8.667505179047055,
+      "available_gib": 191.37966918945312
+    },
+    {
+      "cpu_busy_pct": 9.646910466582598,
+      "iowait_pct": 8.19672131147541,
+      "disk_busy_pct": 76.66897035743466,
+      "disk_await_ms": 6.327636459989401,
+      "available_gib": 191.33831024169922
+    },
+    {
+      "cpu_busy_pct": 12.523839796567069,
+      "iowait_pct": 17.60966306420852,
+      "disk_busy_pct": 75.3584097515765,
+      "disk_await_ms": 7.385129604365621,
+      "available_gib": 191.35627365112305
+    },
+    {
+      "cpu_busy_pct": 7.35479797979798,
+      "iowait_pct": 9.974747474747474,
+      "disk_busy_pct": 81.24695507092207,
+      "disk_await_ms": 6.459619047619047,
+      "available_gib": 191.36848068237305
+    },
+    {
+      "cpu_busy_pct": 24.422651059791207,
+      "iowait_pct": 7.212907307813983,
+      "disk_busy_pct": 44.32063180374919,
+      "disk_await_ms": 0.9373695198329853,
+      "available_gib": 191.34298706054688
+    },
+    {
+      "cpu_busy_pct": 4.9010367577756835,
+      "iowait_pct": 0.9739239710964499,
+      "disk_busy_pct": 25.64820787789641,
+      "disk_await_ms": 5.872727272727273,
+      "available_gib": 191.34039688110352
+    },
+    {
+      "cpu_busy_pct": 6.791641057160418,
+      "iowait_pct": 2.2433927473878303,
+      "disk_busy_pct": 65.17386215505387,
+      "disk_await_ms": 2.5205882352941176,
+      "available_gib": 191.37738418579102
+    }
+  ],
+  "healthy": true
+}

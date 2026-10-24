@@ -1,0 +1,8 @@
+{
+  "serial_seconds": 80.71,
+  "parallel_seconds": 32.63,
+  "accepted_jobs_each": 8,
+  "event_rows": 640,
+  "state_rows": 5000,
+  "repeat_count": 1
+}

@@ -20,6 +20,10 @@ def main():
     p.add_argument('--lane', choices=['all', 'events-state', 'reverted'], default='all',
                    help='Independent dataset or reverted lane; requires an explicit finalized --to-block')
     p.add_argument('--cleanup', action='store_true', help='Delete acknowledged node staging only')
+    p.add_argument('--pool-workers', type=int, choices=[1, 2, 4], default=1,
+                   help='Concurrent contracts in the events/state lane')
+    p.add_argument('--rpc-requests', type=int, choices=[8, 16, 32], default=8,
+                   help='Maximum concurrent Cryo RPC requests per extraction process')
     args = p.parse_args()
     if args.lane != 'all' and args.to_block is None and not (args.status or args.matrix):
         p.error('independent lanes require the same explicit --to-block cutoff')

@@ -1,0 +1,51 @@
+{
+  "settings": {
+    "kind": "state",
+    "root": "/home/node/dsc-extraction/data/benchmarks/20261024/state-p4-r16-a",
+    "start": 20000000,
+    "blocks": 200,
+    "pool_workers": 4,
+    "requests": 16,
+    "chunk": 1000,
+    "trace_workers": 2
+  },
+  "cases": [
+    {
+      "address": "0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc",
+      "seconds": 0.8720059674233198,
+      "rows": 1000,
+      "digest": "4eb0416bddbf4551a76f5c79190b4f46effa148af07f712e6dc9366f0e5bd184"
+    },
+    {
+      "address": "0x0d4a11d5eeaac28ec3f61d100daf4d40471f1852",
+      "seconds": 0.9236092921346426,
+      "rows": 1000,
+      "digest": "1858e9aec7cd781016ace4fced715cb07c38eed3b1e0f1171869fc70abd4a333"
+    },
+    {
+      "address": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+      "seconds": 0.8717049453407526,
+      "rows": 1000,
+      "digest": "5d880ec5df274b780d72b1c08eb0a85d3ed20891bf098ae1cc41a9dc7569ab87"
+    },
+    {
+      "address": "0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8",
+      "seconds": 0.9722465816885233,
+      "rows": 1000,
+      "digest": "108da4b4612f22562e86de193bde280492974f29be177653f1eaff9df3f7da43"
+    }
+  ],
+  "valid": true,
+  "units_per_second": 722.6245726465423,
+  "seconds": 1.107081899419427,
+  "samples": [
+    {
+      "cpu_busy_pct": 24.158354114713216,
+      "iowait_pct": 2.4625935162094765,
+      "disk_busy_pct": 19.680208992259484,
+      "disk_await_ms": 0.5486018641810919,
+      "available_gib": 191.64736938476562
+    }
+  ],
+  "healthy": true
+}

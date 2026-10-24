@@ -53,3 +53,16 @@ retained. Startup reuses accepted batches and incomplete node archive files.
 Validation: 80 tests passed in the full data-server suite, six API tests passed
 separately, and the additional serial-mode status cleanup regression passed.
 Systemd unit validation passed. Review completed without remaining findings.
+
+## Pool concurrency rollout (2026-10-24)
+
+The events/state lane now uses four concurrent pools, each with eight Cryo RPC
+requests. The reverted lane remains at two trace workers. Each pool has its own
+SQLite connection and remote lock; tracker bits and data fingerprints are
+unchanged. Set `--pool-workers 1` in the systemd template and reload/restart the
+service to return to serial scheduling without discarding accepted coverage.
+
+Measured node-state worker throughput improved 3.86x on the selection range and
+2.93x on a second historical range. This is not a full-backfill ETA multiplier.
+See [benchmark report](../../docs/optimize/extraction-throughput-report.md) for
+measurements, correctness checks and limitations.
