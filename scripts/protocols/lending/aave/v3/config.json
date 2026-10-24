@@ -1,0 +1,23 @@
+{
+  "protocol": "aave-v3",
+  "category": "lending",
+  "version": "v3",
+  "contract_role": "pool",
+  "abi": "Pool.json",
+  "state_mode": "reserves",
+  "schema_version": 1,
+  "state_getters": [
+    "getReservesList",
+    "getReserveData"
+  ],
+  "discovery_function": "getReservesList()",
+  "state_calls": [
+    {
+      "function": "getReserveData(address)",
+      "arguments": [
+        "$reserve"
+      ]
+    }
+  ],
+  "requires_deployment": true
+}

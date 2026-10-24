@@ -1,0 +1,17 @@
+{
+  "protocol": "uniswap-v2",
+  "abi": "UniswapV2Pair.json",
+  "catalog": "state.tsv",
+  "state_getters": [
+    "getReserves",
+    "totalSupply",
+    "price0CumulativeLast",
+    "price1CumulativeLast",
+    "kLast"
+  ],
+  "category": "dex",
+  "version": "v2",
+  "contract_role": "pool",
+  "state_mode": "static",
+  "schema_version": 1
+}

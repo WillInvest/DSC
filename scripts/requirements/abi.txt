@@ -1,0 +1,5 @@
+web3==8.0.0
+eth-abi==6.0.0
+eth-utils==6.0.0
+eth-hash[pycryptodome]==0.8.0
+pyarrow==24.0.0

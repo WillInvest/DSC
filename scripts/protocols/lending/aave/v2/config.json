@@ -1,0 +1,23 @@
+{
+  "protocol": "aave-v2",
+  "category": "lending",
+  "version": "v2",
+  "contract_role": "lending_pool",
+  "abi": "LendingPool.json",
+  "state_mode": "reserves",
+  "schema_version": 1,
+  "state_getters": [
+    "getReservesList",
+    "getReserveData"
+  ],
+  "discovery_function": "getReservesList()",
+  "state_calls": [
+    {
+      "function": "getReserveData(address)",
+      "arguments": [
+        "$reserve"
+      ]
+    }
+  ],
+  "requires_deployment": true
+}

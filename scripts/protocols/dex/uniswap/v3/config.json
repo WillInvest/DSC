@@ -1,0 +1,17 @@
+{
+  "protocol": "uniswap-v3",
+  "abi": "UniswapV3Pool.json",
+  "catalog": "state.tsv",
+  "state_getters": [
+    "slot0",
+    "liquidity",
+    "feeGrowthGlobal0X128",
+    "feeGrowthGlobal1X128",
+    "protocolFees"
+  ],
+  "category": "dex",
+  "version": "v3",
+  "contract_role": "pool",
+  "state_mode": "static",
+  "schema_version": 1
+}
