@@ -64,25 +64,76 @@ def selected(run_id):
     raise HTTPException(404, 'Run not found')
 
 
+def heartbeat_status(heartbeat):
+    if not heartbeat:
+        return 'Not started'
+    if heartbeat.get('state') in ('stopped','complete'):
+        return heartbeat['state'].capitalize()
+    try:
+        stamp = datetime.fromisoformat(heartbeat['timestamp'])
+        if stamp.tzinfo is None:
+            stamp = stamp.replace(tzinfo=timezone.utc)
+        seconds = (datetime.now(timezone.utc)-stamp).total_seconds()
+    except (KeyError,TypeError,ValueError):
+        return 'Heartbeat missing'
+    return 'Running' if heartbeat.get('state') == 'running' and 0 <= seconds <= 60 else 'Heartbeat missing'
+
+
+def source_report(source):
+    lanes = {name:{**lane,'status':heartbeat_status(lane.get('heartbeat'))}
+             for name,lane in source.get('lanes',{}).items()}
+    statuses = [lane['status'] for lane in lanes.values()]
+    runner = heartbeat_status(source.get('heartbeat'))
+    if statuses:
+        if all(s == 'Complete' for s in statuses):
+            runner = 'Complete'
+        elif all(s in ('Running','Complete') for s in statuses):
+            runner = 'Running'
+        elif len(set(statuses)) == 1:
+            runner = statuses[0]
+        else:
+            runner = 'Needs attention'
+    runs = []
+    for run in source['runs']:
+        contracts = []
+        for contract in run['contracts']:
+            work = []
+            for job in contract.get('active_jobs',[]):
+                if lanes:
+                    lane = lanes[job['lane']]
+                    progress = lane.get('progress') or {}
+                    live = lane['status'] == 'Running' and progress.get('run_id') == run.get('local_id')
+                    live = live and job['start'] < progress.get('stop',0) and job['stop'] > progress.get('start',0)
+                else:
+                    active = source.get('active') or {}
+                    live = runner == 'Running' and active.get('run_id') == run.get('local_id')
+                if live:
+                    work.append(job)
+            contracts.append({k:v for k,v in contract.items() if k not in ('intervals','active_jobs')} |
+                             {'running':bool(work), 'current_work':work})
+        # Stable sorts provide descending activity with an ascending address tie-break.
+        contracts.sort(key=lambda c:c['address'])
+        contracts.sort(key=lambda c:c.get('updated') or '',reverse=True)
+        contracts.sort(key=lambda c:c['running'],reverse=True)
+        runs.append({**run,'contracts':contracts})
+    return {**source,'lanes':lanes,'runs':runs,'runner':runner}
+
+
 @app.get('/api/overview')
 def overview():
     data = current()
     age = max(0,time.time()-last_success)
-    sources = []
-    for source in data['sources']:
-        heartbeat = source.get('heartbeat')
-        runner = 'Not started'
-        if heartbeat:
-            seconds = (datetime.now(timezone.utc)-datetime.fromisoformat(heartbeat['timestamp'])).total_seconds()
-            runner = 'Stopped' if heartbeat['state']=='stopped' else ('Heartbeat missing' if seconds>60 else 'Running')
-        runs = [{**run, 'contracts':[{k:v for k,v in c.items() if k!='intervals'} for c in run['contracts']]} for run in source['runs']]
-        sources.append({**source, 'runs':runs, 'runner':runner})
-    return {**data, 'sources':sources, 'age_seconds':age, 'stale':age>90, 'collection_error':collection_error}
+    return {**data, 'sources':[source_report(s) for s in data['sources']],
+            'age_seconds':age, 'stale':age>90, 'collection_error':collection_error}
 
 
 @app.get('/api/contracts')
 def contracts(run: str):
-    return [{k:v for k,v in c.items() if k!='intervals'} for c in selected(run)['contracts']]
+    for source in current()['sources']:
+        for candidate in source_report(source)['runs']:
+            if candidate['id'] == run:
+                return candidate['contracts']
+    raise HTTPException(404,'Run not found')
 
 
 @app.get('/api/jobs')

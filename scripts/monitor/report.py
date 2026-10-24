@@ -70,9 +70,53 @@ def optional_json(path):
         return None
 
 
+def activity(connection, run_id, targets):
+    """Aggregate every linked job; the recent-job display limit is unrelated."""
+    mapped = """
+        WITH targets AS MATERIALIZED (
+          SELECT json_extract(value,'$.address') AS address,
+                 max(json_extract(value,'$.start'),json_extract(value,'$.creation_block')) AS start,
+                 json_extract(value,'$.stop') AS stop FROM json_each(?)
+        ), linked AS MATERIALIZED (
+          SELECT j.id,j.stage,j.start,j.stop,j.updated,
+                 json_extract(j.spec,'$.kind') AS kind,
+                 json_extract(j.spec,'$.address') AS address,
+                 json_extract(j.spec,'$.contracts') AS contracts
+          FROM monitor_jobs m JOIN jobs j ON j.id=m.job_id WHERE m.run_id=?
+        ), mapped AS (
+          SELECT t.address,j.id,j.kind,j.stage,j.start,j.stop,j.updated
+          FROM linked j JOIN targets t ON t.address=j.address
+          WHERE j.kind NOT IN ('archive','reverted') AND j.start<t.stop AND j.stop>t.start
+          UNION ALL
+          SELECT t.address,j.id,j.kind,j.stage,j.start,j.stop,j.updated
+          FROM linked j JOIN json_each(j.contracts) c JOIN targets t ON t.address=c.value
+          WHERE j.kind='reverted' AND j.start<t.stop AND j.stop>t.start
+          UNION ALL
+          SELECT t.address,j.id,j.kind,j.stage,j.start,j.stop,j.updated
+          FROM linked j JOIN targets t ON j.start<t.stop AND j.stop>t.start
+          WHERE j.kind='archive'
+        )
+    """
+    params = (json.dumps(targets), run_id)
+    result = {t['address']: {'updated':None, 'failed':False, 'active_jobs':[]} for t in targets}
+    for row in connection.execute(mapped + "SELECT address,max(updated) AS updated,max(stage IN ('failed','blocked')) AS failed FROM mapped GROUP BY address", params):
+        result[row['address']].update(updated=row['updated'], failed=bool(row['failed']))
+    query = mapped + "SELECT address,kind,stage,start,stop,updated FROM mapped WHERE stage IN ('running','extracting','transferring','validating') ORDER BY updated DESC,id"
+    for row in connection.execute(query, params):
+        job = {key:row[key] for key in ('kind','stage','start','stop','updated')}
+        job['lane'] = 'events-state' if row['kind'] in ('events','state') else 'reverted'
+        result[row['address']]['active_jobs'].append(job)
+    return result
+
+
 def read_source(source):
     path = Path(source['db'])
     result = {'source': source['id'], 'label': source['label'], 'runs': [], 'heartbeat': optional_json(path.parent/'heartbeat.json'), 'active': optional_json(path.parent/'active-run.json')}
+    lanes = {name: {'heartbeat':optional_json(path.parent/f'heartbeat-{name}.json'),
+                    'progress':optional_json(path.parent/f'progress-{name}.json')}
+             for name in ('events-state','reverted')}
+    if any(lane['heartbeat'] or lane['progress'] for lane in lanes.values()):
+        result['lanes'] = lanes
     if not path.exists():
         result['state'] = 'not_started'
         return result
@@ -91,6 +135,9 @@ def read_source(source):
         for run in connection.execute('SELECT * FROM monitor_runs ORDER BY created DESC,id LIMIT 20'):
             manifest = json.loads(run['manifest'])
             contracts = [contract_report(t, coverage) for t in manifest['targets']]
+            updates = activity(connection, run['id'], manifest['targets'])
+            for contract in contracts:
+                contract.update(updates[contract['address']])
             total = sum(c['total'] for c in contracts)
             done = sum(c['complete'] for c in contracts)
             jobs = []

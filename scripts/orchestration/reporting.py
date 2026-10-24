@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 import threading
 import json
 from orchestration.artifacts import digest, write_json
+from orchestration.locking import file_lock
 
 
 def record_run(coordinator, key, settings):
@@ -46,23 +47,26 @@ def record_run(coordinator, key, settings):
         if match:
             with tracker.db:
                 tracker.db.execute('INSERT OR IGNORE INTO monitor_jobs VALUES(?,?)',(ident,job['id']))
-    write_json(coordinator.root / 'active-run.json', {'run_id': ident})
+    with file_lock(coordinator.root / 'reporting.lock'):
+        write_json(coordinator.root / 'active-run.json', {'run_id': ident})
 
 
 @contextmanager
-def heartbeat(root):
+def heartbeat(root, lane='all'):
     stop = threading.Event()
     def emit(state):
-        write_json(root / 'heartbeat.json', {'state': state, 'timestamp': datetime.now(timezone.utc).isoformat()})
+        write_json(root / ('heartbeat.json' if lane == 'all' else f'heartbeat-{lane}.json'), {'state': state, 'timestamp': datetime.now(timezone.utc).isoformat()})
     def loop():
         while not stop.wait(15):
             emit('running')
     emit('running')
     thread = threading.Thread(target=loop, daemon=True)
     thread.start()
+    completed = False
     try:
         yield
+        completed = True
     finally:
         stop.set()
         thread.join()
-        emit('stopped')
+        emit('complete' if completed and lane != 'all' else 'stopped')

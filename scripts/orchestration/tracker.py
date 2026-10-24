@@ -10,6 +10,11 @@ class Tracker:
         Path(path).parent.mkdir(parents=True, exist_ok=True)
         self.db = sqlite3.connect(path, timeout=30)
         self.db.row_factory = sqlite3.Row
+        from orchestration.locking import file_lock
+        with file_lock(Path(str(path) + '.init.lock')):
+            self._initialize()
+
+    def _initialize(self):
         self.db.executescript('''
         PRAGMA synchronous=FULL;
         CREATE TABLE IF NOT EXISTS monitor_runs (
@@ -23,6 +28,8 @@ class Tracker:
           id TEXT PRIMARY KEY, spec TEXT NOT NULL, stage TEXT NOT NULL,
           attempts INTEGER NOT NULL DEFAULT 0, error TEXT, receipt TEXT,
           updated TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);
+        CREATE TABLE IF NOT EXISTS run_lanes (
+          run_id TEXT, lane TEXT, finished INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(run_id,lane));
         CREATE TABLE IF NOT EXISTS runs (
           id TEXT PRIMARY KEY, spec TEXT NOT NULL, finished INTEGER NOT NULL DEFAULT 0);
         CREATE TABLE IF NOT EXISTS chain_blocks (number INTEGER PRIMARY KEY, hash TEXT NOT NULL);
@@ -46,6 +53,20 @@ class Tracker:
                 self.db.execute('UPDATE jobs SET receipt=? WHERE id=?', (json.dumps(receipt), row['id']))
         self.db.execute('PRAGMA user_version=2')
         self.db.commit()
+
+    def start_lane(self, key, lane):
+        with self.db:
+            self.db.execute('INSERT OR REPLACE INTO run_lanes VALUES(?,?,0)', (key,lane))
+            self.db.execute('UPDATE runs SET finished=0 WHERE id=?', (key,))
+
+    def finish_lane(self, key, lane):
+        with self.db:
+            self.db.execute('UPDATE run_lanes SET finished=1 WHERE run_id=? AND lane=?', (key,lane))
+            complete = lane == 'all' or self.db.execute(
+                "SELECT count(*) FROM run_lanes WHERE run_id=? AND lane IN ('events-state','reverted') AND finished=1",
+                (key,)).fetchone()[0] == 2
+            if complete:
+                self.db.execute('UPDATE runs SET finished=1 WHERE id=?', (key,))
 
     def record_headers(self, receipt):
         headers = receipt.pop('headers', {})

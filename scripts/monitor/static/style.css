@@ -4,3 +4,5 @@
 
 .dataset-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px}.dataset-summary div{display:flex;justify-content:space-between;gap:6px;font-size:12px;padding:12px;background:#e7efec;border-radius:8px}.dataset-summary strong{color:#267d70}
 @media(max-width:760px){.dataset-summary div{flex-direction:column;gap:5px}.dataset-summary strong{font-size:15px}}
+
+.lanes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:14px}.lanes article{padding:14px;background:white;border:1px solid #dce5e2;border-radius:10px;overflow-wrap:anywhere}.lanes span,.lanes strong,.lanes small{display:block}.lanes span{font-size:12px;color:#637780}.lanes strong{font-size:18px;margin:7px 0}.card.running{border:2px solid #258774}.pill.live{display:inline-block;margin-left:12px;background:#d8eee5;color:#16664e}.card .current-work{color:#16664e;margin-top:8px}.card .changed{margin-top:8px;font-size:11px}#cardOrder{margin:0}#runner{overflow-wrap:anywhere;font-size:28px}@media(max-width:380px){.lanes{grid-template-columns:1fr}}

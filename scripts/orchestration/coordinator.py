@@ -30,7 +30,9 @@ def remote(server, request):
     command = [server['python'], server['scripts'] + '/orchestration/worker.py', encoded]
     if request['action'] in ('extract', 'select', 'cleanup', 'archive_index', 'archive_reuse'):
         # flock survives an SSH client disconnect and excludes overlapping workers.
-        command = ['flock', '-w', '5', server['root'] + '.lock', *command]
+        lane = 'events-state' if request.get('spec', {}).get('kind') in ('events','state') else 'reverted'
+        command = ['flock', '-s', '-w', '5', server['root'] + '.lock',
+                   'flock', '-w', '5', server['root'] + f'.{lane}.lock', *command]
     result = subprocess.run([*SSH, server['host'], shell(command)], check=True, capture_output=True, text=True)
     if result.stderr:
         print(result.stderr, file=sys.stderr, end='')
@@ -98,6 +100,7 @@ def accept_decoded(raw, output, spec):
 class Coordinator:
     def __init__(self, args):
         self.args = args
+        self.lane = getattr(args, 'lane', 'all')
         self.root = args.data_root.resolve()
         self.servers = json.loads(args.servers.read_text()) if args.servers else DEFAULTS
         self.rows = registry(args.contracts)
@@ -282,6 +285,15 @@ class Coordinator:
                         self.tracker.invalidate(address, spec['start'], spec['stop'], str(exc), (bit,))
                 raise ValueError('accepted data damaged; affected flags cleared, inspect before retrying') from exc
 
+    def process_batch(self, start, stop, hashes):
+        active = [r for r in self.rows if r['creation_block'] < stop]
+        if self.lane in ('all', 'events-state'):
+            for row in active:
+                for kind, bit in [('events', 1), ('state', 2)]:
+                    self.dataset(row, kind, bit, max(start, row['creation_block']), stop, hashes)
+        if self.lane in ('all', 'reverted'):
+            self.reverted(start, stop, active, hashes)
+
     def run(self):
         if self.args.matrix:
             if self.args.from_block is None or self.args.to_block is None or not 0 <= self.args.to_block-self.args.from_block < 1000:
@@ -308,6 +320,8 @@ class Coordinator:
         if shutil.disk_usage(self.root).free < 1024**3:
             raise ValueError('less than 1 GiB available on dsc-data')
         for role, server in self.servers.items():
+            if self.lane == 'events-state' and role == 'revert':
+                continue
             try:
                 remote(server, {'action': 'preflight', 'root': server['root']})
             except subprocess.CalledProcessError as exc:
@@ -339,25 +353,26 @@ class Coordinator:
             self.tracker.db.execute('INSERT OR REPLACE INTO runs VALUES(?,?,0)', (run_key, json.dumps(settings)))
         from orchestration.reporting import record_run
         record_run(self, run_key, settings)
+        self.tracker.start_lane(run_key, self.lane)
         for start in range(first, end, 1000):
             stop = min(start+1000, end)
-            print(f'Batch {start}:{stop}', flush=True)
+            print(f'{self.lane} batch {start}:{stop}', flush=True)
+            if self.lane != 'all':
+                write_json(self.root / f'progress-{self.lane}.json',
+                           {'run_id': self.tracker.run_id, 'start': start, 'stop': stop})
             hashes = remote(self.servers['node'], {'action': 'headers', 'start': start, 'stop': stop})
             self.check_previous(start, stop, hashes)
-            active = [r for r in self.rows if r['creation_block'] < stop]
-            for row in active:
-                for kind, bit in [('events', 1), ('state', 2)]:
-                    self.dataset(row, kind, bit, max(start, row['creation_block']), stop, hashes)
-            self.reverted(start, stop, active, hashes)
+            self.process_batch(start, stop, hashes)
             if self.args.cleanup:
+                owned = {'all': ('events', 'state', 'archive'),
+                         'events-state': ('events', 'state'), 'reverted': ('archive',)}[self.lane]
                 for job in self.tracker.db.execute("SELECT spec FROM jobs WHERE stage IN ('accepted','cleanup_pending') AND receipt IS NOT NULL AND start>=? AND stop<=?", (start, stop)).fetchall():
                     spec = json.loads(job['spec'])
-                    if spec['kind'] in ('events', 'state', 'archive'):
+                    if spec['kind'] in owned:
                         self.cleanup(spec)
-            self.tracker.backup(self.root / 'tracker.backup.sqlite')
+            self.tracker.backup(self.root / ('tracker.backup.sqlite' if self.lane == 'all' else f'tracker.{self.lane}.backup.sqlite'))
         if not self.failed:
-            with self.tracker.db:
-                self.tracker.db.execute('UPDATE runs SET finished=1 WHERE id=?', (run_key,))
+            self.tracker.finish_lane(run_key, self.lane)
         print(json.dumps(self.tracker.summary(), indent=2))
         if self.failed:
             raise SystemExit('Run has failed or blocked jobs; accepted coverage is retained.')

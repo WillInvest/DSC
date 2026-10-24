@@ -1,8 +1,8 @@
 # Private extraction monitor
 
 Open **https://dsc-web.tail5aad6c.ts.net/** with Tailscale connected.
-The production workspace shows the 102-contract registry as Not started until
-an actual production run records its target range. Verified pilots are a
+The production workspace shows the active 102-contract historical run. A new
+workspace remains Not started until a run records its target range. Verified pilots are a
 separate workspace. Select a run, filter/search contracts, and tap a card to
 inspect up to 1,000 blocks. Cells explain flags 1/2/4 and combined status 7.
 
@@ -39,8 +39,12 @@ block. Pre-deployment and outside-run heights are distinguished. Empty checked
 results retain their completion bits. Up to ten missing ranges are summarized;
 block inspection supports at most 1,000 blocks and ten contracts per request.
 
-The coordinator writes a heartbeat every 15 seconds, even during long remote
-calls. The monitor polls every 30 seconds. After 60 seconds without a running
+Each production lane writes a heartbeat every 15 seconds, even during long
+remote calls. The monitor shows events/state and reverted status separately.
+Contract cards show running work first, followed by the most recently updated
+contracts. The Running now filter hides inactive cards. Activity requires a
+fresh heartbeat and matching run/batch; shared archive work applies only to
+contracts deployed within that batch. The monitor polls every 30 seconds. After 60 seconds without a running
 heartbeat it shows Heartbeat missing; a cleanly stopped runner shows Stopped.
 No recent stage change alone does not imply extraction failure.
 
@@ -79,7 +83,7 @@ Do not expose port 18084 on 0.0.0.0 or publish this app through the public domai
   tailnet-only access. Existing beta services remained active.
 - Chrome at a 390 × 844 CSS viewport had scroll width 390, no console errors,
   working protocol filters, and Aave block detail showing all three checks complete.
-- Both verified pilot runs display 100%; production remains Not started.
+- Both verified pilot runs display 100%; production extraction is now running.
 
 The final device check is opening the URL on the user's phone with Tailscale on.
-No full historical extraction was started to build or test this monitor.
+The historical run is supervised separately by the two extraction services.

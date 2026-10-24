@@ -19,7 +19,11 @@ An unfinished run retains its cutoff. A successful subsequent run catches up.
 The registry's `through_block` is provenance, not a permanent extraction cap.
 
 Default SQLite location: `/home/dsc-data/data/tracker.sqlite`. Use `--data-root`
-for isolated pilots. The coordinator uses a local exclusive lock, transactional
+for isolated pilots. Production uses `--lane events-state` and `--lane reverted`
+with the same explicit `--to-block`. Each lane advances independently. The
+default `--lane all` retains serial pilot behavior. Lane locks exclude duplicate
+workers, and the shared root lock excludes simultaneous legacy serial runs.
+The coordinator uses transactional
 SQLite updates and compact per-dataset coverage intervals. `Tracker.status`
 combines those intervals into the single logical 0–7 cell. Missing intervals are
 zero; code/profile identities prevent old completion from satisfying changed

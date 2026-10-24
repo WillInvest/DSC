@@ -1,7 +1,8 @@
 # Production historical run
 
-`dsc-extraction.service` runs on dsc-data as `dsc-data` and starts at boot.
-Systemd restarts a failed coordinator after 60 seconds. It reuses the same local
+`dsc-extraction.service` starts two independent workers on dsc-data at boot:
+`dsc-extraction@events-state.service` and `dsc-extraction@reverted.service`.
+Both run as `dsc-data`. Systemd restarts a failed worker after 60 seconds. It reuses the same local
 tracker, fixed cutoff, profiles and registry; destination-accepted coverage is
 not discarded. A successful bounded run exits without restarting indefinitely.
 This supervises process failure and reboot recovery, not arbitrary application
@@ -18,10 +19,18 @@ access only: https://dsc-web.tail5aad6c.ts.net/ .
 
 ```bash
 sudo systemctl status dsc-extraction.service
-journalctl -u dsc-extraction.service -n 50 --no-pager
+systemctl status dsc-extraction@events-state dsc-extraction@reverted
+journalctl -u dsc-extraction@events-state -u dsc-extraction@reverted -n 50 --no-pager
 sudo systemctl stop dsc-extraction.service
 sudo systemctl start dsc-extraction.service
 ```
+
+Each worker advances through its own 1,000-block batches. Events/state do not
+wait for tracing. Both share the SQLite tracker and fixed cutoff; flags 1/2/4
+retain their meaning, and 7 still requires all checks. Each lane has its own
+lock, heartbeat, current-batch file and SQLite backup. The parent unit controls
+both workers; restart a child unit to recover only that lane. A successful
+lane exits and remains Complete while its peer continues.
 
 `--cleanup` removes only acknowledged node staging; it retains the dsc-revert
 archive and dsc-data accepted files. No protected datasets or Savva transfer
@@ -32,3 +41,15 @@ was approximately 854 GiB on data, 782 GiB on revert and 11 TiB on node.
 Profiles and proof: `contracts/ethereum/aave-profiles/README.md` and its evidence
 files. Review receipt: `/tmp/compound-engineering-501/ce-code-review/aave-profiles-20261023`
 on the operator workspace (temporary review record, not a runtime dependency).
+
+## Independent-worker rollout (2026-10-24)
+
+Both worker services started successfully with the original monitor run ID and
+accepted coverage. Live verification showed events/state working on
+`10010355:10011355` while reverted worked on `10009355:10010355` (exclusive stops).
+The first batch's combined completion and the second batch's events/state were
+retained. Startup reuses accepted batches and incomplete node archive files.
+
+Validation: 80 tests passed in the full data-server suite, six API tests passed
+separately, and the additional serial-mode status cleanup regression passed.
+Systemd unit validation passed. Review completed without remaining findings.

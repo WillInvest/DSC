@@ -1,20 +1,11 @@
 [Unit]
-Description=DSC resumable historical extraction coordinator
-Wants=network-online.target
-After=network-online.target
-StartLimitIntervalSec=0
+Description=DSC independent extraction lanes
+Wants=dsc-extraction@events-state.service dsc-extraction@reverted.service
 
 [Service]
-Type=exec
-User=dsc-data
-WorkingDirectory=/home/dsc-data
-Environment=PYTHONUNBUFFERED=1
-ExecStart=/home/dsc-data/scripts/.venv-abi/bin/python /home/dsc-data/scripts/run.py --contracts /home/dsc-data/contracts/ethereum/pools.csv --profiles /home/dsc-data/data/deployment-profiles --to-block 26259811 --cleanup
-Restart=on-failure
-RestartSec=60
-TimeoutStopSec=30
-KillMode=control-group
-NoNewPrivileges=true
+Type=oneshot
+ExecStart=/usr/bin/true
+RemainAfterExit=yes
 
 [Install]
 WantedBy=multi-user.target
