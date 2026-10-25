@@ -145,3 +145,34 @@ The workspace was empty at initialization. No application code, build commands, 
 - This supersedes the earlier notes that profiles and a production service are missing. Fifteen Aave profiles (4 V2, 11 V3) cover deployment through finalized block 26,259,811 inclusive; source ABIs, interval evidence, and real Cryo/decode pilot results are in `contracts/ethereum/aave-profiles/` and protocol `history/` directories.
 - `dsc-extraction.service` on dsc-data runs the 102-address registry, state every block, with that fixed cutoff and `--cleanup`. It is enabled at boot and starts independent `dsc-extraction@events-state` and `dsc-extraction@reverted` workers; each restarts after failure in 60 seconds using the shared tracker. Both require the same fixed cutoff. Their separate heartbeats and current batches drive active-first, recently-updated-next monitor cards. It does not automatically extend into unreviewed future ABI intervals. See `scripts/orchestration/production-run.md`.
 - Historical upgrade discovery uses Blockscout's paginated index; every returned boundary is checked against RETH. Sourcify verified ABI runtime bytecode is matched to RETH. Each extraction batch still rejects unrecorded upgrades. Profiles retain ABI-specific schemas rather than silently normalizing changed fields.
+
+## Core market replay decision (2026-10-24)
+
+- The user selected core market fields only, superseding the every-block full
+  getter extraction requirement for the new core mode. Keep every-block logical
+  state coverage; reconstruct it on dsc-data from ABI-decoded events and compare
+  exactly against node state every 1,000 blocks, plus reviewed boundaries/final
+  partial intervals. Preserve the existing full getter mode and its data.
+- Core fields and exclusions are specified in `scripts/reconstruction/README.md`.
+  Include Aave configurator reserve initialization/drop events and provider proxy
+  routing evidence; implementation-update addresses are not log-source proxies.
+- Core-state configuration identities must differ from full RPC-state identities.
+  Reuse accepted Pool events and preserve independent reverted archive identities.
+  Mismatches must leave affected intervals unaccepted. Aave reviewed creation and
+  upgrade blocks use explicit end-of-block bootstrap evidence.
+- Selected production concurrency is 32 pool workers × 2 Cryo requests per
+  process. Reverted trace-worker concurrency remains unchanged.
+
+## Active simplified pipeline (2026-10-25; supersedes earlier coordinator notes)
+
+- Use scripts/event-cryo-extraction and scripts/automation on dsc-data. The old
+  scripts/run.py, orchestration, benchmarks, experimental queues and old extraction
+  launchers have been retired. Reverted scripts remain unchanged and unscheduled.
+- Decode accepted encoded datasets first; then reconstruct every-block core state
+  directly from decoded events. The user removed recurring RETH comparisons and
+  header scans. Label direct output event-derived/unchecked. Aave boundary seeds
+  and configurator/provider inputs remain necessary, collected once.
+- Preserve runtime data, environments and receipts when cleaning source. Shared
+  helpers live in scripts/shared. scripts/monitor/export.py is the fixed-command
+  SSH compatibility entrypoint; the active monitor code is in event-cryo-extraction.
+- See scripts/README.md and scripts/automation/README.md for current entrypoints.

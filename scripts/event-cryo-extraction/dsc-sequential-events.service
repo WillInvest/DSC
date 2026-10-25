@@ -1,0 +1,17 @@
+[Unit]
+Description=Sequential Cryo extraction for the 102-address registry
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=dsc-data
+WorkingDirectory=/home/dsc-data/scripts/event-cryo-extraction
+ExecStart=/home/dsc-data/scripts/.venv-abi/bin/python /home/dsc-data/scripts/event-cryo-extraction/run.py run
+KillMode=control-group
+TimeoutStopSec=45
+Restart=on-failure
+RestartSec=60
+
+[Install]
+WantedBy=multi-user.target

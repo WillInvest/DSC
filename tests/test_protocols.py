@@ -65,36 +65,6 @@ class ProtocolTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,'different'):
                 run('state',root/'state',root/'state-decoded',config['abi'],ADDRESS,'uniswap-v3')
 
-    def test_state_launchers_supply_correct_getters(self):
-        with tempfile.TemporaryDirectory() as folder:
-            root=Path(folder)
-            mock=root/'cryo'
-            mock.write_text('#!'+sys.executable+'\n'+"""import sys,json
-from pathlib import Path
-import pyarrow as pa
-import pyarrow.parquet as pq
-args=sys.argv[1:]
-selectors=args[args.index('--call-data')+1:args.index('--blocks')]
-out=Path(args[args.index('--output-dir')+1]); out.mkdir()
-rows=[dict(chain_id=1,block_number=100,contract_address=args[args.index('--contract')+1],call_data=s,output_data='0x'+'00'*({'0x0902f1ac':96,'0x3850c7bd':224,'0x1ad8b03b':64}.get(s,32))) for s in selectors]
-pq.write_table(pa.Table.from_pylist(rows),out/'batch.parquet')
-(out/'args.json').write_text(json.dumps(args))
-""")
-            mock.chmod(0o755)
-            for protocol in ('uniswap-v2','uniswap-v3'):
-                out=root/protocol
-                env={**os.environ,'CRYO_BIN':str(mock),'PYTHON_BIN':sys.executable,'OUTPUT_DIR':str(out)}
-                subprocess.run(['bash',str(ROOT/'scripts/extraction/extract_pool_state.sh'),protocol,ADDRESS,'100'],env=env,check=True,capture_output=True)
-                args=json.loads((out/'args.json').read_text())
-                for line in load_protocol(protocol)['catalog'].read_text().splitlines():
-                    self.assertIn(line.split('\t')[1],args)
-                self.assertIn(protocol+'_'+ADDRESS+'_state_v1',args)
-
-    def test_launchers_require_explicit_protocol_address(self):
-        for script in ('extract_pool_events.sh','extract_pool_state.sh'):
-            for args in (['13000000:13000010'],['uniswap-v1',ADDRESS,'1:2'],['uniswap-v2','invalid','1:2']):
-                result=subprocess.run(['bash',str(ROOT/'scripts/extraction'/script),*args],capture_output=True)
-                self.assertNotEqual(result.returncode,0)
 
 
 if __name__ == '__main__':

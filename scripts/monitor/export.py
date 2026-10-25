@@ -1,9 +1,5 @@
 #!/usr/bin/env python3
-"""Fixed report command, suitable for an SSH forced-command key."""
-import json
+"""Compatibility entrypoint for the restricted monitor SSH key."""
 from pathlib import Path
-from report import export
-
-if __name__ == '__main__':
-    config = json.loads(Path('/home/dsc-data/.config/dsc-monitor/sources.json').read_text())
-    print(json.dumps(export(config)))
+import runpy
+runpy.run_path(str(Path(__file__).resolve().parents[1]/"event-cryo-extraction/export.py"),run_name="__main__")

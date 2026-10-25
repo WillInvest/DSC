@@ -19,7 +19,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from protocols.protocol_config import load_protocol
 from protocols.deployment import IMPLEMENTATION_SLOT, boundary_event, verify_deployment
 from decoding.pool_decode import StateDecoder
-from orchestration.coordinator import registry
+from registry.catalog import registry
 
 
 def write(path, value):

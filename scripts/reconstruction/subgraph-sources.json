@@ -1,0 +1,65 @@
+[
+  {
+    "repository": "Uniswap/v2-subgraph",
+    "commit": "cef5fca500484ab983da985e7ff9dbc1e0c1da9e",
+    "path": "src/v2/mappings/core.ts",
+    "url": "https://raw.githubusercontent.com/Uniswap/v2-subgraph/cef5fca500484ab983da985e7ff9dbc1e0c1da9e/src/v2/mappings/core.ts",
+    "sha256": "d5b8730ada08313ea205de83f88710bf58bb6578f2250a287797c4687b7120cd"
+  },
+  {
+    "repository": "Uniswap/v3-subgraph",
+    "commit": "734f0e21992141596d9d090a3af724164b2524f3",
+    "path": "src/v3/mappings/initialize.ts",
+    "url": "https://raw.githubusercontent.com/Uniswap/v3-subgraph/734f0e21992141596d9d090a3af724164b2524f3/src/v3/mappings/initialize.ts",
+    "sha256": "94ca4b477b7056113c0c7c96267cfbd8e83d13b0dba13ae129618665c6e3db7f"
+  },
+  {
+    "repository": "Uniswap/v3-subgraph",
+    "commit": "734f0e21992141596d9d090a3af724164b2524f3",
+    "path": "src/v3/mappings/swap.ts",
+    "url": "https://raw.githubusercontent.com/Uniswap/v3-subgraph/734f0e21992141596d9d090a3af724164b2524f3/src/v3/mappings/swap.ts",
+    "sha256": "ab8d7efa9fe485bc1c1f3bd857c8563159be056ceefb9d0ec9a735f64dd2d589"
+  },
+  {
+    "repository": "Uniswap/v3-subgraph",
+    "commit": "734f0e21992141596d9d090a3af724164b2524f3",
+    "path": "src/v3/mappings/mint.ts",
+    "url": "https://raw.githubusercontent.com/Uniswap/v3-subgraph/734f0e21992141596d9d090a3af724164b2524f3/src/v3/mappings/mint.ts",
+    "sha256": "344febaf65808d50206e65b25a43472430bbce7eae96a48c841a72f5b50b6fac"
+  },
+  {
+    "repository": "Uniswap/v3-subgraph",
+    "commit": "734f0e21992141596d9d090a3af724164b2524f3",
+    "path": "src/v3/mappings/burn.ts",
+    "url": "https://raw.githubusercontent.com/Uniswap/v3-subgraph/734f0e21992141596d9d090a3af724164b2524f3/src/v3/mappings/burn.ts",
+    "sha256": "9033c464e1efc1c751cec7c26683c4d4e9fb8a8cf53b4543f1b37c2b06812abc"
+  },
+  {
+    "repository": "aave/protocol-subgraphs",
+    "commit": "85dae6bde68229efe9c9555046fd5bbd336782c9",
+    "path": "src/mapping/lending-pool/lending-pool.ts",
+    "url": "https://raw.githubusercontent.com/aave/protocol-subgraphs/85dae6bde68229efe9c9555046fd5bbd336782c9/src/mapping/lending-pool/lending-pool.ts",
+    "sha256": "15246007c857c3b472ed9b4cca4c78749190a35682ae866ae485207fbf9c2561"
+  },
+  {
+    "repository": "aave/protocol-subgraphs",
+    "commit": "85dae6bde68229efe9c9555046fd5bbd336782c9",
+    "path": "src/mapping/lending-pool/v3.ts",
+    "url": "https://raw.githubusercontent.com/aave/protocol-subgraphs/85dae6bde68229efe9c9555046fd5bbd336782c9/src/mapping/lending-pool/v3.ts",
+    "sha256": "9fb71e130d5e85c66c0e3e3c4d9b4720287dcaf451ebdabcfc83b0eabc610181"
+  },
+  {
+    "repository": "aave/protocol-subgraphs",
+    "commit": "85dae6bde68229efe9c9555046fd5bbd336782c9",
+    "path": "src/mapping/lending-pool-configurator/v3.ts",
+    "url": "https://raw.githubusercontent.com/aave/protocol-subgraphs/85dae6bde68229efe9c9555046fd5bbd336782c9/src/mapping/lending-pool-configurator/v3.ts",
+    "sha256": "4b566338a3f16bb2e3ee367f1780816607827ecd345ba921606aab8f42b0dc27"
+  },
+  {
+    "repository": "aave/protocol-subgraphs",
+    "commit": "85dae6bde68229efe9c9555046fd5bbd336782c9",
+    "path": "src/helpers/v3/initializers.ts",
+    "url": "https://raw.githubusercontent.com/aave/protocol-subgraphs/85dae6bde68229efe9c9555046fd5bbd336782c9/src/helpers/v3/initializers.ts",
+    "sha256": "4840317bff2685e7f63957121fcae0377efe8e7bc7cdd636e2cb45b6893e2295"
+  }
+]

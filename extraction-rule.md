@@ -1,6 +1,60 @@
-# Finalized protocol event and block-state extraction rule
+## Direct reconstruction revision, 2026-10-25
 
-Status: **Finalized by the user, 2026-10-23; revised with explicit user approval.**
+The user explicitly requested straightforward event reconstruction without the
+recurring node checks. This supersedes the 1,000-block comparison requirement
+below for the active automatic event pipeline. Replay decoded events on dsc-data
+into every-block core state, without per-block headers or periodic getter
+comparisons. Preserve the checked mode and its outputs separately. Label direct
+outputs event-derived and unchecked; do not claim node-verified state coverage.
+Aave boundary initial conditions and configurator/provider events remain required
+inputs, collected once rather than as recurring validation. Decode-ready work
+has priority; otherwise continue direct replay without per-chunk scheduler waits.
+
+# Event extraction and core market reconstruction
+
+## User revision, 2026-10-24
+
+The user selected **core market fields only** and authorized event-driven
+end-of-block reconstruction with periodic node comparisons. This supersedes the
+older prohibition on reconstruction and the older full-getter production scope
+below. The full getter mode remains available for independent validation.
+
+- Retain all Pool events. Cryo extracts encoded logs on dsc-node; dsc-data decodes
+  them using the existing official ABI/Web3.py path and replays core state there.
+- Core fields: Uniswap V2 reserve0/reserve1; Uniswap V3 sqrtPriceX96, tick and active
+  liquidity; Aave V2/V3 stored liquidity/variable-borrow indices and liquidity,
+  variable-borrow and stable-borrow rates for each active reserve.
+- Supplement Aave Pool logs with canonical configurator initialization/drop logs
+  and provider routing evidence. New idle reserves must not be omitted.
+- Record a core state for **every block**, comparing exact integers with node
+  getters at intervals of at most **1,000 blocks**, including final partial
+  intervals. Creation/upgrade boundaries require explicit bootstrap evidence and
+  the reviewed historical ABI. Aave indices here are stored getter values, not
+  time-accrued normalized-income/debt views.
+- Mismatches leave the interval unaccepted and preserve evidence; never replace a
+  failed endpoint and claim the preceding interval was reproduced correctly.
+- Use a separate core-state identity; preserve accepted events, full getter data
+  and the independent reverted archive. Keep 32 pool workers × 2 Cryo requests.
+- Node checkpoint calls use Web3.py's ABI-aware contract API. This replaces bulk
+  per-block Cryo state calls in core mode; Cryo remains the bulk event extractor.
+
+See [the implementation contract](scripts/reconstruction/README.md) for field
+exclusions, exact data representation, provenance, routes and acceptance.
+
+## Sequential production order, 2026-10-24
+
+Finish all events for all tracked addresses and reviewed profiles first, including
+Aave configurator/provider logs. Then extract sparse state checkpoints on the node
+and reconstruct intermediate every-block core state on dsc-data. Only after that
+phase is accepted may failed-transaction tracing/archive/filter work begin.
+Each phase requires complete configuration-scoped, verified destination evidence.
+Preserve already accepted full state, core state and reverted data for reuse.
+The 32×2 event setting does not imply 64 native trace workers; trace concurrency
+stays unchanged pending a measured tracing benchmark.
+
+## Earlier full getter rule (retained for legacy RPC mode)
+
+Status: **Original full getter decision, 2026-10-23; superseded for core-mode production by the revision above.**
 This replaces the previous decision to decode events inside Cryo. Change it only
 with explicit user direction.
 

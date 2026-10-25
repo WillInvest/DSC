@@ -1,0 +1,9 @@
+[Unit]
+Description=Resume pending decoding and reconstruction
+[Timer]
+OnBootSec=30
+OnUnitInactiveSec=10
+AccuracySec=2
+Unit=dsc-event-pipeline.service
+[Install]
+WantedBy=timers.target

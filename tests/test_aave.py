@@ -17,7 +17,6 @@ if ROOT.name == 'scripts':
 sys.path.insert(0, str(ROOT / 'scripts'))
 from protocols.protocol_config import load_protocol
 from protocols.deployment import load_deployment, verify_deployment, check_block, save_profile
-from extraction.extract_reserve_state import extract
 from decoding.decode_pool_data import run
 from validation.reserve_state import verify_reserves
 
@@ -58,9 +57,12 @@ class AaveTests(unittest.TestCase):
 
     def extracted(self):
         output = self.root / 'raw'
-        with patch('extraction.extract_reserve_state.verify_deployment'), patch(
-                'extraction.extract_reserve_state.cryo_calls', side_effect=self.fake_cryo):
-            extract(self.config, ADDRESS, '100:102', output, self.profile, Mock())
+        save_profile(output,self.profile)
+        (output/'extraction.json').write_text(json.dumps(dict(protocol='aave-v3',address=ADDRESS,blocks='100:102')))
+        self.fake_cryo(ADDRESS,[self.contract.encode_abi('getReservesList')],'100:102',output/'discovery','fixture')
+        for height,assets in [(100,ASSETS),(101,ASSETS[:1])]:
+            calls=[self.contract.encode_abi('getReserveData',args=[asset]) for asset in assets]
+            self.fake_cryo(ADDRESS,calls,str(height),output/'reserves'/str(height),'fixture')
         return output
 
     def test_reserve_discovery_per_block_and_structured_parquet(self):

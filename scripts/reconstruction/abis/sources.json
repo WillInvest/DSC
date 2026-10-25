@@ -1,0 +1,30 @@
+[
+  {
+    "file": "v2-ILendingPoolAddressesProvider.json",
+    "url": "https://registry.npmjs.org/@aave/protocol-v2/-/protocol-v2-1.0.1.tgz",
+    "archive_sha256": "f1bf7e3cfcef541a79b1409e78144e0cbfb17a2162dfc179fa3225a0ee8d0a88",
+    "member": "package/artifacts/contracts/interfaces/ILendingPoolAddressesProvider.sol/ILendingPoolAddressesProvider.json",
+    "sha256": "0759616400e896e3b6e380f686d3b00f022c5b8592f80351805dc110e4106f4c"
+  },
+  {
+    "file": "v2-LendingPoolConfigurator.json",
+    "url": "https://registry.npmjs.org/@aave/protocol-v2/-/protocol-v2-1.0.1.tgz",
+    "archive_sha256": "f1bf7e3cfcef541a79b1409e78144e0cbfb17a2162dfc179fa3225a0ee8d0a88",
+    "member": "package/artifacts/contracts/protocol/lendingpool/LendingPoolConfigurator.sol/LendingPoolConfigurator.json",
+    "sha256": "d4eefd2ad46cd4f3f3c22d2e4403b8cca50f78fca11070593d0467d4a521e644"
+  },
+  {
+    "file": "v3-IPoolAddressesProvider.json",
+    "url": "https://registry.npmjs.org/@aave/core-v3/-/core-v3-1.19.3.tgz",
+    "archive_sha256": "a7bd560885fa804a5233ceb8f9c4da4ef3336246590b6f35e4eaedef044a8679",
+    "member": "package/artifacts/contracts/interfaces/IPoolAddressesProvider.sol/IPoolAddressesProvider.json",
+    "sha256": "759e680c124bae8ee0d1b2744834ad472b041d77029f9a3e4885fc822d1aeafa"
+  },
+  {
+    "file": "v3-IPoolConfigurator.json",
+    "url": "https://registry.npmjs.org/@aave/core-v3/-/core-v3-1.19.3.tgz",
+    "archive_sha256": "a7bd560885fa804a5233ceb8f9c4da4ef3336246590b6f35e4eaedef044a8679",
+    "member": "package/artifacts/contracts/interfaces/IPoolConfigurator.sol/IPoolConfigurator.json",
+    "sha256": "04a1d6733275c1d1281d9455f15c66a150304e17a9365e5b7e5335c2fad5ff8e"
+  }
+]

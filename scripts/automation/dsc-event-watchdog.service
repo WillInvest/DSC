@@ -1,0 +1,6 @@
+[Unit]
+Description=Watch extraction and offline pipeline heartbeats
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /home/dsc-data/scripts/automation/watchdog.py
+TimeoutStartSec=30

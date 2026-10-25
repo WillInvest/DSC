@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DSC · Event extraction</title>
+<style>
+:root{font-family:system-ui,sans-serif;color:#182b36;background:#f2f5f4}body{margin:0;padding:48px 24px}main{max-width:800px;margin:auto}header{display:flex;justify-content:space-between;align-items:center;margin-bottom:42px}small,.muted{color:#647780}h1{font-size:25px;margin:6px 0}h2{font-size:19px;margin:0 0 16px}.card{background:white;border:1px solid #dce5e2;border-radius:18px;padding:28px;margin:20px 0}.number{font-size:64px;font-weight:650;letter-spacing:-3px}.number span{font-size:25px;color:#647780;letter-spacing:0}progress{width:100%;height:14px;accent-color:#147d64;margin:14px 0}.line{display:flex;justify-content:space-between;gap:16px;margin:10px 0}.tag{border-radius:20px;background:#dceee6;padding:8px 14px;font-size:13px}code{font-size:12px;overflow-wrap:anywhere}.warning{color:#a43b22}footer{font-size:13px;line-height:1.6}.hidden{display:none}@media(max-width:520px){body{padding:24px 16px}.card{padding:22px}.number{font-size:52px}header{margin-bottom:24px}.line{flex-wrap:wrap}}
+</style>
+<main>
+<header><div><small>DSC / ETHEREUM</small><h1>Event extraction</h1></div><span id="state" class="tag">Connecting</span></header>
+<p id="warning" class="warning hidden" role="status"></p>
+<section class="card"><small>ADDRESSES RECEIVED ON DSC-DATA</small><div class="number"><b id="done">—</b> <span>/ 102</span></div>
+<progress id="overall" max="102" value="0" aria-label="Addresses received"></progress>
+<div class="line muted"><span id="remaining">Waiting for progress</span><span id="failed"></span></div></section>
+<section class="card"><h2 id="name">Waiting for the runner</h2><code id="address"></code>
+<div class="line"><span id="phase">—</span><strong id="chunks">—</strong></div>
+<progress id="current" max="1" value="0" aria-label="Current address files written"></progress>
+<div class="line muted"><span id="settings">32 concurrent requests</span><span id="inner">1,000 blocks / request</span></div>
+<small>Current progress counts files written on dsc-node. An address is complete only after extraction checks and transfer to dsc-data.</small></section>
+<section class="card"><h2>Offline decoding · dsc-data</h2><div id="decoding">Waiting for decode progress</div><small>Counts update when an output shard finishes; large shards can take several minutes.</small></section>
+<section class="card"><h2>State reconstruction · event-derived, unchecked</h2><div id="reconstruction">Waiting for decoded data</div><small>Every-block core state derived from events. No recurring node comparisons or per-block header downloads.</small></section>
+<p id="pipeline" class="muted"></p>
+<section class="card"><h2>Server storage</h2><div id="storage">Loading storage status</div><small>Decimal GB · Root/data filesystem · Refreshes about every minute</small></section>
+<footer class="muted"><div id="coverage"></div><div id="updated"></div><div>One address at a time · Event extraction · Refreshes every 10 seconds</div></footer>
+</main>
+<script>
+const el=id=>document.getElementById(id),number=n=>Number(n||0).toLocaleString();
+async function refresh(){try{
+ const r=await fetch('/api/progress',{cache:'no-store'});if(!r.ok)throw Error('Monitor unavailable');const s=await r.json(),d=s.data;if(!d)throw Error(s.error||'Waiting for first report');
+ const active=d.state==='running',age=Date.now()/1000-d.updated_at,stale=Date.now()/1000-s.fetched_at>40||(active&&age>60);
+ const warning=s.error||(stale?'Progress is stale; the runner may be stopped.':'');el('warning').textContent=warning;el('warning').classList.toggle('hidden',!warning);
+ el('state').textContent=stale?'Stale':({running:'Running',ready:'Ready',complete:'Complete',complete_with_errors:'Finished with errors'}[d.state]||d.state);
+ el('done').textContent=d.complete_addresses;el('overall').value=d.complete_addresses;el('remaining').textContent=`${d.total_addresses-d.complete_addresses} addresses remaining`;el('failed').textContent=d.failed_addresses?`${d.failed_addresses} failed`:'';
+ const container=el('decoding');container.replaceChildren();
+ const decoded=d.decoding||[];const summary=document.createElement('p');summary.textContent=`${decoded.filter(j=>j.state==='complete').length} / ${d.total_addresses} addresses decoded`;container.append(summary);
+ const visible=(jobs,phase)=>jobs.filter(j=>j.state!=='complete' && d.pipeline?.state===phase && d.pipeline?.current?.address===j.address);
+ container.parentElement.classList.toggle('hidden',visible(decoded,'decode').length===0);
+ for(const job of visible(decoded,'decode')){
+   const row=document.createElement('div'),title=document.createElement('h3'),bar=document.createElement('progress'),detail=document.createElement('p'),stamp=document.createElement('p');
+   const total=Number(job.total_rows||0),done=Number(job.decoded_rows||0),pct=total?100*done/total:0;
+   title.textContent=`${job.protocol} ${job.name||""} · ${job.state} · ${pct.toFixed(1)}%`;
+   bar.max=total||1;bar.value=done;bar.setAttribute('aria-label',`${job.protocol} decoding progress`);
+   detail.textContent=`${number(done)} / ${number(total)} events · ${job.state==='complete'?'Complete':number(Math.round(job.rows_per_second||0))+' new events/s average'} · ${number(job.completed_files)} / ${number(job.total_files)} files`;
+   stamp.className='muted';stamp.textContent=job.updated_at?`Last completed shard: ${new Date(job.updated_at*1000).toLocaleString()}`:'Progress unavailable';
+   row.append(title,bar,detail,stamp);
+   if(job.error){const error=document.createElement('p');error.className='warning';error.textContent=job.error;row.append(error);}
+   container.append(row);
+ }
+ if(!d.decoding?.length)container.textContent='Waiting for decode progress';
+ const reconstruction=el('reconstruction');reconstruction.replaceChildren();
+ const reconstructed=d.reconstruction||[],rc=document.createElement('p');rc.textContent=`${reconstructed.filter(j=>j.state==='complete').length} / ${d.total_addresses} addresses reconstructed`;reconstruction.append(rc);
+ reconstruction.parentElement.classList.toggle('hidden',visible(reconstructed,'reconstruct').length===0);
+ for(const job of visible(reconstructed,'reconstruct')){
+  const heading=document.createElement('h3'),bar=document.createElement('progress'),detail=document.createElement('p');
+  const done=job.completed_blocks||0,total=job.total_blocks||0;
+  heading.textContent=`${job.protocol} ${job.name} · ${job.state} · ${(total?100*done/total:0).toFixed(2)}%`;
+  bar.max=total||1;bar.value=done;bar.setAttribute('aria-label',`${job.name} reconstructed blocks`);
+  detail.textContent=`${number(done)} / ${number(total)} blocks written · ${number(Math.round(job.blocks_per_second||0))} blocks/s average`;
+  reconstruction.append(heading,bar,detail);
+ }
+ const failures=Object.values(d.pipeline_jobs||{}).filter(j=>j.error);
+ el('pipeline').textContent=`Scheduler: ${d.pipeline?.state||'waiting'} · Decode first · Automatic recovery enabled`+(failures.length?' · '+failures.map(j=>j.error).join('; '):'');
+ const storage=el('storage');storage.replaceChildren();
+ for(const server of ['dsc-data','dsc-revert','dsc-node','dsc-web']){
+  const disk=(d.storage||[]).find(x=>x.server===server),row=document.createElement('div'),label=document.createElement('div'),bar=document.createElement('progress');
+  const gb=n=>(n/1e9).toLocaleString(undefined,{maximumFractionDigits:1});
+  const stale=disk&&Date.now()/1000-disk.updated_at>180;
+  label.textContent=!disk||disk.error?`${server}: storage unavailable`:`${server}: ${gb(disk.used_bytes)} GB / ${gb(disk.total_bytes)} GB used (${disk.percent.toFixed(1)}%) · ${gb(disk.available_bytes)} GB available${stale?' · Stale':''}`;
+  row.append(label);
+  if(disk&&!disk.error){bar.max=disk.total_bytes;bar.value=disk.used_bytes;bar.setAttribute('aria-label',`${server} storage used`);row.append(bar);}
+  storage.append(row);
+ }
+ const c=d.current;el('name').parentElement.classList.toggle('hidden',!c||d.state!=='running');el('name').textContent=c?`${c.protocol} · ${c.name}`:(d.state==='complete'?'All addresses received':'No address currently active');el('address').textContent=c?.address||'';
+ el('phase').textContent=c?({extracting:c.inner_request_size<1000?'Retrying smaller requests':'Extracting',checking:'Checking output',extracted:'Preparing transfer',transferring:'Transferring to dsc-data',failed:'Extraction failed'}[c.state]||c.state):'—';
+ el('chunks').textContent=c?`${number(c.written_chunks)} / ${number(c.total_chunks)} chunks`:'';el('current').max=c?.total_chunks||1;el('current').value=c?.written_chunks||0;
+ el('inner').textContent=`${number(c?.inner_request_size||1000)} blocks / request`;
+ el('coverage').textContent=`Through finalized block ${number(d.end_block)} · ${number(d.accepted_blocks)} / ${number(d.total_blocks)} contract-blocks received`;
+ el('updated').textContent=`Last update: ${new Date(d.updated_at*1000).toLocaleString()}`;
+ if(c?.connection_error){el('warning').textContent='Cannot refresh current extraction from dsc-node';el('warning').classList.remove('hidden');}
+ }catch(e){el('warning').textContent=e.message;el('warning').classList.remove('hidden');el('state').textContent='Unavailable';}}
+refresh();setInterval(refresh,10000);
+</script>
+</html>

@@ -1,0 +1,8 @@
+[Unit]
+Description=Refresh terminal pipeline progress
+[Timer]
+OnBootSec=15
+OnUnitInactiveSec=10
+AccuracySec=1
+[Install]
+WantedBy=timers.target
