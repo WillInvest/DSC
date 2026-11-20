@@ -127,6 +127,32 @@ helper. Preserve original replay inputs, events, code, metadata, dictionaries,
 indices, receipts, recovery maps, RETH, trace archives and Savva dependencies.
 Verification running or files listed in Drive do not imply retirement acceptance.
 
+For the six old batches, `evidence/old-retirement-policy-proposal.json` lists the
+exact candidate roots and counts. The three raw batches contain 56 Parquets.
+The three indexed batches contain 490 TARs. Together they account for
+978,424,020,124 logical bytes. These are candidate totals. Compare the proposal
+with the finished verification report and inspect the retained certificates
+before invoking the approved retirement helper. The old primary restore and
+source archive units were observed inactive and disabled when checking the
+scope. Recheck for active consumers before mutation. The helper also checks
+open descriptors and file identity against the certificate before unlinking.
+
+The privileged helper rehashes every remaining file. A large batch may exceed
+the one-hour timeout of the old `_retire` wrapper. Run the approved helper
+against the pinned request in a bounded, supervised service with enough time
+for that full read. Preserve the request, per-file journal and returned receipt.
+For recovery after interruption, compare actual presence with the journal and
+the original certificate before resuming the same request.
+
+After retirement, record per-batch Node payload availability alongside the
+catalog snapshot and keep the Drive paths and all restore indices. Readers can
+download the selected raw Parquet and compare its manifest SHA-256. For indexed
+archives they can download the retained index and the selected TAR to a fresh
+staging directory, then use `03_Code_and_Definitions/read_archive.py` with the
+published index SHA-256 and exact member name. The published paths and immutable
+two-copy acceptance receipt describe the original delivery. The availability
+record describes the current location of the verified payloads.
+
 Runtime proofs and current progress are under node `evidence/` and the local
 `docs/data-collection/aave-v3/evidence/cohort-20261120/`. The goal remains active
 until complete historical coverage, verified publication and scoped retirement.
