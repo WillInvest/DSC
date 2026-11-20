@@ -10,6 +10,41 @@ This is a separate HF run. It does not move the application database or the
 continuous event/state/reverted coordinator. Existing HF workers, inputs,
 accepted prior results and protected services have not been stopped or replaced.
 
+## From chain inputs to cohort rows
+
+1. **Discover reserves and reconstruct shares.** The accepted Pool and
+   configurator histories identify reserves and their token contracts. Pool logs
+   carry user actions, collateral flags and eMode changes. Replaying token
+   events in chain order recovers scaled aToken and variable debt shares per
+   wallet. A qualifying `BalanceTransfer` already carries scaled shares. Decode
+   mint, burn and transfer events using the active historical token profile.
+   See [user history](README.md) and [position replay](replay_positions.py).
+2. **Normalize balances.** For each reserve, `ReserveDataUpdated` supplies the
+   stored liquidity and variable borrow indices and both current rates. The
+   historical replay starts from reviewed reserve seeds and uses the most recent
+   accepted update plus elapsed block time to project the normalized indices
+   between events. Apply the liquidity index to scaled aToken shares and the
+   variable borrow index to scaled variable debt shares, with historical Aave
+   rounding and the applicable GHO rules. See [batch replay](native_batch.py).
+3. **Value the account.** Use the frozen outputs of historical
+   `AaveOracle.getAssetsPrices` calls to our RETH node. Convert underlying
+   balances using their token decimals and the Oracle base currency. Apply
+   end-of-block collateral flags, reserve liquidation thresholds and the active
+   account eMode category. Configuration snapshots cover reviewed activation,
+   event and upgrade boundaries. See [account valuation](hf_batch_f64.py).
+4. **Aggregate by debt and category.** Reserve HF weights wallet HF by that
+   wallet's debt in the reserve. Protocol HF uses total wallet debt. The replay
+   applies the existing account dust rule before aggregation and uses the
+   wallet's category at each block end. Keeping the numerator and denominator
+   for `all`, `non_emode` and `emode` supports future comparisons without a
+   position replay. See [cohort reductions](hf_market_replay/cohorts.py).
+
+This run consumes accepted, frozen copies of those inputs. Its normal RETH
+calls validate samples from computed jobs. For future integration, pass an
+explicit block range, pinned inputs and a checkpoint into the numerical stage.
+The production dispatcher and final archive consume the resulting receipts.
+See the [callable stage contract](hf_market_replay/README.md).
+
 ## Authority and identities
 
 - Node base: `/home/node/hf-cohort-20261120`.
