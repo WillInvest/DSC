@@ -1,0 +1,24 @@
+[Unit]
+Description=Publish complete accepted Aave HF cohort history (20261120)
+Wants=network-online.target
+After=network-online.target
+RequiresMountsFor=/home/node/hf-cohort-20261120/storage
+ConditionPathExists=/home/node/hf-cohort-20261120/storage/control-v2/complete.json
+ConditionPathExists=!/home/node/hf-cohort-20261120/storage/archive-51f12482118a/complete.json
+
+[Service]
+Type=oneshot
+User=node
+WorkingDirectory=/home/node/hf-cohort-20261120
+Environment=PYTHONPATH=/home/node/hf-cohort-20261120/code-v2:/home/node/hf-flow-20261116/code-v5:/usr/local/libexec/dsc-hf-flow:/home/node/hf-f64-20261116/overlay:/home/node/hf-f64-v2-20261116/code
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=OPENBLAS_NUM_THREADS=1
+ExecStart=/home/node/aave-hf-distributed/5197dae89b140ccb/images/1d1a9be72b345989a4a8667573e929c66320535824f480517e6e440633d0e32d/scripts/.venv-abi/bin/python -m hf_market_replay.archive --config /home/node/hf-cohort-20261120/cluster-v2.json
+MemoryMax=2G
+MemorySwapMax=0
+CPUQuota=200%
+Nice=10
+UMask=0077
+TimeoutStartSec=infinity
+Restart=on-failure
+RestartSec=30min

@@ -1,0 +1,11 @@
+[Unit]
+Description=Check accepted Aave HF cohort release for publication
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=30min
+AccuracySec=1min
+Unit=dsc-aave-hf-cohort-20261120-archive.service
+
+[Install]
+WantedBy=timers.target

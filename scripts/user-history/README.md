@@ -513,3 +513,13 @@ reserve/protocol indicators. The old exact generation stays paused. Definitions,
 validated performance, paths, recovery, archive and four-hour audits are in
 [FLOAT64-ROLLOUT.md](FLOAT64-ROLLOUT.md). Full-history computation has started;
 this does not mean the910310934885-value target is complete.
+
+## Market HF cohort replay (2026-11-20)
+
+The new [modular replay package](hf_market_replay/README.md) retains three
+every-block reserve/protocol cohorts: all borrowers, category-zero accounts,
+and nonzero eMode accounts. Weighted numerators and debt denominators remain
+available for subsequent analysis. [COHORT-ROLLOUT.md](COHORT-ROLLOUT.md) records
+the separate Node authority, four-host TLS execution, offline recovery test,
+archive stage and scoped retirement rules. This run does not replace the
+original complete wallet HF release or its reconstruction inputs.

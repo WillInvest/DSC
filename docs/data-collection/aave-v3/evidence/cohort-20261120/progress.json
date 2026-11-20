@@ -9,7 +9,9 @@
     "recovery_commit": "d96107854543dc1107e554d80aeeebf32d9cc195",
     "source_bundle": "tested-sources.bundle",
     "work_branch": "codex/hf-cohort-20261120",
-    "last_commit": "d1edcc36995d44cf289f94b1e864e22e69c92799"
+    "last_commit": "49375d07416617fecb89663977a276a7fbac1523",
+    "cohort_source_bundle": "cohort-sources.bundle",
+    "cohort_source_bundle_sha256": "f813045d2e2bf8c8d544060e3daa38f82ff745ece7d637c6e97d5b6adf81ed40"
   },
   "node_base": "/home/node/hf-cohort-20261120",
   "node_storage": "/home/node/hf-cohort-20261120/storage",
@@ -35,7 +37,15 @@
     "three_io_workers": "authenticated_connected",
     "full_controller": "active",
     "live_tls_smoke_session": 26116,
-    "controlled_data_outage": "passed; data late hashes equal node accepted hashes"
+    "controlled_data_outage": "passed; data late hashes equal node accepted hashes",
+    "accepted_jobs": 633,
+    "accepted_blocks": 632074,
+    "accepted_roles": {
+      "compute": 204,
+      "data": 173,
+      "node": 88,
+      "revert": 168
+    }
   },
   "authorization": {
     "new_ssh_keys": "explicit user approval granted; unused because existing TLS works",
@@ -53,7 +63,9 @@
     "late_benchmark_blocks": 256,
     "late_benchmark_seconds": 240.32844103407115,
     "late_benchmark_peak_rss_kib": 485900,
-    "independent_final_review": "final-review.md; no new actionable defect"
+    "independent_final_review": "final-review.md; no new actionable defect",
+    "extra_live_audit_rpc": 77,
+    "extra_live_audit_samples": 6
   },
   "old_archive_retirement": {
     "verification_service": "dsc-hf-cohort-old-archive-verify-20261120.service",
@@ -72,5 +84,7 @@
     "Commit remaining work with temporary Git index and preserve portable bundle",
     "Supervise all computation and final Node/Drive archive acceptance"
   ],
-  "archive": "real two-block cloud canary active; full release waits for all historical jobs"
+  "archive": "real pilot accepted; boot-enabled final archive timer waits for full production acceptance",
+  "recorded_at_epoch": 1795201450.6533961,
+  "control_backup": "Compute control-backup-1795200962; 3 files SHA and SQLite integrity verified"
 }

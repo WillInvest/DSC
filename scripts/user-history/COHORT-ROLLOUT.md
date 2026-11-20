@@ -96,6 +96,28 @@ immutable rclone copy/check and SHA readback APIs. Cloud acceptance includes
 three logical member restores, a full TAR readback and acceptance-report readback.
 The stage preserves new node payloads and scratch copies.
 
+The real two-block archive pilot passed full copy/check, all three member
+readbacks, full TAR readback and acceptance-report readback. Its generation
+`3960a959f693a2ebf12b01258f79c167a5b71becec377a9a6dbd37e89c73861c`
+is a separate pilot, never production coverage. Node's boot-enabled
+`dsc-aave-hf-cohort-20261120-archive.timer` checks every30 minutes. Its service
+requires the production complete marker and skips an already complete archive.
+The archive code independently requires complete ledger coverage.
+
+A SQLite online backup at377 accepted jobs was copied to Compute under
+`/home/fao/hf-cohort-20261120/control-backup-1795200962`; all three retained
+files passed independent SHA and SQLite integrity checks. It is a recovery
+snapshot, not the current completion count. Node also retains a standalone
+1,969,047-byte Git bundle for tested replay sources, SHA256
+`f813045d2e2bf8c8d544060e3daa38f82ff745ece7d637c6e97d5b6adf81ed40`.
+
+The fresh live audit `live-audit-1795201172.json` rechecked six newly accepted
+helper samples, including debt and categories, with77 actual extra RPC calls.
+Node's sampled early job had no account samples and only block checks; do not
+describe it as a fresh nonempty account comparison. Normal per-job own-node
+checks remain separate. The existing four-hour automation now distinguishes
+this Node authority from the completed Compute-coordinated wallet release.
+
 The user authorized deleting old node HF *result payloads* once their existing
 Drive copies are freshly verified. This supersedes node-copy retention only
 for the explicit old result manifests. `hf_market_replay.retirement` is
