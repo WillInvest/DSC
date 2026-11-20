@@ -1,0 +1,8 @@
+[Unit]
+Description=Accept selected reverted transactions on dsc-data
+After=network-online.target
+[Service]
+Type=oneshot
+User=dsc-data
+ExecStart=/usr/bin/python3 /home/dsc-data/scripts/reverted/deliver_selected.py
+TimeoutStartSec=650

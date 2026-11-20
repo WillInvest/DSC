@@ -36,3 +36,14 @@ capture, acceptance and replay adapters have been removed.
 This schema excludes user positions, full fee/oracle accounting, Aave normalized
 (time-accrued) views, and complete EVM storage. No node-verified completion or
 legacy tracker state bits are claimed by direct replay.
+
+## One-time sampled verification
+
+`verify_samples.py` compares saved core state with ABI-aware historical RETH
+calls at deployment, every 100,000 blocks thereafter, and the fixed final block.
+Run it on dsc-data; its read-only RPC worker runs on dsc-node with eight threads.
+Results, canonical block hashes, exact node values, mismatches and RPC errors
+are retained under `/home/dsc-data/runs/state-validation/<UTC timestamp>/`.
+This is manual sampling, not recurring validation. It does not alter reconstructed
+files or relabel unchecked intervals as verified. Aave boundary seeds come from
+node state already; agreement at those seeded blocks is not independent evidence.

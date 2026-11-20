@@ -1,0 +1,11 @@
+{
+  "numeric_generation": "db2fce32bfc0a227f5d527ffee45c8212d1da0a939ec26447be07ada39af3efa",
+  "numeric_plan_sha256": "e0de3b44ab0ea4fd6004310fa86364e80abfaf51d2a75279b24553965261ca01",
+  "transport": "node_direct_rclone",
+  "batch_target_bytes": 500000000000,
+  "credential_destination": "node only; restricted mode0600; copied directly via TLS with explicit user approval",
+  "code_sha256": {
+    "direct_hf_archive.py": "8f1b3e8ce105c400c14e65a526fd23ddd56c7996bfd20f6960864e83097ff293",
+    "hf_f64_archive.py": "28b09ae79bdcd87e98365520391ab9fc99b91b67bc7dbcfd21f484a209b90790"
+  }
+}

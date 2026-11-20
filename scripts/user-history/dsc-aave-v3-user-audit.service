@@ -1,0 +1,13 @@
+[Unit]
+Description=Read-only Aave V3 user input audit against own RETH
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=dsc-data
+WorkingDirectory=/home/dsc-data/scripts
+ExecStart=/home/dsc-data/scripts/.venv-abi/bin/python /home/dsc-data/scripts/user-history/audit.py
+TimeoutStartSec=10min
+Nice=15
+UMask=0077
+

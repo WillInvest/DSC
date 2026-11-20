@@ -1,0 +1,16 @@
+[Unit]
+Description=Isolated Aave float64 TLS scheduler
+Wants=network-online.target
+After=network-online.target
+[Service]
+Environment=PYTHONPATH=/var/lib/dsc-aave-hf-f64/20261116/overlay:/var/lib/dsc-aave-hf-f64/20261116-v2/code:/home/dsc-data/scripts/user-history:/home/dsc-data/scripts
+Environment=PYTHONDONTWRITEBYTECODE=1
+BindReadOnlyPaths=/home/dsc-data/hf-distributed/snapshots/20261115-v2/image:/home/dsc-data
+User=dsc-data
+ExecStart=/home/dsc-data/scripts/.venv-abi/bin/python -m distributed.cli.dask_scheduler --host tls://10.246.103.151 --port 18896 --no-dashboard --tls-ca-file /var/lib/dsc-aave-hf-data/5197dae89b140ccb/state/private/ca.pem --tls-cert /var/lib/dsc-aave-hf-data/5197dae89b140ccb/state/private/host-cert.pem --tls-key /var/lib/dsc-aave-hf-data/5197dae89b140ccb/state/private/host-key.pem
+MemoryMax=2G
+Restart=on-failure
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target

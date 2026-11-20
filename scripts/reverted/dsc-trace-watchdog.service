@@ -1,0 +1,6 @@
+[Unit]
+Description=Check hosted trace runner heartbeat
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /home/dsc-revert/scripts/reverted/trace_watchdog.py
+TimeoutStartSec=20

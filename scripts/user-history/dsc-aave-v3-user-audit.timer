@@ -1,0 +1,10 @@
+[Unit]
+Description=Hourly Aave V3 read-only node validation
+
+[Timer]
+OnCalendar=hourly
+Persistent=true
+Unit=dsc-aave-v3-user-audit.service
+
+[Install]
+WantedBy=timers.target

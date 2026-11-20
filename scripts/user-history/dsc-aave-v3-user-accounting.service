@@ -1,0 +1,20 @@
+[Unit]
+Description=Aave V3 historical nominal balances and whole-account HF factors
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+User=dsc-data
+WorkingDirectory=/home/dsc-data/scripts
+ExecStart=/home/dsc-data/scripts/.venv-abi/bin/python /home/dsc-data/scripts/user-history/run_accounting.py
+Restart=on-failure
+RestartSec=60
+KillMode=control-group
+TimeoutStopSec=90
+Nice=10
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

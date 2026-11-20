@@ -1,0 +1,8 @@
+[Unit]
+Description=Coordinate direct node-to-revert receipt archive delivery
+After=network-online.target
+[Service]
+Type=oneshot
+User=dsc-data
+ExecStart=/usr/bin/ssh -o BatchMode=yes -o ConnectTimeout=10 dsc-revert@10.246.103.26 /usr/bin/python3 /home/dsc-revert/scripts/reverted/receive_receipts.py
+TimeoutStartSec=650

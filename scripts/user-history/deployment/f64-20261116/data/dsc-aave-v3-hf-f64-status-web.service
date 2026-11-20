@@ -1,0 +1,26 @@
+[Unit]
+Description=Aave float64 data
+Wants=network-online.target
+After=network-online.target
+[Service]
+User=dsc-data
+WorkingDirectory=/home/dsc-data/scripts
+Environment=PYTHONPATH=/var/lib/dsc-aave-hf-f64/20261116/overlay:/var/lib/dsc-aave-hf-f64/20261116-v2/code:/home/dsc-data/scripts/user-history:/home/dsc-data/scripts
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=OPENBLAS_NUM_THREADS=1
+Environment=OMP_NUM_THREADS=1
+Environment=MALLOC_ARENA_MAX=2
+Environment=DSC_HF_ROLE=data
+Environment=DASK_DISTRIBUTED__WORKER__DAEMON=false
+Environment=DASK_DISTRIBUTED__WORKER__MEMORY__TARGET=false
+Environment=DASK_DISTRIBUTED__WORKER__MEMORY__SPILL=false
+BindReadOnlyPaths=/home/dsc-data/hf-distributed/snapshots/20261115-v2/image:/home/dsc-data /var/lib/dsc-aave-hf-data/5197dae89b140ccb/state:/home/dsc-data/worker-state
+BindReadOnlyPaths=/var/lib/dsc-aave-hf-data/5197dae89b140ccb/outputs:/home/dsc-data/data/aave-user-history-v3/26407881/accounting/hf-numeric
+ExecStart=/home/dsc-data/scripts/.venv-abi/bin/python /var/lib/dsc-aave-hf-vector/20261116/code/failover_status.py --file /var/lib/dsc-aave-hf-f64/20261116-v2/public/web.json --bind 10.246.103.151 --port 18900
+MemoryMax=128M
+CPUQuota=25%
+Restart=on-failure
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target

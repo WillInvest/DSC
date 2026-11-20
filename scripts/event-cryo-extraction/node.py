@@ -51,6 +51,7 @@ def run(plan, job):
     fcntl.flock(global_lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
     identity = {k: plan[k] for k in ('end_block', 'end_hash', 'chunk_size')}
     identity.update(address=job['address'], start_block=job['start_block'])
+    if job.get('topic0'):identity['topic0']=job['topic0']
     if (root / 'identity.json').exists() and read(root / 'identity.json') != identity:
         raise ValueError('Output directory belongs to a different extraction range')
     write(root / 'identity.json', identity)
@@ -93,6 +94,7 @@ def run(plan, job):
                '--max-concurrent-requests', str(plan['concurrency']),
                '--max-concurrent-chunks', str(plan['concurrency']), '--include-columns', 'block_hash',
                '--hex', '--output-dir', str(output), '--report-dir', str(report_dir)]
+        if job.get('topic0'):cmd+=['--topic0',job['topic0']]
         exit_file = root / f'exit-{report_dir.name}'
         launch = root / f'launch-{report_dir.name}.sh'
         log_path = root / f'cryo-{report_dir.name}.log'
@@ -114,7 +116,7 @@ def run(plan, job):
             dead = subprocess.check_output(['tmux', 'display-message', '-p', '-t', 'cryo-events:0.0', '#{pane_dead}'], text=True).strip()
             if dead == '1' and not exit_file.exists():
                 raise RuntimeError('Cryo terminal exited without a result')
-            time.sleep(5)
+            time.sleep(plan.get('poll_seconds',5))
         terminal_active = False
         # Keep final reports at the root for empty-chunk evidence across retries.
         for report in report_dir.glob('*.json'):

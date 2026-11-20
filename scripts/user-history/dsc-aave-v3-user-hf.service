@@ -1,0 +1,22 @@
+[Unit]
+Description=Aave V3 all-user numerical historical health factors
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+User=dsc-data
+WorkingDirectory=/home/dsc-data/scripts
+ExecStart=/home/dsc-data/scripts/.venv-abi/bin/python /home/dsc-data/scripts/user-history/materialize_accounts.py --workers 32
+Restart=on-failure
+RestartSec=120
+KillMode=control-group
+TimeoutStopSec=90
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

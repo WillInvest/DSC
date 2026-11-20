@@ -1,0 +1,17 @@
+[Unit]
+Description=Continuous finalized DSC events, state, receipts and failed traces
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=0
+[Service]
+Type=simple
+User=dsc-data
+WorkingDirectory=/home/dsc-data/scripts
+ExecStartPre=/home/dsc-data/scripts/.venv-abi/bin/python /home/dsc-data/scripts/pipeline/verify.py --check
+ExecStart=/home/dsc-data/scripts/.venv-abi/bin/python /home/dsc-data/scripts/main.py continuous
+Restart=on-failure
+RestartSec=60
+KillMode=control-group
+TimeoutStopSec=180
+[Install]
+WantedBy=multi-user.target

@@ -135,7 +135,10 @@ def build(args):
         address = Web3.to_checksum_address(row['address'])
         config = load_protocol(row['protocol'])
         directory = config['abi'].parent
-        evidence = directory / 'history' / 'sources'
+        history=getattr(args,'history_directory','history')
+        target=(directory/history).resolve()
+        if directory.resolve() not in target.parents:raise ValueError('ABI history must stay inside protocol directory')
+        evidence = target / 'sources'
         proxy, proxy_source = verified_abi(w3, address, cutoff, evidence)
         print(f'{row["protocol"]}: scanning upgrade logs', flush=True)
         logs = upgrades(w3, address, row['creation_block'], cutoff+1, evidence)
@@ -155,7 +158,7 @@ def build(args):
                 old_abi, old_source = verified_abi(w3, other, start, evidence)
                 event_sources.append(old_abi)
                 sources.append(old_source)
-            relative = f'history/{start}.json'
+            relative = f'{history}/{start}.json'
             abi_hash = write(directory / relative, extraction_abi(abi, event_sources))
             profile = dict(protocol=row['protocol'], chain_id=1, address=address,
                 from_block=start, to_block=stop, implementation=impl,

@@ -19,10 +19,10 @@ SSH = ['ssh', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=10',
        '-o', 'ServerAliveInterval=15', '-o', 'ServerAliveCountMax=3', NODE]
 
 
-def command(mode, address):
+def command(mode, address, node_plan=NODE_PLAN):
     # A run's SSH terminal sends SIGHUP on disconnect, letting node.py stop Cryo.
     prefix = SSH[:-1] + (['-tt'] if mode == 'run' else []) + [NODE]
-    return prefix + [shlex.join([NODE_PYTHON, NODE_SCRIPT, mode, NODE_PLAN, address])]
+    return prefix + [shlex.join([NODE_PYTHON, NODE_SCRIPT, mode, node_plan, address])]
 
 
 def prepare(registry, data, root):
@@ -110,17 +110,17 @@ def execute(root):
         publish(current)
         try:
             with (root / f'{address}.log').open('a') as log:
-                child = subprocess.Popen(command('run', address), stdout=log, stderr=subprocess.STDOUT)
+                child = subprocess.Popen(command('run', address, plan.get('node_plan', NODE_PLAN)), stdout=log, stderr=subprocess.STDOUT)
                 while child.poll() is None:
                     try:
-                        result = subprocess.run(command('status', address), capture_output=True,
+                        result = subprocess.run(command('status', address, plan.get('node_plan', NODE_PLAN)), capture_output=True,
                                                 text=True, check=True, timeout=20)
                         current.update(json.loads(result.stdout))
                         current['connection_error'] = False
                     except (subprocess.SubprocessError, ValueError):
                         current['connection_error'] = True
                     publish(current)
-                    time.sleep(10)
+                    time.sleep(plan.get('poll_seconds',10))
                 if child.returncode:
                     raise RuntimeError(f'Node extraction failed (exit {child.returncode}); see {address}.log')
             result = subprocess.run(SSH + [shlex.join(['cat', job['node_dir'] + '/manifest.json'])],
@@ -136,7 +136,7 @@ def execute(root):
                          stdout=log, stderr=subprocess.STDOUT)
                 while child.poll() is None:
                     publish(current)
-                    time.sleep(10)
+                    time.sleep(plan.get('poll_seconds',10))
                 if child.returncode:
                     raise RuntimeError(f'Transfer failed (exit {child.returncode})')
             validate_destination(manifest, Path(job['destination']))

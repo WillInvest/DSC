@@ -1,0 +1,32 @@
+[Unit]
+Description=Aave float64 web
+Wants=network-online.target
+After=network-online.target
+[Service]
+User=fao
+WorkingDirectory=/home/dsc-data/scripts
+Environment=PYTHONPATH=/home/fao/hf-f64-20261116/overlay:/home/fao/hf-f64-v2-20261116/code:/home/dsc-data/scripts/user-history:/home/dsc-data/scripts
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=OPENBLAS_NUM_THREADS=1
+Environment=OMP_NUM_THREADS=1
+Environment=MALLOC_ARENA_MAX=2
+Environment=DSC_HF_ROLE=web
+Environment=DASK_DISTRIBUTED__WORKER__DAEMON=false
+Environment=DASK_DISTRIBUTED__WORKER__MEMORY__TARGET=false
+Environment=DASK_DISTRIBUTED__WORKER__MEMORY__SPILL=false
+BindReadOnlyPaths=/home/fao/aave-hf-distributed/5197dae89b140ccb/images/1d1a9be72b345989a4a8667573e929c66320535824f480517e6e440633d0e32d:/home/dsc-data /home/fao/aave-hf-distributed/5197dae89b140ccb/state:/home/dsc-data/worker-state
+BindReadOnlyPaths=/home/fao/aave-hf-distributed/5197dae89b140ccb/outputs:/home/dsc-data/data/aave-user-history-v3/26407881/accounting/hf-numeric
+TemporaryFileSystem=/dev/shm:mode=1777,size=256M
+ExecStart=/home/dsc-data/scripts/.venv-abi/bin/python -m distributed.cli.dask_worker tls://10.246.103.151:18896 --name f64-web --nworkers 2 --nthreads 1 --resources f64_compute=1 --memory-limit 2GiB --host tls://10.246.103.143 --no-dashboard --local-directory /dev/shm/hf-f64 --tls-ca-file /home/fao/aave-hf-distributed/5197dae89b140ccb/state/private/ca.pem --tls-cert /home/fao/aave-hf-distributed/5197dae89b140ccb/state/private/host-cert.pem --tls-key /home/fao/aave-hf-distributed/5197dae89b140ccb/state/private/host-key.pem
+MemoryMax=6G
+MemorySwapMax=0
+CPUQuota=200%
+Nice=15
+UMask=0077
+Restart=always
+RestartSec=30
+KillMode=control-group
+TimeoutStopSec=90
+
+[Install]
+WantedBy=multi-user.target

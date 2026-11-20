@@ -1,12 +1,13 @@
-"""Shared paths and pure selection for the fixed historical event plan."""
+"""Shared dataset paths and legacy fixed-plan task selection."""
 import json
+import os
 from pathlib import Path
 
 SCRIPTS = Path('/home/dsc-data/scripts')
-ROOT = Path('/home/dsc-data/runs/sequential-events')
-AUTO = Path('/home/dsc-data/runs/event-pipeline')
+ROOT = Path(os.environ.get('DSC_EVENT_ROOT', '/home/dsc-data/runs/sequential-events'))
+AUTO = Path(os.environ.get('DSC_AUTO_ROOT', '/home/dsc-data/runs/event-pipeline'))
 PYTHON = str(SCRIPTS / '.venv-abi/bin/python')
-PROFILES = Path('/home/dsc-data/runs/decode-two/profiles')
+PROFILES = Path(os.environ.get('DSC_PROFILES', '/home/dsc-data/runs/decode-two/profiles'))
 
 
 def read(path, default=None):

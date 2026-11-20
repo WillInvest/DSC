@@ -23,8 +23,11 @@ SSH=['ssh','-o','BatchMode=yes','-o','ConnectTimeout=10','-o','ServerAliveInterv
 
 def aave_inputs(job,plan):
     profiles=sorted([read(p) for p in PROFILES.glob(job['protocol']+'-*.json')],key=lambda p:p['from_block'])
-    if not profiles or profiles[0]['from_block']!=job['start_block'] or profiles[-1]['to_block']<plan['end_block']+1 or any(a['to_block']!=b['from_block'] for a,b in zip(profiles,profiles[1:])):
+    profiles=[p for p in profiles if p['from_block']<=plan['end_block'] and p['to_block']>job['start_block']]
+    if not profiles or profiles[0]['from_block']>job['start_block'] or profiles[-1]['to_block']<plan['end_block']+1 or any(a['to_block']!=b['from_block'] for a,b in zip(profiles,profiles[1:])):
         raise ValueError('Missing Aave historical boundary inputs')
+    profiles=[{**p,'bootstrap':not job.get('previous_state') or p['from_block']>=job['start_block'],
+               'from_block':max(p['from_block'],job['start_block'])} for p in profiles]
     request=dict(protocol=job['protocol'],address=job['address'],start=job['start_block'],stop=plan['end_block']+1,profiles=profiles)
     key=digest(request);root=AUTO/'aave-inputs'/key
     cache=root/'decoded-inputs.json'
@@ -69,12 +72,21 @@ def run(job,plan,budget=30):
                   start=job['start_block'],stop=plan['end_block']+1,
                   extraction_receipt=checksum(ROOT/'receipts'/f"{job['address']}.json"),
                   handlers=checksum(Path(__file__).parents[1]/'reconstruction/core.py'))
+    seed=initial(job['protocol'])
+    if job.get('previous_state'):
+        previous=Path(job['previous_state'])
+        identity['previous_state']=checksum(previous)
+        saved=read(previous)
+        if (saved['state']!='complete' or saved['next_block']!=job['start_block'] or
+            saved['identity']['address']!=job['address'] or saved['identity']['mode']!=MODE):
+            raise ValueError('Previous state does not join this interval')
+        seed=saved['last_state']
     old=read(progress_path,{})
     if old and old['identity']!=identity: raise ValueError('Direct replay identity changed')
     previous=read(status_path,{})
     if previous and previous.get('mode')!=MODE and not (base/'checked-progress.json').exists():
         write_json(base/'checked-progress.json',previous)
-    start=old.get('next_block',job['start_block']);state=old.get('last_state',initial(job['protocol']))
+    start=old.get('next_block',job['start_block']);state=old.get('last_state',seed)
     begun=time.monotonic();prior=old.get('elapsed_seconds',0)
     progress=dict(identity=identity,mode=MODE,validation='none',protocol=job['protocol'],name=job['name'],
                   state='preparing_inputs',next_block=start,completed_blocks=start-job['start_block'],

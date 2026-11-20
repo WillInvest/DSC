@@ -1,5 +1,10 @@
 ## Direct replay revision, 2026-10-25
 
+Continuous operation now uses `../main.py` and `../pipeline/README.md`. This
+directory supplies retained workers and monitoring helpers. The fixed-target
+scheduler/watchdog timers described below are disabled when the new coordinator
+is active; do not run both coordinators against the same outputs.
+
 The user explicitly removed recurring RETH comparisons and block-header scans.
 The active runner now uses `reconstruction/direct.py` to replay decoded event
 files locally in 10,000-block chunks. It writes every block, forward-filling

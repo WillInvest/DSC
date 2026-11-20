@@ -4,9 +4,17 @@
 <title>DSC · Event extraction</title>
 <style>
 :root{font-family:system-ui,sans-serif;color:#182b36;background:#f2f5f4}body{margin:0;padding:48px 24px}main{max-width:800px;margin:auto}header{display:flex;justify-content:space-between;align-items:center;margin-bottom:42px}small,.muted{color:#647780}h1{font-size:25px;margin:6px 0}h2{font-size:19px;margin:0 0 16px}.card{background:white;border:1px solid #dce5e2;border-radius:18px;padding:28px;margin:20px 0}.number{font-size:64px;font-weight:650;letter-spacing:-3px}.number span{font-size:25px;color:#647780;letter-spacing:0}progress{width:100%;height:14px;accent-color:#147d64;margin:14px 0}.line{display:flex;justify-content:space-between;gap:16px;margin:10px 0}.tag{border-radius:20px;background:#dceee6;padding:8px 14px;font-size:13px}code{font-size:12px;overflow-wrap:anywhere}.warning{color:#a43b22}footer{font-size:13px;line-height:1.6}.hidden{display:none}@media(max-width:520px){body{padding:24px 16px}.card{padding:22px}.number{font-size:52px}header{margin-bottom:24px}.line{flex-wrap:wrap}}
+#nominal-progress,#hf-progress{overflow-wrap:anywhere}
 </style>
 <main>
-<header><div><small>DSC / ETHEREUM</small><h1>Event extraction</h1></div><span id="state" class="tag">Connecting</span></header>
+<header><div><small>DSC / ETHEREUM</small><h1>Extraction progress</h1></div><span id="state" class="tag">Connecting</span></header>
+<section class="card hidden" id="cycle-card"><h2 id="cycle-title">Continuous finalized pipeline</h2><div id="cycle-status"></div><div id="cycle-stages"></div><small>Each cycle has a fixed finalized target. Completed coverage advances only after all stages accept their output.</small></section>
+<section class="card hidden" id="oracle-card"><h2>Aave V3 · All-reserve oracle prices</h2><div id="oracle-progress"></div><small>End-of-block prices · Own RETH node · Accepted blocks require destination hash and value checks · User HF remains a separate stage</small></section>
+<section class="card hidden" id="nominal-card"><h2>Aave V3 · Actual supply and debt, including interest</h2><div id="nominal-progress"></div><small>Factorized balance history: scaled shares plus exact normalized interest indices. Share recovery alone does not complete this stage.</small></section>
+<section class="card hidden" id="hf-card"><h2>Aave V3 · Whole-account health factor</h2><div id="hf-progress"></div><small>Requires all collateral and debt assets, collateral settings, historical thresholds, eMode and prices. Price collection alone does not complete HF.</small></section>
+<section class="card hidden" id="compaction-card"><h2>Storage compaction</h2><div id="compaction"></div><small>Events/state: original 10,000-block grid · Receipts/traces: original 1,000-block grid · Verified source fragments retired after publication</small></section>
+<section class="card hidden" id="receipt-card"><h2>Failed-transaction receipt scan</h2><div id="receipts"></div><small>Complete failed receipts archived on dsc-revert; tracing progress appears below.</small></section>
+<section class="card hidden" id="trace-card"><h2>Reverted-transaction tracing · dsc-revert</h2><div id="traces"></div><small>Index-sum rule · Full failed call trees retained · Contract filtering on dsc-revert · Resume checkpoints enabled</small></section>
 <p id="warning" class="warning hidden" role="status"></p>
 <section class="card"><small>ADDRESSES RECEIVED ON DSC-DATA</small><div class="number"><b id="done">—</b> <span>/ 102</span></div>
 <progress id="overall" max="102" value="0" aria-label="Addresses received"></progress>
@@ -18,15 +26,104 @@
 <small>Current progress counts files written on dsc-node. An address is complete only after extraction checks and transfer to dsc-data.</small></section>
 <section class="card"><h2>Offline decoding · dsc-data</h2><div id="decoding">Waiting for decode progress</div><small>Counts update when an output shard finishes; large shards can take several minutes.</small></section>
 <section class="card"><h2>State reconstruction · event-derived, unchecked</h2><div id="reconstruction">Waiting for decoded data</div><small>Every-block core state derived from events. No recurring node comparisons or per-block header downloads.</small></section>
+<section class="card hidden" id="preparation-card"><h2>Aave reconstruction preparation</h2><div id="preparation"></div><small>One-time supplementary contract logs and boundary seeds. Each bar covers one source address; more sources may be discovered.</small></section>
 <p id="pipeline" class="muted"></p>
 <section class="card"><h2>Server storage</h2><div id="storage">Loading storage status</div><small>Decimal GB · Root/data filesystem · Refreshes about every minute</small></section>
 <footer class="muted"><div id="coverage"></div><div id="updated"></div><div>One address at a time · Event extraction · Refreshes every 10 seconds</div></footer>
 </main>
 <script>
 const el=id=>document.getElementById(id),number=n=>Number(n||0).toLocaleString();
+function renderAaveStage(id,stage,inputs){
+ const box=el(`${id}-progress`);box.replaceChildren();el(`${id}-card`).classList.toggle('hidden',!stage?.state);
+ if(!stage?.state)return;
+ const line=(text,warning=false)=>{const node=document.createElement('p');node.textContent=text;if(warning)node.className='warning';box.append(node);return node;};
+ const labels={not_started:'Not started',preparing:'Preparing inputs',collecting:'Collecting inputs',collecting_block_times:'Collecting block timestamps',indexing_block_times:'Indexing block timestamps',indexing_pool_events:'Indexing Pool events',collecting_configuration:'Collecting historical risk configuration',indexing_share_history:'Indexing user share histories',running:'Calculating',waiting_for_inputs:'Waiting for inputs',validating:'Validating against node',factorized_history_ready:'Factorized history ready',complete:'Complete',canary_complete:'Trial complete — full history not yet running',failed:'Failed',paused_by_user:'Paused by user — awaiting explicit resume'};
+ line(labels[stage.state]||stage.state,stage.state==='failed');
+ const factorized=String(stage.representation||'').startsWith('factorized'),independent=stage.storage_role==='local_then_node_then_drive';
+ if(stage.representation)line(stage.representation);
+ if(id==='hf'&&stage.recovery_notice){line(`Verified recovery milestones · recorded ${new Date(stage.recovery_notice.recorded_at*1000).toLocaleString()} · central accepted totals remain separate`);for(const item of stage.recovery_notice.milestones||[])line(item);}
+ if(id==='hf'&&inputs?.state){
+  line(`Complete inputs: ${number(inputs.completed_blocks)} / ${number(inputs.total_blocks)} blocks with reconstructable inputs · ${labels[inputs.state]||inputs.state}`);
+  for(const reason of inputs.waiting_for||[])line(`Input preparation waiting: ${reason}`);
+  if(inputs.error)line(`Input preparation error: ${inputs.error}`,true);
+ }
+ const total=Number(stage.total_blocks||0),done=Number(stage.completed_blocks||0);
+ if(total>0){
+  const coverage=factorized?'blocks with reconstructable inputs':'blocks calculated';
+  line(`${number(done)} / ${number(total)} ${coverage} · ${(100*done/total).toFixed(2)}%`);
+  const bar=document.createElement('progress');bar.max=total;bar.value=done;bar.setAttribute('aria-label',`${id==='nominal'?'Aave actual-balance history':'Aave whole-account HF'} ${coverage}`);box.append(bar);
+ }else line('Block coverage has not been reported');
+ const reported=key=>stage[key]===undefined?'not reported':number(stage[key]);
+ line(`${reported(factorized?'numeric_rows_materialized':'processed_rows')} ${factorized?'numeric rows materialized':'output rows'} · ${reported('validated_samples')} node validation samples · ${reported('mismatches')} mismatches`,Number(stage.mismatches)>0);
+ if(stage.total_jobs!==undefined)line(`${number(stage.completed_jobs)} / ${number(stage.total_jobs)} jobs complete`);
+ if(stage.inflight_rows!==undefined)line(`${number(stage.inflight_rows)} rows in progress, not yet accepted`);
+ if(stage.failover)line(independent?'Data owns disjoint assignments and the acceptance ledger; four local queues calculate independently.':stage.coordinator_role==='data'?'Data owns the reconciled HF ledger and queue; node stores validated output.':'Temporary independent execution on surviving hosts; dsc-data tracker remains unavailable.');
+ if(stage.format==='hf-vector-v1')line('Exact HF vectors; coverage counts individual user-block HF values, not physical vector segments. Original full-row accepted outputs are retained.');
+ if(stage.format==='hf-vector-f64-v2'){
+  line('Float64 user HF vectors; reserve/protocol values are debt-weighted research indicators. Original exact data retained.');
+  if(stage.dust_threshold_usd)line(`Accounts with total debt below $${stage.dust_threshold_usd} are treated as zero debt and excluded from weighted indicators; original inputs and exclusion counts/value are retained.`);
+  line(`User HF: ${number(stage.user_values_accepted)} / ${number(stage.total_user_values)} accepted values · Reserve and protocol: ${number(stage.reserve_blocks_accepted)} / ${number(stage.protocol_blocks_accepted)} accepted blocks`);
+  line(`Continuous through block ${number(stage.continuous_end_block)} · Highest accepted ${number(stage.highest_accepted_block)} · ${number(stage.gap_jobs)} jobs remaining · ${number(stage.bytes)} output bytes`);
+  if(stage.conditional_eta_seconds!==null&&stage.conditional_eta_seconds!==undefined)line(`Conditional estimate at current throughput: ${(stage.conditional_eta_seconds/3600).toFixed(1)} hours remaining`);
+ }
+ if(stage.archive){const a=stage.archive;line(`Drive archive: ${a.state||'unknown'} · ${number(a.verified_bytes)} verified bytes · ${number(a.staged_bytes)} bytes staged · batch target ${number(a.batch_target_bytes)} bytes`);if(a.transport==='node_direct_rclone')line(a.node_parquet_cleanup_enabled?'Node uploads directly to Google Drive; verified result Parquets are retired after upload. Inputs, receipts and the recovery index are retained.':'Node uploads directly to Google Drive; no compute staging; node originals retained.');if(a.error||a.public_error)line(`Drive archive: ${a.error||a.public_error}`,true);}
+ if(stage.activity_unavailable)line('Live compute activity unknown: reports are stale; accepted totals are from the last report.',true);
+ else if(stage.active_compute_processes!==undefined)line(`${number(stage.active_compute_processes)} ${independent?'local compute processes currently working':stage.format==='hf-vector-f64-v2'?'scheduler-assigned compute tasks':'compute processes currently working'}`);
+ if(stage.host_flow){
+  const gb=n=>n===undefined||n===null?'not reported':`${(Number(n)/1e9).toLocaleString(undefined,{maximumFractionDigits:1})} GB`;
+  for(const [host,flow] of Object.entries(stage.host_flow))line(`${host==='web'?'dsc-compute':'dsc-'+host}: ${flow.producer_stale?'unknown':number(flow.active_compute_processes)} / ${number(flow.workers_configured)} local compute slots active · ${gb(flow.local_buffered_bytes)} buffered / ${gb(flow.local_transfer_target_bytes)} transfer target · ${gb(flow.node_transferred_bytes)} accepted on node · ${number(flow.node_accepted_jobs)} node jobs · ${gb(flow.free_bytes)} free`+(flow.producer_stale?' · LOCAL PRODUCER STALE':''),flow.producer_stale);
+ }else if(stage.distributed){const hosts=stage.distributed.hosts||{},online=stage.distributed.online_hosts||{},active=stage.distributed.active_by_host;line(`${stage.distributed.engine}: `+Object.entries(hosts).map(([host,count])=>`${host==='web'?'dsc-compute':host} ${active?`${active[host]||0} assigned; ${count} slots`:`${online[host]||0}/${count} workers online`}`).join(' · '));}
+ if(stage.current){const current=typeof stage.current==='string'?stage.current:[stage.current.stage,stage.current.id,stage.current.address,stage.current.token,stage.current.kind,stage.current.file,stage.current.through_block!==undefined?'through block '+number(stage.current.through_block):null,stage.current.state].filter(Boolean).join(' · ');if(current)line(`Current: ${current}`);}
+ if(stage.current?.total_blocks>0){
+  const inputTotal=Number(stage.current.total_blocks),inputDone=Number(stage.current.completed_blocks||0);
+  line(`Current input: ${number(inputDone)} / ${number(inputTotal)} blocks collected · ${(100*inputDone/inputTotal).toFixed(2)}%`+(stage.current.requests?` · ${number(stage.current.requests)} concurrent requests`:''));
+  const inputBar=document.createElement('progress');inputBar.max=inputTotal;inputBar.value=inputDone;inputBar.setAttribute('aria-label','Aave current input blocks collected');box.append(inputBar);
+ }
+ for(const reason of stage.waiting_for||[])line(`Waiting: ${reason}`);
+ if(stage.error)line(stage.error,true);
+ const bounds=stage.start_block!==undefined&&stage.end_block!==undefined?`Fixed block range ${number(stage.start_block)}–${number(stage.end_block)} · `:'';
+ const live=['preparing','collecting','collecting_block_times','indexing_block_times','indexing_pool_events','collecting_configuration','indexing_share_history','running','materializing','waiting_for_inputs','validating'].includes(stage.state),stale=live&&stage.updated_at&&Date.now()/1000-stage.updated_at>90;
+ const stamp=line(bounds+(stage.updated_at?`Last update ${new Date(stage.updated_at*1000).toLocaleString()}`:'No heartbeat published')+(stale?' · STALE':''),stale);
+ if(!stale)stamp.className='muted';
+}
 async function refresh(){try{
  const r=await fetch('/api/progress',{cache:'no-store'});if(!r.ok)throw Error('Monitor unavailable');const s=await r.json(),d=s.data;if(!d)throw Error(s.error||'Waiting for first report');
- const active=d.state==='running',age=Date.now()/1000-d.updated_at,stale=Date.now()/1000-s.fetched_at>40||(active&&age>60);
+ const coordinator=d.coordinator||{},cycle=coordinator.cycle;
+ renderAaveStage('nominal',d.aave_nominal);renderAaveStage('hf',d.aave_hf,d.aave_hf_inputs);
+ const oracle=d.aave_oracle||{},oracleBox=el('oracle-progress');oracleBox.replaceChildren();
+ el('oracle-card').classList.toggle('hidden',!oracle.state);
+ if(oracle.state){
+  const total=Number(oracle.total_blocks||0),done=Number(oracle.accepted_blocks||0),inflight=Number(oracle.current?.completed_blocks||0),rate=Number(oracle.blocks_per_second||0),rateReady=Number(oracle.price_values||0)>=1000000;
+  const title=document.createElement('p'),bar=document.createElement('progress'),counts=document.createElement('p'),details=document.createElement('p'),stamp=document.createElement('p');
+  title.textContent=`${oracle.state} · ${number(done)} / ${number(total)} blocks accepted on dsc-data · ${(total?100*done/total:0).toFixed(2)}%`;
+  bar.max=total||1;bar.value=done;bar.setAttribute('aria-label','Aave oracle accepted historical blocks');
+  counts.textContent=`${number(oracle.price_values)} price values accepted · ${number(oracle.accepted_intervals)} / ${number(oracle.total_intervals)} intervals · ${number(oracle.requests)} concurrent requests`;
+  details.textContent=`Node current interval: ${oracle.current?.state||'between intervals'} · ${number(inflight)} / ${number(oracle.current?.total_blocks)} blocks`;
+  if(rateReady&&rate>0){details.textContent+=` · ${rate.toFixed(1)} accepted blocks/s`;if(done<total)details.textContent+=` · Estimated remaining ${(Math.max(0,total-done)/rate/3600).toFixed(1)} hours`;}
+  else if(done<total)details.textContent+=' · Estimating speed after initial asset-onboarding intervals';
+  stamp.className='muted';stamp.textContent=`Fixed finalized target ${number(oracle.end_block)} · Last update ${new Date(oracle.updated_at*1000).toLocaleString()}`+(oracle.state!=='complete'&&Date.now()/1000-oracle.updated_at>90?' · STALE':'');
+  oracleBox.append(title,bar,counts,details,stamp);
+  const users=d.aave_users;if(users){const line=document.createElement('p');line.textContent=`All-reserve token events: ${number(users.raw_completed)} / ${number(users.total)} collected · ${number(users.decoded_completed)} decoded · ${number(users.scaled_completed)} scaled histories complete`;oracleBox.append(line);for(const item of users.failed||[]){const err=document.createElement('p');err.className='warning';err.textContent=`Position replay ${item.token}: ${item.error}`;oracleBox.append(err);}}
+  if(oracle.error){const err=document.createElement('p');err.className='warning';err.textContent=oracle.error;oracleBox.append(err);}
+ }
+ const compact=d.compaction||{},compactBox=el('compaction');compactBox.replaceChildren();
+ el('compaction-card').classList.toggle('hidden',!compact.state);
+ if(compact.state){
+  const title=document.createElement('p');title.textContent=`${compact.state} · ${compact.current_role||'all stores'} · Compacted through ${number(compact.through)} · Target ${number(compact.target)}`;compactBox.append(title);
+  for(const [role,item] of Object.entries(compact.roles||{})){
+   const line=document.createElement('p');line.style.overflowWrap='anywhere';line.textContent=`${role}: ${number(item.files)} files · ${number(item.sealed_files)} sealed · ${number(item.open_files)} growing · ${number(item.retired_files)} fragments retired`+(item.written_files?` · ${number(item.written_files)} prepared`:'')+(item.current_stream?` · ${item.current_stream.split('/').slice(0,3).join('/')} · Block ${number(item.current_start)}`:'');compactBox.append(line);
+  }
+  if(compact.error){const error=document.createElement('p');error.className='warning';error.textContent=compact.error;compactBox.append(error);}
+ }
+ el('cycle-title').textContent=coordinator.purpose==='verification'?'Pipeline replay verification':'Continuous finalized pipeline';
+ el('cycle-card').classList.toggle('hidden',!coordinator.state);
+ el('cycle-status').textContent=`${coordinator.state||'Waiting'} · ${coordinator.purpose==='verification'?'Replay completed through':'Completed through'} ${number(coordinator.completed_through)}`+(cycle?` · Cycle ${number(cycle.start)}–${number(cycle.end)} · Stage: ${coordinator.stage||'complete'}`:'');
+ const stages=el('cycle-stages');stages.replaceChildren();
+ for(const name of ['profiles','events','decode','reconstruct','receipts','receipt_delivery','traces','selected_delivery']){
+  const item=(coordinator.stages||[]).find(s=>s.name===name),line=document.createElement('p');line.textContent=`${name.replaceAll('_',' ')}: ${item?.state||'pending'}`;stages.append(line);
+ }
+ if(coordinator.error){const e=document.createElement('p');e.className='warning';e.textContent=coordinator.error;stages.append(e);}
+ const active=d.state==='running',stamp=coordinator.updated_at||d.updated_at,age=Date.now()/1000-stamp,stale=Date.now()/1000-s.fetched_at>40||((coordinator.state?['running','compacting'].includes(coordinator.state):active)&&age>90);
  const warning=s.error||(stale?'Progress is stale; the runner may be stopped.':'');el('warning').textContent=warning;el('warning').classList.toggle('hidden',!warning);
  el('state').textContent=stale?'Stale':({running:'Running',ready:'Ready',complete:'Complete',complete_with_errors:'Finished with errors'}[d.state]||d.state);
  el('done').textContent=d.complete_addresses;el('overall').value=d.complete_addresses;el('remaining').textContent=`${d.total_addresses-d.complete_addresses} addresses remaining`;el('failed').textContent=d.failed_addresses?`${d.failed_addresses} failed`:'';
@@ -57,25 +154,80 @@ async function refresh(){try{
   detail.textContent=`${number(done)} / ${number(total)} blocks written · ${number(Math.round(job.blocks_per_second||0))} blocks/s average`;
   reconstruction.append(heading,bar,detail);
  }
+ const prep=el('preparation');prep.replaceChildren();
+ const preparing=d.preparation?.jobs||[],prepAge=Date.now()/1000-(d.preparation?.updated_at||0);
+ el('preparation-card').classList.toggle('hidden',preparing.length===0);
+ for(const job of preparing){
+  const title=document.createElement('h3');
+  title.textContent=`${job.protocol} · ${prepAge>40?'Status stale':'Collector running'} · boundary seeds ${job.seeds_completed}/${job.seeds_total}`;prep.append(title);
+  for(const source of job.sources){
+   const label=document.createElement('p'),bar=document.createElement('progress');
+   const age=source.last_output_at?Math.max(0,Math.round(Date.now()/1000-source.last_output_at)):null;
+   label.textContent=`${source.address} · ${number(source.completed_chunks)}/${number(source.total_chunks)} chunks · ${(source.bytes/1e6).toFixed(1)} MB · last file ${age===null?'not yet written':age+'s ago'}`;
+   bar.max=source.total_chunks||1;bar.value=source.completed_chunks;bar.setAttribute('aria-label','Supplementary log chunks');prep.append(label,bar);
+  }
+  const stamp=document.createElement('p');stamp.className='muted';stamp.textContent=`Process last observed: ${new Date(job.updated_at*1000).toLocaleString()}`;prep.append(stamp);
+ }
+ const scan=d.receipt_scan?.node,archive=d.receipt_scan?.archive||{},receipts=el('receipts');receipts.replaceChildren();
+ el('receipt-card').classList.toggle('hidden',!scan?.total_blocks);
+ if(scan?.state==='running')el('state').textContent='Receipt scan running';
+ if(scan?.total_blocks){
+  const done=scan.completed_blocks||0,total=scan.total_blocks,rate=scan.blocks_per_second||0,age=Date.now()/1000-scan.updated_at;
+  const label=document.createElement('p'),bar=document.createElement('progress'),details=document.createElement('p'),destination=document.createElement('p'),stamp=document.createElement('p');
+  label.textContent=`${number(done)} / ${number(total)} blocks scanned · ${(100*done/total).toFixed(2)}% · ${scan.state}`;
+  bar.max=total;bar.value=done;bar.setAttribute('aria-label','Receipt scan blocks completed');
+  details.textContent=`${rate.toFixed(1)} blocks/s · ${number(scan.failed_transactions)} failed transactions · ${scan.workers} workers · current chunk ${number(scan.inflight_completed)}/1,000`;
+  destination.textContent=`dsc-revert accepted: ${number(archive.completed_blocks)} blocks · ${(Number(archive.compressed_bytes||0)/1e9).toFixed(2)} GB · ${archive.state||'waiting'}${archive.connection_error?' · connection unavailable':''}`;
+  stamp.textContent=`Last scan update: ${new Date(scan.updated_at*1000).toLocaleString()}${age>60||scan.connection_error?' · STALE':''}`;
+  if(rate>0&&scan.state==='running')stamp.textContent+=` · Estimated scan remaining: ${((total-done)/rate/3600).toFixed(1)} hours`;
+  receipts.append(label,bar,details,destination,stamp);
+  if(scan.error||archive.error){const error=document.createElement('p');error.className='warning';error.textContent=scan.error||archive.error;receipts.append(error);}
+ }
+ const trace=d.receipt_scan?.traces,delivery=d.trace_delivery||{},traceBox=el('traces');traceBox.replaceChildren();
+ el('trace-card').classList.toggle('hidden',!trace?.total_blocks);
+ if(trace?.total_blocks){
+  const done=trace.completed_blocks||0,total=trace.total_blocks,age=Date.now()/1000-trace.updated_at;
+  const title=document.createElement('p'),bar=document.createElement('progress'),detail=document.createElement('p'),sent=document.createElement('p'),stamp=document.createElement('p');
+  title.textContent=`${number(done)} / ${number(total)} blocks processed · ${(100*done/total).toFixed(2)}% · ${trace.state}`;
+  bar.max=total;bar.value=done;bar.setAttribute('aria-label','Reverted tracing progress');
+  detail.textContent=`${Number(trace.blocks_per_second||0).toFixed(2)} blocks/s · ${number(trace.failed_transactions)} failed transactions saved · ${number(trace.selected_transactions)} match tracked contracts · ${trace.active_requests||0}/${trace.accounts?.length||0} workers busy`;
+  detail.textContent+=' · '+Object.entries(trace.providers||{}).map(([name,p])=>`${name.toUpperCase()}: ${p.active}/${p.workers} busy`).join(' · ');
+  sent.textContent=`dsc-data accepted: ${number(delivery.accepted_blocks)} blocks · ${number(delivery.selected_transactions)} matching transactions`;
+  stamp.textContent=`Last trace update: ${new Date(trace.updated_at*1000).toLocaleString()}${age>60||trace.connection_error?' · STALE':''}`;
+  traceBox.append(title,bar,detail,sent,stamp);
+  const estimate=trace.estimate||{},eta=document.createElement('p'),note=document.createElement('small');
+  eta.textContent=`Estimated remaining time: ${estimate.full_duration||'unavailable'} · ${number(estimate.remaining_blocks)} blocks remaining`;
+  if(estimate.estimated_finish_at)eta.textContent+=` · Projected finish: ${new Date(estimate.estimated_finish_at*1000).toLocaleString()}`;
+  note.textContent='Fixed target, matching the receipt scan. ETA uses average processed blocks/s since the latest runner start; retries, workload and key availability can change it.';
+  traceBox.append(eta,note);
+  for(const account of trace.accounts||[]){
+   const status=document.createElement('p'),cooldown=Math.max(0,Math.ceil(account.next_at-Date.now()/1000));
+   status.className=account.error?'warning':'muted';status.textContent=`${account.name}: ${account.disabled?'paused — authorization/quota':cooldown?'retry in '+cooldown+'s':'available'} · ${number(account.requests)} requests${account.error?' · '+account.error:''}`;traceBox.append(status);
+  }
+  for(const failure of trace.errors||[]){const error=document.createElement('p');error.className='warning';error.textContent=`Block ${failure.number}: ${failure.error}`;traceBox.append(error);}
+  if(delivery.error){const error=document.createElement('p');error.className='warning';error.textContent=delivery.error;traceBox.append(error);}
+ }
  const failures=Object.values(d.pipeline_jobs||{}).filter(j=>j.error);
- el('pipeline').textContent=`Scheduler: ${d.pipeline?.state||'waiting'} · Decode first · Automatic recovery enabled`+(failures.length?' · '+failures.map(j=>j.error).join('; '):'');
+ el('pipeline').textContent=(coordinator.state?`Coordinator: ${coordinator.state} · ${coordinator.stage||'waiting for finalized blocks'} · Stages run in order`:`Scheduler: ${d.pipeline?.state||'waiting'} · Decode first · Automatic recovery enabled`)+(failures.length?' · '+failures.map(j=>j.error).join('; '):'');
  const storage=el('storage');storage.replaceChildren();
  for(const server of ['dsc-data','dsc-revert','dsc-node','dsc-web']){
   const disk=(d.storage||[]).find(x=>x.server===server),row=document.createElement('div'),label=document.createElement('div'),bar=document.createElement('progress');
   const gb=n=>(n/1e9).toLocaleString(undefined,{maximumFractionDigits:1});
   const stale=disk&&Date.now()/1000-disk.updated_at>180;
-  label.textContent=!disk||disk.error?`${server}: storage unavailable`:`${server}: ${gb(disk.used_bytes)} GB / ${gb(disk.total_bytes)} GB used (${disk.percent.toFixed(1)}%) · ${gb(disk.available_bytes)} GB available${stale?' · Stale':''}`;
+  const display=server==='dsc-web'?'dsc-compute':server;
+  label.textContent=!disk||disk.error?`${display}: storage unavailable`:`${display}: ${gb(disk.used_bytes)} GB / ${gb(disk.total_bytes)} GB used (${disk.percent.toFixed(1)}%) · ${gb(disk.available_bytes)} GB available${stale?' · Stale':''}`;
   row.append(label);
   if(disk&&!disk.error){bar.max=disk.total_bytes;bar.value=disk.used_bytes;bar.setAttribute('aria-label',`${server} storage used`);row.append(bar);}
   storage.append(row);
  }
- const c=d.current;el('name').parentElement.classList.toggle('hidden',!c||d.state!=='running');el('name').textContent=c?`${c.protocol} · ${c.name}`:(d.state==='complete'?'All addresses received':'No address currently active');el('address').textContent=c?.address||'';
+ const c=d.current;el('name').parentElement.classList.toggle('hidden',!c||d.state!=='running'||(coordinator.state&&coordinator.stage!=='events'));el('name').textContent=c?`${c.protocol} · ${c.name}`:(d.state==='complete'?'All addresses received':'No address currently active');el('address').textContent=c?.address||'';
  el('phase').textContent=c?({extracting:c.inner_request_size<1000?'Retrying smaller requests':'Extracting',checking:'Checking output',extracted:'Preparing transfer',transferring:'Transferring to dsc-data',failed:'Extraction failed'}[c.state]||c.state):'—';
  el('chunks').textContent=c?`${number(c.written_chunks)} / ${number(c.total_chunks)} chunks`:'';el('current').max=c?.total_chunks||1;el('current').value=c?.written_chunks||0;
  el('inner').textContent=`${number(c?.inner_request_size||1000)} blocks / request`;
  el('coverage').textContent=`Through finalized block ${number(d.end_block)} · ${number(d.accepted_blocks)} / ${number(d.total_blocks)} contract-blocks received`;
- el('updated').textContent=`Last update: ${new Date(d.updated_at*1000).toLocaleString()}`;
- if(c?.connection_error){el('warning').textContent='Cannot refresh current extraction from dsc-node';el('warning').classList.remove('hidden');}
+ el('updated').textContent=`Last update: ${new Date(stamp*1000).toLocaleString()}`;
+ if(c?.connection_error&&(!coordinator.state||coordinator.stage==='events')){el('warning').textContent='Cannot refresh current extraction from dsc-node';el('warning').classList.remove('hidden');}
+ if(coordinator.state){el('state').textContent=coordinator.state==='running'?`Running · ${coordinator.stage}`:coordinator.state;if(coordinator.state==='running'&&Date.now()/1000-coordinator.updated_at>90){el('warning').textContent='Coordinator heartbeat is stale';el('warning').classList.remove('hidden');}}
  }catch(e){el('warning').textContent=e.message;el('warning').classList.remove('hidden');el('state').textContent='Unavailable';}}
 refresh();setInterval(refresh,10000);
 </script>

@@ -1,5 +1,9 @@
 # Sequential encoded-event extraction
 
+For current incremental/continuous operation, use `../main.py` and see
+`../pipeline/README.md`. This queue and node worker remain the fast event workers;
+the fixed historical plan and preparation commands below are retained for rollback.
+
 This is the user-requested replacement for the historical event coordinator and
 private monitor. It extracts **events only** for the registry's 50 Uniswap V2,
 50 Uniswap V3, and 2 Aave market addresses. State, decoding, and reverted traces

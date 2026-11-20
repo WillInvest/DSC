@@ -4,4 +4,4 @@ Description=Publish decode and reconstruction counters to native Cryo monitor
 Type=oneshot
 User=dsc-data
 ExecStart=/usr/bin/python3 /home/dsc-data/scripts/automation/publish.py
-TimeoutStartSec=30
+TimeoutStartSec=60

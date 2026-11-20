@@ -51,7 +51,7 @@ def boundary_event(log):
                 implementation=Web3.to_checksum_address(bytes(log['topics'][1])[-20:]))
 
 
-def verify_deployment(w3, profile, blocks):
+def verify_deployment(w3, profile, blocks, upgrade_logs=None):
     """Verify the implementation interval, including explicitly reviewed boundary logs."""
     from web3 import Web3
     start, end = blocks[0], blocks[-1]
@@ -66,8 +66,9 @@ def verify_deployment(w3, profile, blocks):
         at_height = profile.get('previous_implementation', expected).lower() if height == profile['from_block'] - 1 else expected
         if '0x' + bytes(slot)[-20:].hex() != at_height:
             raise ValueError('unsupported proxy implementation or upgrade boundary')
-    upgrades = w3.eth.get_logs({'address': address, 'fromBlock': start, 'toBlock': end,
-                               'topics': ['0x' + Web3.keccak(text='Upgraded(address)').hex()]})
+    upgrades = upgrade_logs if upgrade_logs is not None else w3.eth.get_logs(
+        {'address': address, 'fromBlock': start, 'toBlock': end,
+         'topics': ['0x' + Web3.keccak(text='Upgraded(address)').hex()]})
     reviewed = [e for e in profile.get('boundary_upgrades', []) if start <= e['block'] <= end]
     if len(upgrades) != len(reviewed):
         raise ValueError('range contains an unreviewed proxy upgrade')

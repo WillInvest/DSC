@@ -1,0 +1,8 @@
+[Unit]
+Description=Archive completed receipt batches every 30 seconds
+[Timer]
+OnBootSec=20
+OnUnitInactiveSec=30
+Unit=dsc-receipt-delivery.service
+[Install]
+WantedBy=timers.target

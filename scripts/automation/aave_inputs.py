@@ -47,18 +47,20 @@ def collect(request):
         if start>=stop: continue
         write_json(output/'progress.json',dict(state='boundary_inputs',block=start,protocol=protocol))
         seed_path=output/f'seed-{start}.json'
-        if not seed_path.exists():
-            write_json(seed_path,snapshot(w3,protocol,address,start,profile))
-        seeds[str(start)]=json.loads(seed_path.read_text())
+        if profile.get('bootstrap',True):
+            if not seed_path.exists():
+                write_json(seed_path,snapshot(w3,protocol,address,start,profile))
+            seeds[str(start)]=json.loads(seed_path.read_text())
         cfg=load_protocol(protocol,profile)
         pool=w3.eth.contract(address=Web3.to_checksum_address(address),abi=json.loads(cfg['abi'].read_text()))
         getter='getAddressesProvider' if version=='v2' else 'ADDRESSES_PROVIDER'
-        provider_address=getattr(pool.functions,getter)().call(block_identifier=start)
+        routing_block=start if profile.get('bootstrap',True) else start-1
+        provider_address=getattr(pool.functions,getter)().call(block_identifier=routing_block)
         provider_file=version+'-'+('ILendingPoolAddressesProvider' if version=='v2' else 'IPoolAddressesProvider')+'.json'
         abi=json.loads((abi_root/provider_file).read_text())
         provider=w3.eth.contract(address=provider_address,abi=abi)
         getter='getLendingPoolConfigurator' if version=='v2' else 'getPoolConfigurator'
-        current=getattr(provider.functions,getter)().call(block_identifier=start).lower()
+        current=getattr(provider.functions,getter)().call(block_identifier=routing_block).lower()
         key=provider_address.lower()
         if key not in providers:
             extract(key)
@@ -74,7 +76,7 @@ def collect(request):
                         if new is not None:
                             updates.append(dict(block=row['block_number'],log_index=row['log_index'],address=new.lower()))
             providers[key]=sorted(updates,key=lambda e:(e['block'],e['log_index']))
-        transitions=[e for e in providers[key] if start<e['block']<end]
+        transitions=[e for e in providers[key] if (start<e['block'] if profile.get('bootstrap',True) else start<=e['block']) and e['block']<end]
         routes.append(dict(start=start,stop=end,initial=current,transitions=transitions))
         config_file=version+'-'+('LendingPoolConfigurator' if version=='v2' else 'IPoolConfigurator')+'.json'
         sources.add((key,provider_file,True));sources.add((current,config_file,False))

@@ -1,0 +1,14 @@
+[Unit]
+Description=Trace and select accepted failed receipts using RETH and configured dRPC accounts
+After=network-online.target
+Wants=network-online.target
+[Service]
+Type=simple
+User=dsc-revert
+ExecStart=/home/dsc-revert/scripts/.venv-web3/bin/python /home/dsc-revert/scripts/reverted/trace_received.py --reth-rpc http://10.246.103.160:8545 --reth-workers 32
+Restart=on-failure
+RestartSec=30
+KillMode=control-group
+TimeoutStopSec=240
+[Install]
+WantedBy=multi-user.target

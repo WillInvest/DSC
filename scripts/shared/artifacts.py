@@ -17,15 +17,19 @@ def checksum(path):
     return value.hexdigest()
 
 
-def write_json(path, data):
+def write_json(path, data, *, durable=True):
+    """Atomically publish JSON; deferred durability requires an outer sync barrier."""
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     temp = path.with_suffix(path.suffix + '.tmp')
     with temp.open('w') as stream:
         json.dump(data, stream, sort_keys=True)
         stream.flush()
-        os.fsync(stream.fileno())
+        if durable:
+            os.fsync(stream.fileno())
     temp.replace(path)
+    if not durable:
+        return
     fd = os.open(path.parent, os.O_RDONLY)
     try:
         os.fsync(fd)

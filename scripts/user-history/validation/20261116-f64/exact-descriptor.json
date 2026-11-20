@@ -1,0 +1,71 @@
+{
+  "generation": "60e4873a31048140d1e9f64cd6bd3b047514703751e1103d7a70a5d6c0dc215a",
+  "identity": {
+    "method": "native_integer_hf_vector_central_v1",
+    "all_users": true,
+    "block_step": 1,
+    "cutoff": 26407881,
+    "end_hash": "0x2c88bc81d57ed2af2a17622a4450a182b25663b3c8d7c48cbcf8bdd8a5a46b91",
+    "factor_generation": "5197dae89b140ccbed5090f2f3e6ff39dde3eba5c737bb97b0ec320663532004",
+    "snapshot_manifest_sha256": "1d1a9be72b345989a4a8667573e929c66320535824f480517e6e440633d0e32d",
+    "format": "hf-vector-v1",
+    "buffer_values": 1000000,
+    "registry_digest": "88289451664b81f6e08c52110f2fcd0e74f7dbe792c5fd9ee2d5c170df55c70d",
+    "sources": {
+      "failover_hf.py": "fb6b3d36648a4811c37fd49644c887d7c58efe4c8a2cdb3b276fe44d35e50da5",
+      "materialize_accounts.py": "7d6aafc3c97c1ecf7ac7bd0acb45baeef97371f04316176b090ec677b818718c",
+      "native_hf.py": "daa9cfd400f3a0b5a9a59cf4d6425e59c43535c7f4210fd542e973f83eadabdf",
+      "native_batch.py": "64b782e28eee22e88d0d43681e2d83588bca3fa34cb167f0f42c79696d716786",
+      "hf_vectors.py": "5bea8b67cb2a05c4300c3af69036d04c45506cbf5a82124613b9842433632d8f",
+      "vector_compute.py": "c40c6b5bb5495061061b506ee0e804d6446781b6d1f6660da27d77f34284c13d",
+      "vector_accept.py": "9f0d810deebd286714937435fc59070133c91803c956f618365d518eb524fdb3"
+    }
+  },
+  "locations": [
+    {
+      "role": "node",
+      "host": "node@100.108.171.14",
+      "base": "/home/node/hf-vector-20261116"
+    },
+    {
+      "role": "revert",
+      "host": "dsc-revert@100.91.215.76",
+      "base": "/home/dsc-revert/hf-vector-20261116"
+    },
+    {
+      "role": "web",
+      "host": "fao@100.119.128.31",
+      "base": "/home/fao/hf-vector-20261116"
+    }
+  ],
+  "payload": {
+    "identity": {
+      "method": "native_integer_hf_vector_central_v1",
+      "all_users": true,
+      "block_step": 1,
+      "cutoff": 26407881,
+      "end_hash": "0x2c88bc81d57ed2af2a17622a4450a182b25663b3c8d7c48cbcf8bdd8a5a46b91",
+      "factor_generation": "5197dae89b140ccbed5090f2f3e6ff39dde3eba5c737bb97b0ec320663532004",
+      "snapshot_manifest_sha256": "1d1a9be72b345989a4a8667573e929c66320535824f480517e6e440633d0e32d",
+      "format": "hf-vector-v1",
+      "buffer_values": 1000000,
+      "registry_digest": "88289451664b81f6e08c52110f2fcd0e74f7dbe792c5fd9ee2d5c170df55c70d",
+      "sources": {
+        "failover_hf.py": "fb6b3d36648a4811c37fd49644c887d7c58efe4c8a2cdb3b276fe44d35e50da5",
+        "materialize_accounts.py": "7d6aafc3c97c1ecf7ac7bd0acb45baeef97371f04316176b090ec677b818718c",
+        "native_hf.py": "daa9cfd400f3a0b5a9a59cf4d6425e59c43535c7f4210fd542e973f83eadabdf",
+        "native_batch.py": "64b782e28eee22e88d0d43681e2d83588bca3fa34cb167f0f42c79696d716786",
+        "hf_vectors.py": "5bea8b67cb2a05c4300c3af69036d04c45506cbf5a82124613b9842433632d8f",
+        "vector_compute.py": "c40c6b5bb5495061061b506ee0e804d6446781b6d1f6660da27d77f34284c13d",
+        "vector_accept.py": "9f0d810deebd286714937435fc59070133c91803c956f618365d518eb524fdb3"
+      }
+    },
+    "generation": "60e4873a31048140d1e9f64cd6bd3b047514703751e1103d7a70a5d6c0dc215a",
+    "job": {
+      "expected_rows": 9794116,
+      "id": "25200029-25200073",
+      "start": 25200029,
+      "stop": 25200074
+    }
+  }
+}

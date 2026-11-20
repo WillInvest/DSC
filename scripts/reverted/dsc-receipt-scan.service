@@ -1,0 +1,14 @@
+[Unit]
+Description=Historical failed-receipt scan only (no debug tracing)
+After=network-online.target
+Wants=network-online.target
+[Service]
+Type=simple
+User=node
+ExecStart=/home/node/dsc-extraction/.venv-web3/bin/python /home/node/dsc-extraction/scripts/reverted/scan_receipts.py --start 10008355 --stop 26266552 --workers 32 --executor process --output /home/node/dsc-reverted/receipts/historical-v1
+Restart=on-failure
+RestartSec=30
+KillMode=control-group
+TimeoutStopSec=20
+[Install]
+WantedBy=multi-user.target

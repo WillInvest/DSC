@@ -1,0 +1,16 @@
+{
+  "compute/dsc-aave-v3-hf-f64-archive-worker.service": "e28e73deeac654c3c51d939309e4a0459f995d7618de587daab7462aace7c19a",
+  "compute/dsc-aave-v3-hf-f64-workers.service": "194f1be44930de99d2287b28e23a72d8cfed594810394e62b93c319197ff68c4",
+  "data/dsc-aave-v3-hf-f64-archive.service": "1467c45a521f91106d1822b322ad24cedbff7f0ae4f009de4edd90005be2e206",
+  "data/dsc-aave-v3-hf-f64-producer.service": "29cc8ecb4a6a11c28af422a77e2dcaf63bbaba4e515b5ed069935ddcbf74f739",
+  "data/dsc-aave-v3-hf-f64-scheduler.service": "fbe05dc0b33b077bef362e069a658cc7c23731465175595fcbe54a96aa011f4a",
+  "data/dsc-aave-v3-hf-f64-status-archive.service": "7c71d3b1c98c54501f22e7fd8771bcd59a23171a437aceb156fa210095d6055f",
+  "data/dsc-aave-v3-hf-f64-status-data.service": "6e676c7e15bac01f60862c6856af9d8bc9feb3e832f98639dad0f6d9136ac368",
+  "data/dsc-aave-v3-hf-f64-status-node.service": "313883ffae5622956647c8c5d0752755e403e33eb7392a06c5ac102008179418",
+  "data/dsc-aave-v3-hf-f64-status-revert.service": "bdfd246757c29a453937c937b803af5163daa6b4b06bb86b1e96eaa3b2b35b7b",
+  "data/dsc-aave-v3-hf-f64-status-web.service": "3a11ddaed443a419e4cc5855e5102e6d59f9051b2520ff21b4e0240fa66d2115",
+  "data/dsc-aave-v3-hf-f64-workers.service": "7f14158383b0555054d2f24ea74082a96426203ed27e5bceeb0d3de7d007f19d",
+  "node/dsc-aave-v3-hf-f64-accept.service": "2c19b7c66d9729f5111b5a133b23aceb6f99142fa7d392ea387e6fe6c59f0f35",
+  "node/dsc-aave-v3-hf-f64-workers.service": "48fadc70bcd7a3afd352a08ac9404c43ab420bfca9c442fc3ac79b952cef67fd",
+  "revert/dsc-aave-v3-hf-f64-workers.service": "8f24ce97b35591918c8244babfbc1004901d1540375a0aba40d34f721c0353d9"
+}
