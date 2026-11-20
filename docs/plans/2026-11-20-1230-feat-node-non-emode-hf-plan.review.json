@@ -1,0 +1,9 @@
+{
+  "fixes_applied": 0,
+  "proposed_fixes_count": 0,
+  "decisions_count": 0,
+  "fyi_count": 0,
+  "skipped_reason": "skill_unreachable",
+  "skipped_detail": "No native skill-invocation tool is exposed for ce-doc-review. Read-only code research and direct plan coherence checks completed; formal document review did not run.",
+  "confidence": "Existing frozen calculation, sparse debt-edge interface and live four-host paths verified. Deployment authentication and exact worker limits remain implementation-time checks."
+}

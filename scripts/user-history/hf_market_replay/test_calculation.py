@@ -69,7 +69,9 @@ class CohortTests(unittest.TestCase):
                                  excluded_dust_debt_base=0.0)], block, block + 1, 2)
         result = dict(job=dict(id=str(block), start=block, stop=block + 1),
                       format='hf-market-cohort-v1', reserves=['asset0', 'asset1'],
-                      parts=[part], samples=[], cohort_proofs=[])
+                      parts=[part], samples=[], cohort_proofs=[dict(block=block, cohorts={
+                          name: {key: value.tolist() for key, value in values.items()
+                                 if key != 'hf'} for name, values in summary.items()})])
         report = validate_result(result)
         self.assertEqual(report['aggregate_blocks'], 1)
         self.assertEqual(report['rows'], 9)
