@@ -1,0 +1,76 @@
+{
+  "recorded_at": "2026-11-20T18:53:42.035005+00:00",
+  "goal_active": true,
+  "plan": "docs/plans/2026-11-20-1230-feat-node-non-emode-hf-plan.md",
+  "git": {
+    "original_index_absent": true,
+    "original_branch_unchanged": "cleanup/active-event-pipeline",
+    "recovery_tag": "codex/hf-tested-baseline-20261120",
+    "recovery_commit": "d96107854543dc1107e554d80aeeebf32d9cc195",
+    "source_bundle": "tested-sources.bundle",
+    "work_branch": "codex/hf-cohort-20261120",
+    "last_commit": "d1edcc36995d44cf289f94b1e864e22e69c92799"
+  },
+  "node_base": "/home/node/hf-cohort-20261120",
+  "node_storage": "/home/node/hf-cohort-20261120/storage",
+  "v1": {
+    "generation": "baf977292b957c7aac8dabf0630317e8dc93be4634505bd1e93911590422f473",
+    "accepted_jobs": 388,
+    "accepted_blocks": 388000,
+    "preserved": true
+  },
+  "v2": {
+    "generation": "51f12482118a4c00040e72f8aad996d9fc2273b5836d304b5649d77fc5cd4f54",
+    "plan": "/home/node/hf-cohort-20261120/plan-v2.json",
+    "jobs": 10124,
+    "blocks": 10116755,
+    "worker_roots": {
+      "node": "/home/node/hf-cohort-20261120/storage/worker-v2",
+      "revert": "/home/dsc-revert/hf-cohort-20261120/worker-v2",
+      "compute": "/home/fao/hf-cohort-20261120/worker-v2",
+      "data": "/var/lib/dsc-aave-hf-cohort/20261120/worker-v2"
+    },
+    "numeric_workers": "active_76_slots",
+    "scheduler": "tls://10.246.103.160:18920",
+    "three_io_workers": "authenticated_connected",
+    "full_controller": "active",
+    "live_tls_smoke_session": 26116,
+    "controlled_data_outage": "passed; data late hashes equal node accepted hashes"
+  },
+  "authorization": {
+    "new_ssh_keys": "explicit user approval granted; unused because existing TLS works",
+    "private_key_created_on_node_only": true,
+    "pending_question_superseded_by_existing_tls": true,
+    "safer_route": "reuse existing HF TLS identities; no certificates/keys/trust grants changed"
+  },
+  "runtime_fix": "Private /dev/shm restored on all NEW worker units after observed SemLock disappearance; helper pilot then completed",
+  "checks": {
+    "linux_tests_passed": 26,
+    "real_canary_samples": 6,
+    "real_canary_rpc": 54,
+    "old_protocol_hf_exact_match": 1.5303809234957064,
+    "non_emode_protocol_hf_at_same_block": 1.9404314341449214,
+    "late_benchmark_blocks": 256,
+    "late_benchmark_seconds": 240.32844103407115,
+    "late_benchmark_peak_rss_kib": 485900,
+    "independent_final_review": "final-review.md; no new actionable defect"
+  },
+  "old_archive_retirement": {
+    "verification_service": "dsc-hf-cohort-old-archive-verify-20261120.service",
+    "raw_batches_verified": 3,
+    "packed_batches_pending": 3,
+    "payload_files": 546,
+    "payload_bytes": 978424020124,
+    "files_retired": 0
+  },
+  "pending": [
+    "Collect TLS smoke result",
+    "Run real TLS worker transfer and Data offline/late duplicate pilot",
+    "Start full v2 node controller with 4 hosts",
+    "Finish sparse eMode/dictionary metadata export and archive stage",
+    "Finish old archive exact verification and scoped privileged retirement",
+    "Commit remaining work with temporary Git index and preserve portable bundle",
+    "Supervise all computation and final Node/Drive archive acceptance"
+  ],
+  "archive": "real two-block cloud canary active; full release waits for all historical jobs"
+}
