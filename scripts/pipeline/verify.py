@@ -11,7 +11,7 @@ import sys
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 import pyarrow.parquet as pq
 from shared.artifacts import write_json,digest
-from pipeline.runtime import REVERT,rpc,ssh,transfer
+from pipeline.runtime import NODE_LOCAL,REVERT,rpc,ssh,transfer
 from pipeline.stages import read,state_path,verification_cycle_path,MODE
 from pipeline.tracker import Tracker
 from pipeline.main import run_cycle,DEFAULT,HISTORICAL,PROFILES
@@ -116,9 +116,15 @@ def compare(baseline_plan,new_plan,root,start,stop):
 
 
 def main():
-    p=argparse.ArgumentParser();p.add_argument('--blocks',type=int,default=100);p.add_argument('--root',type=Path,default=DEFAULT/'verification')
+    p=argparse.ArgumentParser();p.add_argument('--blocks',type=int,default=100);p.add_argument('--root',type=Path)
+    p.add_argument('--baseline-plan',type=Path)
+    p.add_argument('--profiles',type=Path)
     p.add_argument('--check',action='store_true',help='Check the completed exact 100-block verification gate')
     args=p.parse_args()
+    if NODE_LOCAL and (args.root is None or
+                       (not args.check and (args.baseline_plan is None or args.profiles is None))):
+        p.error('Node verification requires an explicit --root and, for replay, --baseline-plan and --profiles')
+    args.root = args.root or DEFAULT/'verification'
     if args.check:
         r=read(args.root/'verification.json')
         if (r['state']!='passed' or r['stop']-r['start']!=100 or len(r['addresses'])!=102 or
@@ -126,19 +132,21 @@ def main():
             raise ValueError('Exact 100-block verification has not passed')
         print('Exact 100-block pipeline verification passed');return
     if args.blocks<1:p.error('blocks must be positive')
-    plan=read(HISTORICAL)
+    baseline = args.baseline_plan or HISTORICAL
+    profiles = args.profiles or PROFILES
+    plan=read(baseline)
     stop=plan['end_block']+1;start=stop-args.blocks
     root = args.root.resolve() / 'isolated' / f'{start}-{stop-1}'
     root.mkdir(parents=True, exist_ok=True)
     with (root/'coordinator.lock').open('a') as lock:
         fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
-        report = replay(root, plan, start, stop)
+        report = replay(root, baseline, profiles, plan, start, stop)
         if args.blocks == 100:
             write_json(args.root/'verification.json', report)
         print(json.dumps(report))
 
 
-def replay(root, plan, start, stop):
+def replay(root, baseline, profiles, plan, start, stop):
     if rpc('eth_getBlockByNumber', [hex(stop-1), False])['hash'] != plan['end_hash']:
         raise ValueError('Historical verification target hash changed')
     for job in plan['jobs']:
@@ -156,9 +164,9 @@ def replay(root, plan, start, stop):
         if cycle:
             pointer=dict(cycle=cycle,root=str(root/'cycles'/cycle['id']))
             write_json(root/'current.json',pointer)
-            run_cycle(tracker,cycle,prior,PROFILES)
+            run_cycle(tracker,cycle,prior,profiles)
         tracker.publish(cycle,state='comparing')
-        try: report = compare(HISTORICAL,root/'cycles'/f'{start}-{stop-1}'/'events/plan.json',root,start,stop)
+        try: report = compare(baseline,root/'cycles'/f'{start}-{stop-1}'/'events/plan.json',root,start,stop)
         except Exception as error:
             tracker.publish(cycle,state='mismatch',error=str(error));raise
         tracker.publish(cycle,state='passed')

@@ -4,7 +4,8 @@ from pathlib import Path
 import shutil
 from tempfile import TemporaryDirectory
 from pipeline.runtime import (NODE,REVERT,SCRIPTS,PYTHON,NODE_SCRIPTS,NODE_PYTHON,
-                              REVERT_SCRIPTS,REVERT_PYTHON,ssh,remote_json,run,transfer,rpc)
+                              REVERT_SCRIPTS,REVERT_PYTHON,REGISTRY,
+                              node_command,node_json,node_path,ssh,remote_json,run,transfer,rpc)
 from shared.artifacts import checksum,digest,write_json
 from automation.common import paths
 
@@ -102,19 +103,19 @@ class Stages:
                         break
                 if cursor <= self.cycle['end']:
                     raise ValueError(f'Historical replay requires reviewed {protocol} coverage')
-        self.execute(ssh(NODE,['mkdir','-p',self.node+'/previous-profiles']))
-        self.copy(str(source)+'/',NODE+':'+self.node+'/previous-profiles/')
-        self.copy('/home/dsc-data/contracts/ethereum/pools.csv',NODE+':'+self.node+'/pools.csv')
-        self.execute(ssh(NODE,[NODE_PYTHON,NODE_SCRIPTS+'/pipeline/profiles.py',
+        self.execute(node_command(['mkdir','-p',self.node+'/previous-profiles']))
+        self.copy(str(source)+'/',node_path(self.node+'/previous-profiles/'))
+        self.copy(REGISTRY,node_path(self.node+'/pools.csv'))
+        self.execute(node_command([NODE_PYTHON,NODE_SCRIPTS+'/pipeline/profiles.py',
             '--source',self.node+'/previous-profiles','--output',self.node+'/profiles',
             '--start',self.cycle['start'],'--stop',self.cycle['end']+1,
             '--contracts',self.node+'/pools.csv'],True))
         self.profiles.mkdir(exist_ok=True)
-        self.copy(NODE+':'+self.node+'/profiles/',str(self.profiles)+'/')
+        self.copy(node_path(self.node+'/profiles/'),str(self.profiles)+'/')
         if not self.verification:
             for v in ('v2','v3'):
                 relative=f'protocols/lending/aave/{v}/history/'
-                self.copy(NODE+':'+NODE_SCRIPTS+'/'+relative,str(SCRIPTS/relative)+'/')
+                self.copy(node_path(NODE_SCRIPTS+'/'+relative),str(SCRIPTS/relative)+'/')
         accepted=read(self.profiles/'accepted.json')
         for n,h in accepted['files'].items():
             if checksum(self.profiles/n)!=h:raise ValueError('Profile transfer checksum mismatch')
@@ -122,7 +123,7 @@ class Stages:
 
     def events_stage(self):
         plan=self.prepare()
-        self.copy(str(self.events/'plan.json'),NODE+':'+self.node+'/plan.json')
+        self.copy(str(self.events/'plan.json'),node_path(self.node+'/plan.json'))
         def event_progress():
             p=read(self.events/'progress.json');current=p.get('current') or {}
             return (p['complete_addresses'],current.get('address'),current.get('state'),current.get('written_chunks'))
@@ -166,12 +167,12 @@ class Stages:
 
     def receipts_stage(self):
         def progress():
-            p=remote_json(NODE,self.node+'/receipts/progress.json')
+            p=node_json(self.node+'/receipts/progress.json')
             return (p.get('completed_blocks'),p.get('inflight_completed'))
-        self.execute(ssh(NODE,[NODE_PYTHON,NODE_SCRIPTS+'/reverted/scan_receipts.py',
+        self.execute(node_command([NODE_PYTHON,NODE_SCRIPTS+'/reverted/scan_receipts.py',
             '--start',self.cycle['start'],'--stop',self.cycle['end']+1,'--end-hash',self.cycle['hash'],
             '--workers','32','--executor','process','--output',self.node+'/receipts'],True),progress=progress)
-        progress=remote_json(NODE,self.node+'/receipts/progress.json');self.check_blocks(progress,'completed_blocks')
+        progress=node_json(self.node+'/receipts/progress.json');self.check_blocks(progress,'completed_blocks')
         return progress
 
     def receipt_delivery_stage(self):

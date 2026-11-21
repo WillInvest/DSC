@@ -6,7 +6,7 @@ import time
 from pathlib import Path
 import sys
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
-from pipeline.runtime import REVERT,remote_json,rpc
+from pipeline.runtime import NODE_LOCAL,REVERT,remote_json,rpc
 from pipeline.stages import Stages,read,validate_previous
 from pipeline.tracker import Tracker
 from shared.artifacts import write_json
@@ -87,6 +87,8 @@ def main():
     if args.poll_seconds<5:p.error('poll-seconds must be at least 5')
     if args.mode=='continuous' and args.end_block is not None:p.error('end-block belongs to a bounded once run')
     if args.mode=='status':print((args.root/'progress.json').read_text());return
+    if NODE_LOCAL:
+        p.error('This entrypoint still uses the legacy Data compaction layout. Use pipeline/verify.py for Node replays.')
     args.root.mkdir(parents=True,exist_ok=True)
     with (args.root/'coordinator.lock').open('w') as lock:
         fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)

@@ -42,13 +42,21 @@ def report_successes(folder, expected):
     return (result - invalid) & expected.keys()
 
 
-def run(plan, job):
+def run(plan, job, *, wait_for_extraction_lock=False):
     root = Path(job['node_dir'])
     root.mkdir(parents=True, exist_ok=True)
     lock = (root / 'lock').open('w')
     fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
     global_lock = Path('/home/node/dsc-extraction/sequential-events/extraction.lock').open('w')
-    fcntl.flock(global_lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    try:
+        fcntl.flock(global_lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except BlockingIOError:
+        if not wait_for_extraction_lock:
+            raise
+        write(root / 'progress.json', {'state': 'waiting_for_extraction_lock',
+              'updated_at': time.time(), 'written_chunks': 0,
+              'total_chunks': len(chunks(job, plan))})
+        fcntl.flock(global_lock, fcntl.LOCK_EX)
     identity = {k: plan[k] for k in ('end_block', 'end_hash', 'chunk_size')}
     identity.update(address=job['address'], start_block=job['start_block'])
     if job.get('topic0'):identity['topic0']=job['topic0']
@@ -139,6 +147,7 @@ if __name__ == '__main__':
     parser.add_argument('mode', choices=['run', 'status'])
     parser.add_argument('plan')
     parser.add_argument('address')
+    parser.add_argument('--wait-for-extraction-lock', action='store_true')
     args = parser.parse_args()
     plan = read(args.plan)
     job = next(j for j in plan['jobs'] if j['address'] == args.address)
@@ -147,4 +156,4 @@ if __name__ == '__main__':
         path = Path(job['node_dir']) / 'progress.json'
         print(json.dumps(read(path) if path.exists() else {}))
     else:
-        run(plan, job)
+        run(plan, job, wait_for_extraction_lock=args.wait_for_extraction_lock)

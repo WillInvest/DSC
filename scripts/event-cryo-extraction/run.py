@@ -1,28 +1,33 @@
-"""Sequential event-only queue on dsc-data. No SQLite or historical header scan."""
+"""Sequential event queue using the RETH host's Cryo worker."""
 import argparse
 import csv
 import fcntl
 import json
+import os
 from pathlib import Path
-import shlex
+import signal
 import subprocess
+import sys
 import time
 
 import pyarrow.parquet as pq
 from common import chunks, read, summarize, write
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from pipeline.runtime import NODE_LOCAL,NODE_PYTHON,SCRIPTS,node_command,node_json,node_path,rsync_command,running_worker
 
-NODE = 'node@10.246.103.160'
-NODE_SCRIPT = '/home/node/dsc-extraction/sequential-events/node.py'
-NODE_PYTHON = '/home/node/dsc-extraction/.venv-abi/bin/python'
+NODE_CRYO_CANDIDATE = os.environ.get('DSC_PIPELINE_NODE_CRYO_WORKER')
+DEFAULT_NODE_SCRIPT = (SCRIPTS / 'event-cryo-extraction/node.py' if NODE_LOCAL
+                       else Path('/home/node/dsc-extraction/sequential-events/node.py'))
+NODE_SCRIPT = NODE_CRYO_CANDIDATE or str(DEFAULT_NODE_SCRIPT)
 NODE_PLAN = '/home/node/dsc-extraction/sequential-events/plan.json'
-SSH = ['ssh', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=10',
-       '-o', 'ServerAliveInterval=15', '-o', 'ServerAliveCountMax=3', NODE]
 
 
 def command(mode, address, node_plan=NODE_PLAN):
     # A run's SSH terminal sends SIGHUP on disconnect, letting node.py stop Cryo.
-    prefix = SSH[:-1] + (['-tt'] if mode == 'run' else []) + [NODE]
-    return prefix + [shlex.join([NODE_PYTHON, NODE_SCRIPT, mode, node_plan, address])]
+    args = [NODE_PYTHON, NODE_SCRIPT, mode, node_plan, address]
+    if mode == 'run' and (NODE_LOCAL or NODE_CRYO_CANDIDATE):
+        args.append('--wait-for-extraction-lock')
+    return node_command(args, terminal=mode == 'run')
 
 
 def prepare(registry, data, root):
@@ -110,35 +115,33 @@ def execute(root):
         publish(current)
         try:
             with (root / f'{address}.log').open('a') as log:
-                child = subprocess.Popen(command('run', address, plan.get('node_plan', NODE_PLAN)), stdout=log, stderr=subprocess.STDOUT)
-                while child.poll() is None:
-                    try:
-                        result = subprocess.run(command('status', address, plan.get('node_plan', NODE_PLAN)), capture_output=True,
-                                                text=True, check=True, timeout=20)
-                        current.update(json.loads(result.stdout))
-                        current['connection_error'] = False
-                    except (subprocess.SubprocessError, ValueError):
-                        current['connection_error'] = True
-                    publish(current)
-                    time.sleep(plan.get('poll_seconds',10))
-                if child.returncode:
-                    raise RuntimeError(f'Node extraction failed (exit {child.returncode}); see {address}.log')
-            result = subprocess.run(SSH + [shlex.join(['cat', job['node_dir'] + '/manifest.json'])],
-                                    check=True, capture_output=True, text=True, timeout=30)
-            manifest = json.loads(result.stdout)
+                with running_worker(command('run', address, plan.get('node_plan', NODE_PLAN)),
+                                    stdout=log, stderr=subprocess.STDOUT) as child:
+                    while child.poll() is None:
+                        try:
+                            result = subprocess.run(command('status', address, plan.get('node_plan', NODE_PLAN)),
+                                                    capture_output=True, text=True, check=True, timeout=20)
+                            current.update(json.loads(result.stdout))
+                            current['connection_error'] = False
+                        except (subprocess.SubprocessError, ValueError):
+                            current['connection_error'] = True
+                        publish(current)
+                        time.sleep(plan.get('poll_seconds',10))
+                    if child.returncode:
+                        raise RuntimeError(f'Node extraction failed (exit {child.returncode}); see {address}.log')
+            manifest = node_json(job['node_dir'] + '/manifest.json')
             validate_manifest(manifest, plan, job)
             current['state'] = 'transferring'
             publish(current)
             with (root / f'{address}.log').open('a') as log:
-                child = subprocess.Popen(['rsync', '-a', '--partial', '--info=progress2',
-                         '-e', 'ssh -o BatchMode=yes -o ConnectTimeout=10',
-                         f"{NODE}:{job['node_dir']}/encoded/", job['destination'] + '/'],
-                         stdout=log, stderr=subprocess.STDOUT)
-                while child.poll() is None:
-                    publish(current)
-                    time.sleep(plan.get('poll_seconds',10))
-                if child.returncode:
-                    raise RuntimeError(f'Transfer failed (exit {child.returncode})')
+                copy = rsync_command(node_path(job['node_dir'] + '/encoded/'),
+                                     job['destination'] + '/', '--info=progress2')
+                with running_worker(copy, stdout=log, stderr=subprocess.STDOUT) as child:
+                    while child.poll() is None:
+                        publish(current)
+                        time.sleep(plan.get('poll_seconds',10))
+                    if child.returncode:
+                        raise RuntimeError(f'Transfer failed (exit {child.returncode})')
             validate_destination(manifest, Path(job['destination']))
             write(receipt, manifest)
             jobs[address] = {'state': 'complete', 'finished_at': time.time(),
@@ -161,4 +164,8 @@ if __name__ == '__main__':
     if args.mode == 'prepare':
         prepare(args.registry, args.data, args.root)
     else:
+        def stop(signum, frame):
+            raise SystemExit(128 + signum)
+        for sig in (signal.SIGTERM, signal.SIGINT, signal.SIGHUP):
+            signal.signal(sig, stop)
         execute(args.root)

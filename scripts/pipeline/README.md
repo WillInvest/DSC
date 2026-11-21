@@ -81,6 +81,15 @@ structure, addresses, gas, values and raw input/output must match. Human-readabl
 provider error/revert strings must also match exactly. Any provider formatting
 difference fails the gate and is recorded for inspection. No production coverage moves.
 
+For a candidate installed on Node, set `DSC_PIPELINE_SITE=node` and
+`DSC_PIPELINE_SCRIPTS` to the candidate's `scripts` directory. The candidate
+loads the pool registry from `contracts/ethereum/pools.csv` alongside that
+directory. Run `pipeline/verify.py` with explicit `--root`, `--baseline-plan`
+and `--profiles` paths on Node. RETH, Cryo, receipt collection and Aave
+auxiliary collection use Node-local execution. Revert commands and archive
+comparison retain the Revert SSH route. Reuse the deployed Python environment.
+The continuous entrypoint still uses the existing Data compaction layout.
+
 Deployment: disable the old extraction/offline watchdog and delivery timers before
 enabling `dsc-pipeline.service`; keep `dsc-pipeline-monitor.timer` active. The monitor
 uses `current.json` to follow the active cycle and shows all eight stages. It is

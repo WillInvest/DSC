@@ -2,7 +2,6 @@
 import base64
 import json
 from pathlib import Path
-import shlex
 import subprocess
 import sys
 import time
@@ -12,15 +11,12 @@ import pyarrow.parquet as pq
 from web3 import Web3
 from automation.common import ROOT, AUTO, PROFILES, paths, read
 from shared.artifacts import checksum,digest,write_json
+from pipeline.runtime import NODE_PYTHON,NODE_SCRIPTS,node_command,node_path,rsync_command
 from reconstruction.core import initial,HANDLERS
 from reconstruction.direct import read_chunk,replay_table
 from decoding.pool_decode import EventDecoder
 
 MODE='event-derived-unchecked-v1'
-NODE='node@10.246.103.160'
-SSH=['ssh','-o','BatchMode=yes','-o','ConnectTimeout=10','-o','ServerAliveInterval=15','-o','ServerAliveCountMax=3',NODE]
-
-
 def aave_inputs(job,plan):
     profiles=sorted([read(p) for p in PROFILES.glob(job['protocol']+'-*.json')],key=lambda p:p['from_block'])
     profiles=[p for p in profiles if p['from_block']<=plan['end_block'] and p['to_block']>job['start_block']]
@@ -36,11 +32,11 @@ def aave_inputs(job,plan):
     request['output'] = str(Path(node_inputs) / key)
     if not (root/'inputs.json').exists():
         encoded=base64.b64encode(json.dumps(request).encode()).decode()
-        subprocess.run(SSH+[shlex.join(['/home/node/dsc-extraction/.venv-abi/bin/python',
-            '/home/node/dsc-extraction/scripts/automation/aave_inputs.py',encoded])],check=True,timeout=3300)
+        subprocess.run(node_command([NODE_PYTHON,NODE_SCRIPTS+'/automation/aave_inputs.py',encoded]),
+                       check=True,timeout=3300)
         root.mkdir(parents=True,exist_ok=True)
-        subprocess.run(['rsync','-a','--partial','-e','ssh -o BatchMode=yes -o ConnectTimeout=10',
-                        NODE+':'+request['output']+'/',str(root)+'/'],check=True,timeout=300)
+        subprocess.run(rsync_command(node_path(request['output']+'/'),str(root)+'/'),
+                       check=True,timeout=300)
     payload=read(root/'inputs.json');events=[]
     for source in payload['sources']:
         if source['provider']: continue
