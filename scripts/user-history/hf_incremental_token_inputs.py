@@ -1,22 +1,95 @@
 """Verify raw token input and prove an Aave HF window stays on frozen routes."""
 from concurrent.futures import ThreadPoolExecutor
+import fcntl
 import json
+import os
 from pathlib import Path
+import subprocess
+from tempfile import TemporaryDirectory
 
 import pyarrow.parquet as pq
 from eth_utils.abi import event_abi_to_log_topic
 from web3 import Web3
 
 from decode_tokens import UPGRADED
+from decoding.pool_decode import cryo_event_log
 from oracle_common import POOL, POOL_ABI
 from registry.build_aave_profiles import implementation
-from shared.artifacts import checksum, digest
+from shared.artifacts import checksum, digest, write_json
 
 ABIS = Path(__file__).resolve().parents[1] / 'reconstruction' / 'abis'
 PROVIDER_CHANGES = {'PoolUpdated', 'PoolConfiguratorUpdated', 'AddressSet',
                     'AddressSetAsProxy', 'ProxyCreated'}
 TOKEN_CHANGES = {'ReserveInitialized', 'ReserveDropped', 'ATokenUpgraded',
                  'VariableDebtTokenUpgraded', 'StableDebtTokenUpgraded'}
+LOG_CHUNK = 128
+
+
+def log_identity(log, headers, addresses):
+    def hex_text(value):
+        return value.lower() if isinstance(value, str) else Web3.to_hex(value).lower()
+
+    block, address = log['blockNumber'], log['address'].lower()
+    if address not in addresses or headers.get(block) != hex_text(log['blockHash']):
+        raise ValueError('Token log does not match the reviewed address and block lineage')
+    return (block, log['transactionIndex'], log['logIndex'], address,
+            hex_text(log['transactionHash']), tuple(hex_text(topic) for topic in log['topics']),
+            hex_text(log['data']))
+
+
+def collect_raw_tokens(window, jobs, output, w3, cryo):
+    """Extract with Cryo and prove completeness, including empty chunks, with RETH."""
+    scope = window['identity']
+    start, stop = scope['start'], scope['stop']
+    headers = {h['block']: h['hash'] for h in window['headers']}
+    addresses = sorted(map(Web3.to_checksum_address, jobs))
+    receipt_name = 'registered-token-inputs.json'
+    output.parent.mkdir(parents=True, exist_ok=True)
+    with output.with_suffix('.lock').open('a') as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        if output.exists():
+            read_token_inputs(window, output/receipt_name, jobs)
+            return json.loads((output/receipt_name).read_text())
+        check_anchors(w3, scope)
+        with TemporaryDirectory(dir=output.parent) as temporary:
+            stage = Path(temporary)/'publish'
+            raw, reports = stage/'raw', stage/'reports'
+            raw.mkdir(parents=True)
+            reports.mkdir()
+            command = [str(cryo), 'logs', '--rpc', 'http://127.0.0.1:8545',
+                       '--contract', *addresses, '--blocks', f'{start}:{stop}',
+                       '--chunk-size', str(LOG_CHUNK), '--inner-request-size', str(LOG_CHUNK),
+                       '--max-concurrent-requests', '4', '--include-columns', 'block_hash',
+                       '--hex', '--output-dir', str(raw), '--report-dir', str(reports)]
+            with (stage/'cryo.log').open('wb') as log:
+                subprocess.run(command, stdout=log, stderr=subprocess.STDOUT, check=True, timeout=900)
+            actual, files = [], []
+            for path in sorted(raw.glob('*.parquet')):
+                parquet = pq.ParquetFile(path)
+                files.append(dict(path=str(path.relative_to(stage)), sha256=checksum(path), rows=parquet.metadata.num_rows))
+                for batch in parquet.iter_batches():
+                    actual.extend(log_identity(cryo_event_log(row), headers, jobs) for row in batch.to_pylist())
+            reference = []
+            for first in range(start, stop, LOG_CHUNK):
+                rows = w3.eth.get_logs(dict(address=addresses, fromBlock=first, toBlock=min(stop, first+LOG_CHUNK)-1))
+                reference.extend(log_identity(log, headers, jobs) for log in rows)
+            if sorted(actual) != sorted(reference) or len(set(actual)) != len(actual):
+                raise ValueError('Cryo token log coverage differs from RETH')
+            check_anchors(w3, scope)
+            receipt = dict(window_sha256=window['window_sha256'], start=start, stop=stop,
+                           addresses=len(addresses), historical_registry_sha256=digest(addresses),
+                           historical_registry_only=True, exact_reth_comparison=True, events=len(actual), files=files)
+            for item in files:
+                with (stage/item['path']).open('rb') as file:
+                    os.fsync(file.fileno())
+            write_json(stage/receipt_name, receipt)
+            stage.rename(output)
+            parent = os.open(output.parent, os.O_RDONLY)
+            try:
+                os.fsync(parent)
+            finally:
+                os.close(parent)
+        return receipt
 
 
 def read_token_inputs(window, manifest_path, jobs):

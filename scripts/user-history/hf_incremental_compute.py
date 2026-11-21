@@ -61,9 +61,9 @@ def initialize_database(db, window, boundary, factors, positions):
                  row['previous_index'], row['discount_percent']) for row in streams.get('gho_history', [])])
 
 
-def wallet_registry(historical, first_seen, start, stop):
-    if digest(historical) != REGISTRY:
-        raise ValueError('Frozen HF wallet dictionary differs')
+def wallet_registry(historical, first_seen, start, stop, expected_registry=None):
+    if digest(historical) != (REGISTRY if expected_registry is None else expected_registry):
+        raise ValueError('Opening HF wallet dictionary differs')
     known = set(dict(historical))
     if any(not start <= first < stop for first in first_seen.values()):
         raise ValueError('Wallet discovery is outside the current window')
@@ -129,7 +129,7 @@ def check_published(output, provenance):
     return record
 
 
-def run(window_path, state_path, factors_path, tokens_path, root, output):
+def load_window(window_path, state_path, factors_path, tokens_path, root):
     from hf_incremental_factors import pinned_json
 
     window = json.loads(window_path.read_text())
@@ -143,12 +143,27 @@ def run(window_path, state_path, factors_path, tokens_path, root, output):
             or factors['token_sha256'] != checksum(tokens_path)):
         raise ValueError('Factors are detached from the opening checkpoint or token replay')
     plan = json.loads((root/'plan.json').read_text())
-    owners = wallet_registry(owner_universe(root, start), tokens['result']['first_seen'], start, stop)
+    chain = boundary['input_identity']
+    if 'token_registry_sha256' in chain:
+        if checksum(root/'plan.json') != chain['token_registry_sha256']:
+            raise ValueError('Token registry differs from the accepted checkpoint')
+        historical = [tuple(row) for row in json.loads(state_path.with_name('wallets.json').read_text())]
+        expected_registry = chain['wallet_registry_sha256']
+    else:
+        historical = owner_universe(root, start)
+        expected_registry = REGISTRY
+    owners = wallet_registry(historical, tokens['result']['first_seen'], start, stop, expected_registry)
     scope = dict(start=start, stop=stop, window_sha256=window['window_sha256'],
                  wallet_registry_sha256=digest(owners))
     provenance = dict(format='aave-v3-hf-incremental-result-v1', scope=scope,
                       factors_sha256=checksum(factors_path), token_replay_sha256=checksum(tokens_path))
     model = FloatBatch(owners, plan['jobs'])
+    return window, boundary, factors, tokens, plan, model, provenance
+
+
+def run(window_path, state_path, factors_path, tokens_path, root, output):
+    window, boundary, factors, tokens, plan, model, provenance = load_window(
+        window_path, state_path, factors_path, tokens_path, root)
     output.parent.mkdir(parents=True, exist_ok=True)
     with output.with_suffix('.lock').open('a') as lock:
         fcntl.flock(lock, fcntl.LOCK_EX)
@@ -157,7 +172,7 @@ def run(window_path, state_path, factors_path, tokens_path, root, output):
         else:
             record = publish_window(output, root, plan, model, window, boundary, factors, tokens, provenance)
     return dict(path=str(output/'result.json'), sha256=checksum(output/'result.json'),
-                wallets=len(owners), wallet_values=record['wallet_values'], aggregate_rows=record['coverage']['rows'],
+                wallets=len(model.owners), wallet_values=record['wallet_values'], aggregate_rows=record['coverage']['rows'],
                 sample_accounts=record['validation']['account_getter_samples'])
 
 

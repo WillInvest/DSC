@@ -71,6 +71,29 @@ read-only. It prepares the first successor window as follows.
    vector dataset and the all, eMode, and non-eMode reserve and protocol
    aggregates. The result receipt records the input checksums, Parquet
    partitions, full coverage, and sampled comparisons with RETH.
+8. `hf_incremental_chain` replays the accepted inputs through the last block,
+   matches the accepted closing RETH samples, and seals the successor checkpoint.
+   The generation binds the parent checkpoint, window, accepted manifest, and
+   stable wallet and token registries. Retrying verifies the sealed bytes.
+
+`hf_incremental_run` runs these stages for one finalized window, using a sealed
+opening boundary directory, the canonical Pool catalog, the frozen input
+registry and the Node Cryo executable. Its `progress.json` reports the active
+stage. Once the result and successor checkpoint both pass validation, it
+reports `locally_verified`; Drive backup and production acceptance remain
+separate gates.
+
+```sh
+python -m hf_incremental_run \
+  --opening /node/hf/boundary-26407897 --end-block 26407929 \
+  --catalog /node/compacted --historical-root /node/frozen-aave-inputs \
+  --cryo /node/bin/cryo --output /node/hf/windows/26407898-26407929
+```
+
+Use `<output>/successor` as the opening directory for the next window. The
+registry is bound to a verified profile throughout each window. Token log
+extraction uses bounded Cryo queries and compares the complete event identities
+with RETH, including ranges that return zero logs.
 
 Reserve registration, removal, or implementation changes require a reviewed
 profile before this position stage accepts the window. The incremental wallet tile format

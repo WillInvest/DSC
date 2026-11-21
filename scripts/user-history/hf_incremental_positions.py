@@ -138,7 +138,11 @@ def load_inputs(window_path, state_path, raw_manifest, historical_root):
                              scope['predecessor_hash'], scope['release_generation'])
     plan_path = historical_root / 'plan.json'
     plan = json.loads(plan_path.read_text())
-    if (plan['end_block'], plan['end_hash']) != (scope['start']-1, scope['predecessor_hash']):
+    chain = boundary['input_identity']
+    if 'token_registry_sha256' in chain:
+        if checksum(plan_path) != chain['token_registry_sha256'] or plan['end_block'] >= scope['start']:
+            raise ValueError('Token registry differs from the accepted checkpoint')
+    elif (plan['end_block'], plan['end_hash']) != (scope['start']-1, scope['predecessor_hash']):
         raise ValueError('Historical token registry does not join the HF window')
     jobs = {job['address'].lower(): job for job in plan['jobs']}
     rows = read_token_inputs(window, raw_manifest, jobs)
