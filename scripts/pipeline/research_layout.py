@@ -93,7 +93,9 @@ def archive_kind(relative):
         return 'receipts'
     if '/selected/chunks/' in relative:
         return 'selected'
-    return 'traces'
+    if '/archive/' in relative:
+        return 'traces'
+    raise ValueError(f'Unrecognized historical Revert source: {relative}')
 
 
 def publish_archive(path, root, kind, start, stop, lower, sha, addresses):
@@ -102,7 +104,7 @@ def publish_archive(path, root, kind, start, stop, lower, sha, addresses):
         link(path, target, sha)
     elif not target.exists():
         pack(target, records([Fragment(path, start, stop)], lower, stop))
-    if kind == 'selected':
+    if kind == 'selected' and addresses is not None:
         publish_selected(path, root, start, stop, lower, addresses)
 
 
@@ -167,28 +169,49 @@ def publish_encoded(root, historical_markets, market_tail):
                            market_through=read(market_tail/'manifest.json')['through']))
 
 
-def publish(root, historical_markets, historical_reverts, market_tail, revert_tail):
-    status = root/'metadata'/'publication.json'
-    addresses, through, index = publish_history(root, historical_markets, status, MARKET_KINDS)
-    publish_tail_markets(market_tail, root, through+1)
-
+def publish_revert_history(root, historical_reverts, status, *, addresses=None, markets=None, cutoff=None):
     archive = read(historical_reverts/'historical-revert.json')
-    if archive['stop'] != through+1:
+    if cutoff is not None and archive['stop'] != cutoff:
         raise ValueError('Historical market and Revert cutoffs differ')
     identity = checksum(historical_reverts/'historical-revert.json')
+    progress = {'stage': 'historical-reverted', 'start': archive['start']}
+    if markets is not None:
+        progress['markets'] = markets
     for start in range(archive['start'], archive['stop'], 1_000_000):
         stop = min(start+1_000_000, archive['stop'])
         source = historical_reverts/f'{start}-{stop-1}'
         group = read(source/'manifest.json')
         if (group['start'], group['stop'], group['parent_inventory_sha256']) != (start, stop, identity):
             raise ValueError('Historical Revert shard has a different identity')
+        coverage = defaultdict(list)
         for row in group['files']:
             relative = row['path']
             path = source/relative
             lower, upper = bounds(path)
-            publish_archive(path, root, archive_kind(relative), lower, upper, lower,
-                            row['sha256'], addresses)
-        write_json(status, dict(stage='historical-reverted', markets=index, through=stop-1))
+            kind = archive_kind(relative)
+            coverage[kind].append((lower, upper))
+            publish_archive(path, root, kind, lower, upper, lower, row['sha256'], addresses)
+        if set(coverage) != {'receipts', 'traces', 'selected'}:
+            raise ValueError('Historical Revert shard does not contain all three archive families')
+        for ranges in coverage.values():
+            ranges.sort()
+            cursor = start
+            for lower, upper in ranges:
+                if lower != cursor or upper <= lower:
+                    raise ValueError('Historical Revert coverage contains a gap or overlap')
+                cursor = upper
+            if cursor != stop:
+                raise ValueError('Historical Revert coverage ends before or beyond the accepted cutoff')
+        write_json(status, dict(progress, through=stop-1))
+    return archive
+
+
+def publish(root, historical_markets, historical_reverts, market_tail, revert_tail):
+    status = root/'metadata'/'publication.json'
+    addresses, through, index = publish_history(root, historical_markets, status, MARKET_KINDS)
+    publish_tail_markets(market_tail, root, through+1)
+    publish_revert_history(root, historical_reverts, status,
+                           addresses=addresses, markets=index, cutoff=through+1)
     publish_tail_reverts(revert_tail, root, through+1, addresses)
     market_end = read(market_tail/'manifest.json')['through']
     revert_end = read(revert_tail/'manifest.json')['through']
@@ -199,7 +222,9 @@ def publish(root, historical_markets, historical_reverts, market_tail, revert_ta
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--root', required=True, type=Path)
-    parser.add_argument('--encoded-only', action='store_true')
+    scope = parser.add_mutually_exclusive_group()
+    scope.add_argument('--encoded-only', action='store_true')
+    scope.add_argument('--global-revert-only', action='store_true')
     for field in ('historical-markets', 'historical-reverts', 'market-tail', 'revert-tail',
                   'coordinator', 'registry'):
         parser.add_argument('--'+field, type=Path)
@@ -207,11 +232,19 @@ def main():
     if not args.root.is_dir():
         parser.error('Create the research root on the data disk first')
     historical = (args.historical_markets, args.historical_reverts, args.market_tail, args.revert_tail)
+    lock_name = 'publication.lock'
     if args.encoded_only:
         if not args.historical_markets or not args.market_tail or any(
                 (args.historical_reverts, args.revert_tail, args.coordinator, args.registry)):
             parser.error('Raw publication requires historical markets and a market tail')
         sources = args.historical_markets, args.market_tail
+        lock_name = 'encoded-publication.lock'
+    elif args.global_revert_only:
+        if not args.historical_reverts or any(
+                (args.historical_markets, args.market_tail, args.revert_tail, args.coordinator, args.registry)):
+            parser.error('Global Revert publication requires the historical Revert import')
+        sources = (args.historical_reverts,)
+        lock_name = 'global-revert-publication.lock'
     elif args.coordinator:
         if not args.registry or any(historical):
             parser.error('Use a coordinator and registry, or the four historical import paths')
@@ -223,11 +256,14 @@ def main():
     for source in sources:
         if source.stat().st_dev != args.root.stat().st_dev:
             parser.error('Research publication and accepted imports must share the data disk')
-    lock_name = 'encoded-publication.lock' if args.encoded_only else 'publication.lock'
     with (args.root/lock_name).open('a') as lock:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         if args.encoded_only:
             publish_encoded(args.root, args.historical_markets, args.market_tail)
+        elif args.global_revert_only:
+            status = args.root/'metadata/global-revert-publication.json'
+            archive = publish_revert_history(args.root, args.historical_reverts, status)
+            write_json(status, dict(stage='complete', start=archive['start'], through=archive['stop']-1))
         elif args.coordinator:
             publish_committed(args.root, args.coordinator, args.registry)
         else:

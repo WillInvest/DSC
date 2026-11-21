@@ -34,6 +34,13 @@ range filenames and schema folders for compacted inputs. Historical
 acceptance manifests establish empty ranges. The raw publication watermark
 is in `metadata/encoded-publication.json`.
 
+`python -m pipeline.research_layout --root DATA --global-revert-only
+--historical-reverts IMPORT` places the accepted global historical archive
+while market publication is still underway. It checks that all three
+archive families cover every block in each verified historical shard.
+`metadata/global-revert-publication.json` records this watermark. The
+normal publication pass also creates each protocol's matching subset.
+
 The `lending/aaveV3/health-factor/` directory holds historical indexed packs
 and completed incremental windows. Run `python -m pipeline.hf_storage
 SOURCE_WINDOWS DRIVE_WORK HEALTH_FACTOR_ROOT` to place already accepted

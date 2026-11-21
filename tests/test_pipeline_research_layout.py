@@ -59,6 +59,9 @@ class ResearchLayoutTests(unittest.TestCase):
             source = root/'10-11.jsonl.gz'
             row = dict(block_number=11, failed=[dict(matched_contracts=['0x1', '0x2'], trace={'calls': []})])
             pack(source, [dict(block_number=10, failed=[]), row])
+            publish_archive(source, root, 'selected', 10, 12, 10, checksum(source), None)
+            self.assertTrue((root/'revert/selected/10-11.jsonl.gz').samefile(source))
+            self.assertFalse((root/'dex/uniswapV2/reverted-tx/10-11.jsonl.gz').exists())
             from collections import defaultdict
             addresses = defaultdict(set, {'uniswap-v2': {'0x1'}, 'aave-v3': {'0x2'}})
             publish_archive(source, root, 'selected', 10, 12, 11, checksum(source), addresses)
