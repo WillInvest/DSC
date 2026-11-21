@@ -54,9 +54,18 @@ read-only. It prepares the first successor window as follows.
 4. `hf_incremental_pool` slices existing Pool events through the shared-lock
    Node catalog. Its receipt links the source hashes and records an exact
    comparison with the corresponding bounded RETH log query.
+5. `hf_incremental_positions` takes the sealed checkpoint, the pinned window,
+   and the checksummed Cryo token logs already compared with RETH. It checks the
+   provider, configurator, reserve registry, and token implementation stability.
+   It reuses the historical ABI decoder and the original Aave and GHO math
+   workers. The output records sparse position changes, GHO changes, and first
+   token activity per wallet. Node verifies the end-of-block scaled balance for
+   each changed token and holder. The same command with `--reference` and
+   `--reference-sha256` reproduces the accepted delta on an offline helper.
 
-These receipts describe input coverage. Numerical coverage also requires the
-versioned token and configuration changes, complete wallet and cohort
+Reserve registration, removal, or implementation changes require a reviewed
+profile before this position stage accepts the window. Full numerical coverage
+also requires the versioned configuration changes, complete wallet and cohort
 outputs, and their own validation. The incremental wallet tile format
 `hf-vector-f64-v3` requires an explicit range, window SHA-256 and wallet
 dictionary SHA-256 when encoding and decoding. Calls for the frozen historical

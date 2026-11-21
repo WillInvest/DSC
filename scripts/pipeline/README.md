@@ -81,6 +81,11 @@ structure, addresses, gas, values and raw input/output must match. Human-readabl
 provider error/revert strings must also match exactly. Any provider formatting
 difference fails the gate and is recorded for inspection. No production coverage moves.
 
+The isolated Node candidate passed this gate for blocks 26,266,452 through
+26,266,551, covering the 102 registered contracts and 294 complete failed
+transaction traces. The verification ledger records the exact event, decoded
+event, state, receipt, trace and contract-selection comparisons.
+
 For a candidate installed on Node, set `DSC_PIPELINE_SITE=node` and
 `DSC_PIPELINE_SCRIPTS` to the candidate's `scripts` directory. The candidate
 loads the pool registry from `contracts/ethereum/pools.csv` alongside that
