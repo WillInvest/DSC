@@ -1,0 +1,18 @@
+[Unit]
+Description=Back up and restore-verify each accepted Aave HF window
+PartOf=dsc-node-pipeline.target
+Wants=network-online.target
+After=network-online.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=exec
+User=node
+EnvironmentFile=/etc/dsc/node-pipeline.env
+ExecStart=/home/node/dsc-extraction/.venv-abi/bin/python -u \
+    -m hf_incremental_archive --continuous --windows ${HF_WINDOWS} \
+    --work ${HF_BACKUP_WORK} --remote ${HF_DRIVE} --start ${HF_BACKUP_START}
+Restart=on-failure
+RestartSec=60s
+CPUWeight=25
+IOWeight=25

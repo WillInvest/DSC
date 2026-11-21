@@ -156,6 +156,48 @@ Run `scripts/main.py status --status-config CONFIG` for an on-demand report.
 The existing status command without that option still prints the coordinator's
 own progress file.
 
+### Node production services
+
+`deployment/node/dsc-node-pipeline.target` groups the market coordinator, HF
+computation, independent Drive backups and the read-only status publisher.
+Start and stop the full set through the target. Each service retries
+independently using its own lock and cursor. The HF worker reads committed
+market blocks from the Node catalog and the HF backup reads accepted windows.
+
+Set the following fields in the root-managed `/etc/dsc/node-pipeline.env`.
+
+| Fields | Value |
+| --- | --- |
+| `DSC_PIPELINE_SCRIPTS`, `PYTHONPATH` | Versioned scripts directory and its runtime module paths, including `scripts/user-history` and the deployed Drive modules |
+| `DSC_PIPELINE_REVERT_SSH_CONFIG` | Existing restricted Node-to-Revert SSH client configuration |
+| `MARKET_ROOT`, `MARKET_BASELINE`, `MARKET_PROFILES`, `MARKET_VERIFICATION` | Node coordinator directory, sealed handoff plan, reviewed profiles and accepted replay report directory |
+| `MARKET_BACKUP_WORK`, `MARKET_DRIVE` | Market Drive cursor directory and remote root |
+| `HF_OPENING`, `HF_HISTORY`, `CRYO`, `HF_WINDOWS`, `HF_WORK`, `HF_HELPERS` | Accepted HF successor at the market epoch boundary, frozen HF inputs, Cryo executable, accepted window directory, new epoch work directory and helper configuration |
+| `HF_BACKUP_WORK`, `HF_DRIVE`, `HF_BACKUP_START` | Existing HF archive cursor directory, matching Drive remote and original first block |
+| `STATUS_CONFIG`, `STATUS_REPORT` | Absolute paths to the combined read-only source configuration and report |
+
+Before enabling the target, finish the last Data-owned cycle, fence
+`dsc-pipeline.service` on Data and verify it is inactive and masked.
+Capture the accepted boundary and confirm the Node and Drive restores. Seal
+the Node handoff at that block. The root-managed
+`/etc/dsc/node-production-fence.json` must contain `format`
+(`dsc-node-production-fence-v1`), `legacy_writer` (`dsc-pipeline.service`),
+`legacy_state` (`masked`), the resolved `coordinator_root`, the inclusive
+`through` and the `handoff_sha256` of `handoff.json`. The public Node
+continuous command validates this file against the chosen baseline and root
+before opening the coordinator. Bounded shadow runs use the existing
+`once` command.
+
+Close the old HF follower at the same boundary using the accepted legacy
+catalog and point `HF_OPENING` to its successor checkpoint. Stop the
+temporary backup and status units before the production target takes over
+their work directories. After installation and `daemon-reload`, enable and
+start `dsc-node-pipeline.target`. Verify the first committed Node cycle and
+its Drive recovery. Before a rollback, stop the target, reconcile accepted
+Node coverage to the Data ledger and restore the single Data writer.
+
+### Legacy Data services
+
 Deployment: disable the old extraction/offline watchdog and delivery timers before
 enabling `dsc-pipeline.service`; keep `dsc-pipeline-monitor.timer` active. The monitor
 uses `current.json` to follow the active cycle and shows all eight stages. It is

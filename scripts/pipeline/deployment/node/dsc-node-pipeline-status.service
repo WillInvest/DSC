@@ -1,0 +1,15 @@
+[Unit]
+Description=Publish read-only DSC pipeline progress
+PartOf=dsc-node-pipeline.target
+Wants=network-online.target
+After=network-online.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=exec
+User=node
+EnvironmentFile=/etc/dsc/node-pipeline.env
+ExecStart=/home/node/dsc-extraction/.venv-abi/bin/python -u \
+    -m pipeline.node_status aggregate ${STATUS_CONFIG} --follow --output ${STATUS_REPORT}
+Restart=on-failure
+RestartSec=30s

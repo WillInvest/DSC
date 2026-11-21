@@ -1,0 +1,17 @@
+[Unit]
+Description=Compute contiguous Aave HF windows from committed DSC market blocks
+PartOf=dsc-node-pipeline.target
+Wants=network-online.target
+After=network-online.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=exec
+User=node
+EnvironmentFile=/etc/dsc/node-pipeline.env
+ExecStart=/home/node/dsc-extraction/.venv-abi/bin/python -u \
+    -m hf_incremental_follow --continuous --catalog ${MARKET_ROOT}/canonical \
+    --opening ${HF_OPENING} --historical-root ${HF_HISTORY} --cryo ${CRYO} \
+    --windows ${HF_WINDOWS} --work ${HF_WORK} --helpers ${HF_HELPERS}
+Restart=on-failure
+RestartSec=60s

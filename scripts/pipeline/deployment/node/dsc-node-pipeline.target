@@ -1,0 +1,8 @@
+[Unit]
+Description=DSC Node production pipeline
+AssertPathExists=/etc/dsc/node-production-fence.json
+Wants=dsc-node-market.service dsc-node-market-backup.service dsc-node-hf.service
+Wants=dsc-node-hf-backup.service dsc-node-pipeline-status.service
+
+[Install]
+WantedBy=multi-user.target

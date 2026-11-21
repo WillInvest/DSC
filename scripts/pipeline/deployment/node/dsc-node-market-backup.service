@@ -1,0 +1,17 @@
+[Unit]
+Description=Back up committed DSC market catalogs to Drive
+PartOf=dsc-node-pipeline.target
+Wants=network-online.target
+After=network-online.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=exec
+User=node
+EnvironmentFile=/etc/dsc/node-pipeline.env
+ExecStart=/home/node/dsc-extraction/.venv-abi/bin/python -u \
+    -m pipeline.compaction.backup_catalog follow ${MARKET_ROOT} ${MARKET_BACKUP_WORK} ${MARKET_DRIVE}
+Restart=on-failure
+RestartSec=60s
+CPUWeight=25
+IOWeight=25

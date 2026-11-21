@@ -63,6 +63,18 @@ def initialize_node(tracker, baseline_plan, verification_root):
     tracker.baseline(end, block_hash)
 
 
+def validate_production_fence(root, baseline_plan, fence):
+    handoff_path = baseline_plan.with_name('handoff.json')
+    handoff = read(handoff_path)
+    authorization = read(fence)
+    expected = dict(format='dsc-node-production-fence-v1',
+                    legacy_writer='dsc-pipeline.service', legacy_state='masked',
+                    coordinator_root=str(root.resolve()), through=handoff['identity']['through'],
+                    handoff_sha256=checksum(handoff_path))
+    if authorization != expected or handoff['baseline_sha256'] != checksum(baseline_plan):
+        raise ValueError('Node production authorization differs from its root or sealed handoff')
+
+
 def run_cycle(tracker, cycle, baseline_plan, profiles):
     predecessor=tracker.db.execute("select id from cycles where state='complete' order by end desc limit 1").fetchone()
     previous=tracker.root/'cycles'/predecessor['id'] if predecessor else None
@@ -117,6 +129,7 @@ def main():
     p.add_argument('--root',type=Path);p.add_argument('--end-block',type=int)
     p.add_argument('--baseline-plan',type=Path);p.add_argument('--profiles',type=Path)
     p.add_argument('--node-verification',type=Path,help='Directory with the accepted Node replay report')
+    p.add_argument('--node-production-fence', type=Path, help='Authorization from the fenced Data handoff')
     p.add_argument('--status-config',type=Path,help='Read-only Node progress sources for status')
     p.add_argument('--poll-seconds',type=int,default=30);args=p.parse_args()
     if args.poll_seconds<5:p.error('poll-seconds must be at least 5')
@@ -131,6 +144,11 @@ def main():
     if NODE_LOCAL and (args.root is None or (args.mode != 'status' and
                        None in (args.baseline_plan, args.profiles, args.node_verification))):
         p.error('Node requires an explicit root, baseline, profiles and verification directory')
+    node_production = NODE_LOCAL and args.mode == 'continuous'
+    if node_production != (args.node_production_fence is not None):
+        p.error('Node continuous mode requires --node-production-fence exclusively')
+    if node_production:
+        validate_production_fence(args.root, args.baseline_plan, args.node_production_fence)
     args.root = args.root or DEFAULT
     args.baseline_plan = args.baseline_plan or HISTORICAL
     args.profiles = args.profiles or PROFILES

@@ -1,0 +1,21 @@
+[Unit]
+Description=Extract and commit finalized DSC markets and failed transactions
+PartOf=dsc-node-pipeline.target
+Wants=network-online.target
+After=network-online.target
+AssertPathExists=/etc/dsc/node-production-fence.json
+StartLimitIntervalSec=0
+
+[Service]
+Type=exec
+User=node
+EnvironmentFile=/etc/dsc/node-pipeline.env
+Environment=DSC_PIPELINE_SITE=node
+ExecStart=/home/node/dsc-extraction/.venv-abi/bin/python -u \
+    ${DSC_PIPELINE_SCRIPTS}/main.py continuous --root ${MARKET_ROOT} \
+    --baseline-plan ${MARKET_BASELINE} --profiles ${MARKET_PROFILES} \
+    --node-verification ${MARKET_VERIFICATION} \
+    --node-production-fence /etc/dsc/node-production-fence.json
+Restart=on-failure
+RestartSec=60s
+TimeoutStopSec=180s
