@@ -190,45 +190,31 @@ labels. The private page shows this report independently of the legacy Data
 connection and flags stale reports.
 The current tailnet endpoint is [DSC extraction progress](https://dsc-compute.tail5aad6c.ts.net/).
 
-### Node production services
+### Node production handoff
 
-`deployment/node/dsc-node-pipeline.target` groups the market coordinator, HF
-computation, independent Drive backups and the read-only status publisher.
-Start and stop the full set through the target. Each service retries
-independently using its own lock and cursor. The HF worker reads committed
-market blocks from the Node catalog and the HF backup reads accepted windows.
+The versioned `/mnt/storage/dsc-scripts/main.py` runs a single pass. The
+[Node launcher guide](deployment/node/DSC-SCRIPTS.md) lists its configuration
+keys and the scoped HF mount. Use `run --local-only` while Drive backup is
+deferred. The separate systemd target includes backup services and is for
+later deployment.
 
-Set the following fields in the root-managed `/etc/dsc/node-pipeline.env`.
-
-| Fields | Value |
-| --- | --- |
-| `DSC_PIPELINE_SCRIPTS`, `PYTHONPATH` | Versioned scripts directory and its runtime module paths, including `scripts/user-history` and the deployed Drive modules |
-| `DSC_PIPELINE_REVERT_SSH_CONFIG` | Existing restricted Node-to-Revert SSH client configuration |
-| `MARKET_ROOT`, `MARKET_BASELINE`, `MARKET_PROFILES`, `MARKET_VERIFICATION` | Node coordinator directory, sealed handoff plan, reviewed profiles and accepted replay report directory |
-| `MARKET_BACKUP_WORK`, `MARKET_DRIVE` | Market Drive cursor directory and remote root |
-| `HF_OPENING`, `HF_HISTORY`, `CRYO`, `HF_WINDOWS`, `HF_WORK`, `HF_HELPERS` | Accepted HF successor at the market epoch boundary, frozen HF inputs, Cryo executable, accepted window directory, new epoch work directory and helper configuration |
-| `HF_BACKUP_WORK`, `HF_DRIVE`, `HF_BACKUP_START` | Existing HF archive cursor directory, matching Drive remote and original first block |
-| `STATUS_CONFIG`, `STATUS_REPORT` | Absolute paths to the combined read-only source configuration and report |
-
-Before enabling the target, finish the last Data-owned cycle, fence
+Before running the Node writer, finish the last Data-owned cycle, fence
 `dsc-pipeline.service` on Data and verify it is inactive and masked.
-Capture the accepted boundary and confirm the Node and Drive restores. Seal
-the Node handoff at that block. The root-managed
+Capture and independently verify the final Data and Revert catalogs on Node.
+Seal the Node handoff at that block and bind the HF opening checkpoint to the
+next block. The root-managed
 `/etc/dsc/node-production-fence.json` must contain `format`
 (`dsc-node-production-fence-v1`), `legacy_writer` (`dsc-pipeline.service`),
 `legacy_state` (`masked`), the resolved `coordinator_root`, the inclusive
-`through` and the `handoff_sha256` of `handoff.json`. The public Node
-continuous command validates this file against the chosen baseline and root
-before opening the coordinator. Bounded shadow runs use the existing
-`once` command.
+`through` and the `handoff_sha256` of `handoff.json`. The production launcher
+validates it before opening the coordinator. Bounded shadow runs use
+`pipeline.main once` with a separate coordinator directory.
 
-Close the old HF follower at the same boundary using the accepted legacy
-catalog and point `HF_OPENING` to its successor checkpoint. Stop the
-temporary backup and status units before the production target takes over
-their work directories. After installation and `daemon-reload`, enable and
-start `dsc-node-pipeline.target`. Verify the first committed Node cycle and
-its Drive recovery. Before a rollback, stop the target, reconcile accepted
-Node coverage to the Data ledger and restore the single Data writer.
+Run the first local pass manually and verify the market, Revert and HF
+outputs against their accepted inputs. Before rollback, stop the Node
+writer and reconcile any accepted Node coverage to the Data ledger before
+restoring Data as the writer. Source retirement requires independently
+verified Drive restores and a dependency audit for the exact candidates.
 
 ### Legacy Data services
 
