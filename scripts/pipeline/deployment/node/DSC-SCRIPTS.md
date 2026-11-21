@@ -45,6 +45,8 @@ The configuration supplies `market_baseline`, `market_profiles`,
 `market_verification`, `production_fence` and `revert_ssh_config` as local
 paths. Supply `hf_opening`, `hf_history`, `cryo` and `hf_helpers` for the
 accepted HF checkpoint, frozen inputs, Cryo executable and helper configuration.
+The HF checkpoint must start at the block after the market baseline and
+carry its exact predecessor hash before the launcher opens a writer.
 For passes that include backup, `market_drive` and `hf_drive` identify the
 approved Drive roots. `hf_backup_start` is the first inclusive block for the
 configured HF archive.

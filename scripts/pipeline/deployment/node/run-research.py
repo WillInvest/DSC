@@ -20,10 +20,18 @@ def check_storage():
         raise ValueError('DSC data disk is not mounted at the configured storage paths')
 
 
+def check_hf_opening(baseline_path, opening_path):
+    market = json.loads(Path(baseline_path).read_text())
+    hf = json.loads((Path(opening_path)/'boundary.json').read_text())
+    if (hf['next_block'], hf['predecessor_hash']) != (market['end_block']+1, market['end_hash']):
+        raise ValueError('HF opening block and hash must join the sealed market baseline')
+
+
 def run(config, *, local_only=False):
     image = config.get('hf_input_image')
     if image is not None and not Path('/home/dsc-data').samefile(image):
         raise ValueError('Mount the configured HF input image read-only at /home/dsc-data')
+    check_hf_opening(config['market_baseline'], config['hf_opening'])
     module_paths = [SCRIPTS, SCRIPTS/'user-history']
     if overlay := config.get('hf_python_overlay'):
         module_paths.append(Path(overlay))
