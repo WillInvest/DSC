@@ -17,9 +17,12 @@ from hf_incremental_window import pin_window
 from shared.artifacts import checksum, write_json
 
 
-def run(opening, end_block, catalog, historical_root, cryo, output, *, candidate=None, candidate_sha256=None):
+def run(opening, end_block, catalog, historical_root, cryo, output, *, candidate=None,
+        candidate_sha256=None, helpers=None):
     if (candidate is None) != (candidate_sha256 is None):
         raise ValueError('An offline candidate and its receipt SHA-256 are required together')
+    if candidate is not None and helpers:
+        raise ValueError('Provide either a returned candidate or a helper list')
     from_block = json.loads((opening/'boundary.json').read_text())
     state = opening/'state.json.gz'
     if from_block['format'] != FORMAT:
@@ -41,6 +44,7 @@ def run(opening, end_block, catalog, historical_root, cryo, output, *, candidate
     pool, oracle, raw = output/'pool', output/'oracle', output/'raw-tokens'
     tokens, factors = output/'token-replay.json', output/'factors.json'
     result, successor = output/'result', output/'successor'
+    dispatch_receipt = output/'helper-dispatch.json'
     jobs = {job['address'].lower(): job for job in json.loads((historical_root/'plan.json').read_text())['jobs']}
 
     def progress(stage, **evidence):
@@ -67,18 +71,31 @@ def run(opening, end_block, catalog, historical_root, cryo, output, *, candidate
         replay_tokens(window_path, state, raw/'registered-token-inputs.json', historical_root, tokens, w3)
         progress('collect_configuration')
         collect_factors(window_path, state, pool/'pool-inputs.json', oracle/'oracle-inputs.json', tokens, factors)
+        dispatch_evidence = {}
+        if helpers and not result.exists():
+            from hf_incremental_dispatch import schedule
+            progress('dispatch_hf')
+            returned, failed = schedule(helpers, window_path, state, factors, tokens, output/'worker-results')
+            dispatch_evidence['unavailable_helpers'] = failed
+            if returned:
+                candidate, candidate_sha256 = Path(returned['path']), returned['sha256']
+                dispatch_evidence['helper'] = returned['helper']
+            write_json(dispatch_receipt, dispatch_evidence)
+        elif result.exists() and dispatch_receipt.exists():
+            dispatch_evidence = json.loads(dispatch_receipt.read_text())
         if candidate is None:
-            progress('compute_hf')
+            progress('compute_hf', **dispatch_evidence)
             computed = compute(window_path, state, factors, tokens, historical_root, result)
         else:
             from hf_incremental_offload import accept
-            progress('verify_offline_hf')
+            progress('verify_offline_hf', **dispatch_evidence)
             computed = accept(window_path, state, factors, tokens, historical_root,
                               candidate, candidate_sha256, result)
         progress('seal_successor')
         sealed = seal_successor(window_path, state, factors, tokens, historical_root, result, successor)
         evidence = dict(window_sha256=window['window_sha256'], result=computed,
-                        successor_sha256=checksum(successor/'boundary.json'), next_block=sealed['next_block'])
+                        successor_sha256=checksum(successor/'boundary.json'), next_block=sealed['next_block'],
+                        **dispatch_evidence)
         progress('locally_verified', **evidence)
         return evidence
 
@@ -90,10 +107,12 @@ def main():
     parser.add_argument('--end-block', required=True, type=int)
     parser.add_argument('--candidate', type=Path)
     parser.add_argument('--candidate-sha256')
+    parser.add_argument('--helpers', type=Path)
     args = parser.parse_args()
     print(json.dumps(run(args.opening, args.end_block, args.catalog, args.historical_root,
                          args.cryo, args.output, candidate=args.candidate,
-                         candidate_sha256=args.candidate_sha256)))
+                         candidate_sha256=args.candidate_sha256,
+                         helpers=json.loads(args.helpers.read_text()) if args.helpers else None)))
 
 
 if __name__ == '__main__':

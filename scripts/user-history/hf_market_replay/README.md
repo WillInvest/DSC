@@ -109,6 +109,25 @@ with RETH before publishing `result.json`. The regular window runner accepts
 the same receipt through `--candidate` and `--candidate-sha256` and seals its
 successor only after Node acceptance.
 
+The Node window runner also accepts `--helpers` with an ordered JSON list of
+SSH aliases and dedicated client configurations.
+
+```json
+[
+  {"host": "dsc-hf-data", "ssh_config": "/node/.ssh/dsc-pipeline-hf-data-v1.config"},
+  {"host": "dsc-hf-compute", "ssh_config": "/node/.ssh/dsc-pipeline-hf-compute-v1.config"}
+]
+```
+
+The dispatcher identifies the exact input bundle by SHA-256, reuses computed
+jobs after a restart, and records unavailable helpers. It moves to the next
+helper or computes locally if none is reachable. Invalid evidence stops
+acceptance. The dedicated key must be source-restricted to Node and invoke
+`hf_incremental_worker` through a fixed entrypoint. The helper launcher uses
+the frozen runtime in a private network namespace. The worker accepts only
+the declared input filenames and returns only the candidate manifest and
+its checksummed parts.
+
 Reserve registration, removal, or implementation changes require a reviewed
 profile before this position stage accepts the window. The incremental wallet tile format
 `hf-vector-f64-v3` requires an explicit range, window SHA-256 and wallet
