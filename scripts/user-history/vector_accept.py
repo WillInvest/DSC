@@ -40,7 +40,7 @@ def audit_parts(parts,job,identity,samples=()):
     if found!=set(selected):raise ValueError('Missing node sample in vector files')
     return dict(rows=rows,segments=segments,owner_count=n,owner_first_seen_sha256=digest(owners[:n]))
 
-def node_check(samples,job):
+def node_check(samples,job,*,expected_headers=None):
     from accounting_inputs import profiles,profile_at
     plan=m.load(f.ROOT/'plan.json');profs=profiles()
     tasks=[dict(kind='call',function='getUserAccountData',args=[s['user']],block=s['block'],profile=s['profile']) for s in samples]
@@ -48,17 +48,23 @@ def node_check(samples,job):
     abis={p['key']:p['abi'] for p in profs if p['key'] in {x['profile'] for x in tasks}}
     with NODE_LOCK:refs=f.direct_node(plan,dict(operation='snapshots',abis=abis,tasks=tasks))
     if len(refs)!=len(tasks):raise ValueError('Node omitted samples')
-    db=m.readonly(f.ROOT/'accounting.sqlite');checks=[]
+    db=m.readonly(f.ROOT/'accounting.sqlite') if expected_headers is None else None
+    checks=[]
     try:
         for index,(task,ref) in enumerate(zip(tasks,refs)):
-            header=db.execute('select hash from headers where block=?',(task['block'],)).fetchone()
-            exact=bool(header and header[0].lower()==ref['block_hash'].lower())
+            if db is None:
+                expected=expected_headers.get(task['block'])
+            else:
+                header=db.execute('select hash from headers where block=?',(task['block'],)).fetchone()
+                expected=header[0] if header else None
+            exact=bool(expected and expected.lower()==ref['block_hash'].lower())
             if samples:
                 s=samples[index];actual=[str(x) for x in ref['result']]
                 exact=exact and s['account']==actual and s['block_hash'].lower()==ref['block_hash'].lower()
                 checks.append(dict(user=s['user'],block=s['block'],profile=s['profile'],predicted=s['account'],node=actual,block_hash=ref['block_hash'],exact=exact))
             else:checks.append(dict(block=task['block'],field='empty_interval_endpoint_hash',exact=exact))
-    finally:db.close()
+    finally:
+        if db is not None:db.close()
     report=dict(checks=checks,all_exact=all(x['exact'] for x in checks),account_getter_samples=len(samples),empty_interval_endpoint_checks=0 if samples else len(checks),created_at=time.time())
     if not report['all_exact']:raise ValueError('Exact own-node comparison failed')
     return report

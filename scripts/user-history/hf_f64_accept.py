@@ -67,10 +67,11 @@ def audit(result,owners):
     return dict(structural_exact=True,user_values=rows,aggregate_blocks=job['stop']-job['start'],reserve_count=scopes-1)
 
 
-def node_check(samples,job):
+def node_check(samples,job,*,expected_headers=None):
     from vector_accept import node_check as exact_node_check
     adapted=[dict(s,account=s['exact_reference']) for s in samples]
-    report=exact_node_check(adapted,job)
+    header_options={} if expected_headers is None else {'expected_headers':expected_headers}
+    report=exact_node_check(adapted,job,**header_options)
     errors=[];excluded=0
     for s in samples:
         reference=int(s['exact_reference'][5]);actual=np.inf if s['hf']=='+inf' else float(s['hf'])

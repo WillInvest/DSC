@@ -62,11 +62,18 @@ read-only. It prepares the first successor window as follows.
    token activity per wallet. Node verifies the end-of-block scaled balance for
    each changed token and holder. The same command with `--reference` and
    `--reference-sha256` reproduces the accepted delta on an offline helper.
+6. `hf_incremental_factors` joins the exact Pool events, Oracle price vectors
+   and token replay. It reads risk configuration and eMode changes from
+   configurator events and uses the existing RETH snapshot worker at those
+   blocks. GHO borrowing flags come from the same worker at GHO debt actions.
+7. `hf_incremental_compute` seeds the historical evaluator from the sealed
+   state, applies the incremental rows in log order, and publishes one wallet
+   vector dataset and the all, eMode, and non-eMode reserve and protocol
+   aggregates. The result receipt records the input checksums, Parquet
+   partitions, full coverage, and sampled comparisons with RETH.
 
 Reserve registration, removal, or implementation changes require a reviewed
-profile before this position stage accepts the window. Full numerical coverage
-also requires the versioned configuration changes, complete wallet and cohort
-outputs, and their own validation. The incremental wallet tile format
+profile before this position stage accepts the window. The incremental wallet tile format
 `hf-vector-f64-v3` requires an explicit range, window SHA-256 and wallet
 dictionary SHA-256 when encoding and decoding. Calls for the frozen historical
 window still use `hf-vector-f64-v2`. Keep the deployed historical scientific

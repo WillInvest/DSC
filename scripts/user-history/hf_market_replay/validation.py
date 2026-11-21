@@ -166,7 +166,7 @@ def validate_result(result):
                 independent_checkpoint_blocks=len(checked_proofs))
 
 
-def validate_node_samples(samples, job):
+def validate_node_samples(samples, job, *, expected_headers=None):
     """Compare original account metrics, debt weights and eMode with own node.
 
     The existing account validator owns all historical account/HF comparisons.
@@ -180,7 +180,8 @@ def validate_node_samples(samples, job):
     from accounting_inputs import profiles
     from vector_accept import NODE_LOCK
 
-    report = node_check(samples, job)
+    header_options = {} if expected_headers is None else {'expected_headers': expected_headers}
+    report = node_check(samples, job, **header_options)
     for sample in samples:
         actual = float(sample['debt_base'])
         expected = int(sample['exact_reference'][1])
