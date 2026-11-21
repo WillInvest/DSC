@@ -25,3 +25,12 @@ class ResearchLauncherTests(unittest.TestCase):
         self.assertIn('/mnt/storage/dsc-data/metadata/market', calls[0])
         self.assertIn('/mnt/storage/dsc-data/lending/aaveV3/health-factor/windows', calls[2])
         self.assertIn('--node-production-fence', calls[0])
+
+    def test_local_pass_finishes_without_drive_configuration(self):
+        config = {key: key for key in (
+            'market_baseline', 'market_profiles', 'market_verification', 'production_fence',
+            'revert_ssh_config', 'hf_opening', 'hf_history', 'cryo', 'hf_helpers')}
+        with patch.object(launcher.subprocess, 'run') as execute:
+            launcher.run(config, local_only=True)
+        self.assertEqual([call.args[0][3] for call in execute.call_args_list], [
+            'pipeline.main', 'pipeline.research_layout', 'hf_incremental_follow'])

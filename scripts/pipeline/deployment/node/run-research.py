@@ -20,7 +20,7 @@ def check_storage():
         raise ValueError('DSC data disk is not mounted at the configured storage paths')
 
 
-def run(config):
+def run(config, *, local_only=False):
     market = DATA/'metadata/market'
     hf = DATA/'lending/aaveV3/health-factor'
     catalog = market/'canonical'
@@ -42,6 +42,8 @@ def run(config):
            '--opening', config['hf_opening'], '--historical-root', config['hf_history'],
            '--cryo', config['cryo'], '--helpers', config['hf_helpers'], '--windows', hf/'windows',
            '--work', hf/'compute')
+    if local_only:
+        return
     invoke('pipeline.compaction.backup_catalog', 'follow', market,
            DATA/'metadata/market-drive', config['market_drive'], '--once')
     invoke('hf_incremental_archive', '--continuous', '--once', '--windows', hf/'windows',
@@ -52,9 +54,12 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('mode', choices=('check', 'run'))
     parser.add_argument('--config', type=Path)
+    parser.add_argument('--local-only', action='store_true', help='Run through local HF computation')
     args = parser.parse_args()
     if args.mode == 'run' and not args.config:
         parser.error('run requires --config')
+    if args.local_only and args.mode != 'run':
+        parser.error('--local-only requires run')
     check_storage()
     if args.mode == 'check':
         print(f'Scripts: {SCRIPTS.parent.parent}')
@@ -65,7 +70,7 @@ def main():
     config = json.loads(args.config.read_text())
     with (DATA/'metadata/scheduled-pass.lock').open('a') as lock:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        run(config)
+        run(config, local_only=args.local_only)
 
 
 if __name__ == '__main__':

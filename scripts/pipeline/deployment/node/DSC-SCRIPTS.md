@@ -21,12 +21,16 @@ Node production handoff. A pass commits the finalized market cycle, publishes
 its protocol directories, accepts one HF window when available, and advances
 each Drive backup. The launcher checks the mounted data disk before writing.
 
+Use `python3 /mnt/storage/dsc-scripts/main.py run --local-only --config CONFIG`
+to finish after publishing the local market and HF outputs.
+
 The configuration supplies `market_baseline`, `market_profiles`,
 `market_verification`, `production_fence` and `revert_ssh_config` as local
 paths. Supply `hf_opening`, `hf_history`, `cryo` and `hf_helpers` for the
 accepted HF checkpoint, frozen inputs, Cryo executable and helper configuration.
-`market_drive` and `hf_drive` identify the approved Drive roots.
-`hf_backup_start` is the first inclusive block for the configured HF archive.
+For passes that include backup, `market_drive` and `hf_drive` identify the
+approved Drive roots. `hf_backup_start` is the first inclusive block for the
+configured HF archive.
 The Node market ledger and canonical catalog live under
 `/mnt/storage/dsc-data/metadata/market`. The HF window, work and archive
 cursors live under `/mnt/storage/dsc-data/lending/aaveV3/health-factor`.
