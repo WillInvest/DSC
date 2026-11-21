@@ -128,6 +128,27 @@ the frozen runtime in a private network namespace. The worker accepts only
 the declared input filenames and returns only the candidate manifest and
 its checksummed parts.
 
+`hf_incremental_follow` repeats the window runner up to the requested inclusive
+block. It records a pending interval before starting it and advances only
+after both Node acceptance and the successor checkpoint pass. With multiple
+helpers it rotates the preferred host between accepted windows. The market
+catalog's committed watermark caps each interval.
+
+```sh
+python -m hf_incremental_follow --opening /node/hf/accepted/successor \
+  --catalog /node/compacted --historical-root /node/frozen-aave-inputs \
+  --cryo /node/bin/cryo --windows /node/hf/windows --work /node/hf/catchup \
+  --through 26463976 --size 1024 --helpers /node/hf/helpers.json
+```
+
+`hf_incremental_archive` follows the accepted windows from its own starting
+block. It publishes an indexed TAR, the replay input and result inventory, and
+a Drive receipt for each window. It independently downloads every package,
+checks the SHA-256 of every member, and restores the successor state and wallet
+dictionary before advancing the backup watermark. The archive stores the wallet
+dictionary once and records its successor path as an alias. The archive and
+calculation progress files represent separate watermarks.
+
 Reserve registration, removal, or implementation changes require a reviewed
 profile before this position stage accepts the window. The incremental wallet tile format
 `hf-vector-f64-v3` requires an explicit range, window SHA-256 and wallet
