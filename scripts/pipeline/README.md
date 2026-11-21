@@ -167,6 +167,7 @@ the receiver and readable by the web service. The monitor's
 bounded JSON payload and stores only block watermarks, counts and status
 labels. The private page shows this report independently of the legacy Data
 connection and flags stale reports.
+The current tailnet endpoint is [DSC extraction progress](https://dsc-compute.tail5aad6c.ts.net/).
 
 ### Node production services
 

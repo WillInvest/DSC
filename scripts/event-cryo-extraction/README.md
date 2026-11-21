@@ -56,7 +56,10 @@ address bar counts files written on dsc-node, so it is provisional and may omit
 empty chunks until final verification. Received contract-block totals are separate.
 The page marks stale snapshots and SSH failures explicitly. No ETA is promised.
 
-Live private page: https://dsc-web.tail5aad6c.ts.net/
+The Node pipeline card reads its own cached report and continues to display
+Node catalog, HF and Drive watermarks when the Data report is unavailable.
+
+Live private page: https://dsc-compute.tail5aad6c.ts.net/
 
 Cryo's native current-contract display runs in a persistent tmux session on
 dsc-node (not dsc-data). It updates automatically when the queue changes contracts:
