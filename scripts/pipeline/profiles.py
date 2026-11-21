@@ -12,7 +12,7 @@ from decoding.pool_decode import cryo_event_log
 import pyarrow.parquet as pq
 
 
-def bulk_upgrades(w3, profile, output, start, stop):
+def bulk_upgrades(w3, profile, output, start, stop, *, wait_for_extraction_lock=False):
     import importlib.util
     folder=Path(__file__).resolve().parents[1]/'event-cryo-extraction'
     sys.path.insert(0,str(folder))
@@ -23,7 +23,7 @@ def bulk_upgrades(w3, profile, output, start, stop):
               chunk_size=10000,concurrency=32,cryo='/home/node/.cargo/bin/cryo',poll_seconds=1)
     job=dict(address=profile['address'],start_block=start,node_dir=str(root),
              topic0=Web3.to_hex(Web3.keccak(text='Upgraded(address)')))
-    worker.run(plan,job)
+    worker.run(plan,job,wait_for_extraction_lock=wait_for_extraction_lock)
     manifest=json.loads((root/'manifest.json').read_text());logs=[]
     for name in manifest['files']:
         for batch in pq.ParquetFile(root/'encoded'/name).iter_batches():
@@ -31,7 +31,7 @@ def bulk_upgrades(w3, profile, output, start, stop):
     return logs
 
 
-def extend(source, output, start, stop, contracts):
+def extend(source, output, start, stop, contracts, *, wait_for_extraction_lock=False):
     w3=Web3(Web3.HTTPProvider('http://127.0.0.1:8545',request_kwargs={'timeout':120}))
     if w3.eth.chain_id!=1 or w3.eth.get_block('finalized').number<stop-1:
         raise ValueError('Target must be finalized Ethereum mainnet')
@@ -50,7 +50,7 @@ def extend(source, output, start, stop, contracts):
     for protocol in ('aave-v2','aave-v3'):
         last=max((p for p in profiles if p['protocol']==protocol),key=lambda p:p['to_block'])
         print(f'{protocol}: Cryo upgrade audit [{start}, {stop})',flush=True)
-        logs=bulk_upgrades(w3,last,output,start,stop)
+        logs=bulk_upgrades(w3,last,output,start,stop,wait_for_extraction_lock=wait_for_extraction_lock)
         if last['to_block']>=stop:
             for profile in profiles:
                 if profile['protocol']==protocol and profile['from_block']<stop and profile['to_block']>start:
@@ -76,5 +76,6 @@ def extend(source, output, start, stop, contracts):
 if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('--source',required=True,type=Path);p.add_argument('--output',required=True,type=Path)
     p.add_argument('--start',required=True,type=int);p.add_argument('--stop',required=True,type=int)
-    p.add_argument('--contracts',required=True,type=Path);a=p.parse_args()
-    extend(a.source,a.output,a.start,a.stop,a.contracts)
+    p.add_argument('--contracts',required=True,type=Path)
+    p.add_argument('--wait-for-extraction-lock',action='store_true');a=p.parse_args()
+    extend(a.source,a.output,a.start,a.stop,a.contracts,wait_for_extraction_lock=a.wait_for_extraction_lock)

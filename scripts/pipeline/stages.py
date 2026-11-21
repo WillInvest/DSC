@@ -1,11 +1,13 @@
 """Adapt the accepted fast workers to one immutable incremental interval."""
 import json
+import os
 from pathlib import Path
 import shutil
 from tempfile import TemporaryDirectory
-from pipeline.runtime import (NODE,REVERT,SCRIPTS,PYTHON,NODE_SCRIPTS,NODE_PYTHON,
+from pipeline.runtime import (NODE,NODE_LOCAL,REVERT,SCRIPTS,PYTHON,NODE_SCRIPTS,NODE_PYTHON,
                               REVERT_SCRIPTS,REVERT_PYTHON,REGISTRY,
                               node_command,node_json,node_path,ssh,remote_json,run,transfer,rpc)
+from pipeline.revert_worker import RevertWorker,verify_full_archive
 from shared.artifacts import checksum,digest,write_json
 from automation.common import paths
 
@@ -39,11 +41,17 @@ class Stages:
         self.cycle=cycle;self.root=Path(root)/'cycles'/cycle['id'];self.root.mkdir(parents=True,exist_ok=True)
         self.previous_plan=Path(previous_plan);self.previous_profiles=Path(previous_profiles);self.heartbeat=heartbeat
         self.verification = verification
+        self.revert_worker = None
         if verification:
             relative = verification_cycle_path(root, cycle['id'])
             self.node = f'/home/node/dsc-extraction/{relative}'
             self.revert = f'/home/dsc-revert/data/{relative}'
             self.data = self.root / 'datasets'
+            if NODE_LOCAL:
+                config = os.environ.get('DSC_PIPELINE_REVERT_SSH_CONFIG')
+                if not config:
+                    raise ValueError('Node replay requires the restricted Revert SSH configuration')
+                self.revert_worker = RevertWorker(config, relative.removeprefix('verification/'))
         else:
             self.node=f"/home/node/dsc-extraction/cycles/{cycle['id']}"
             self.revert=f"/home/dsc-revert/data/cycles/{cycle['id']}"
@@ -106,10 +114,14 @@ class Stages:
         self.execute(node_command(['mkdir','-p',self.node+'/previous-profiles']))
         self.copy(str(source)+'/',node_path(self.node+'/previous-profiles/'))
         self.copy(REGISTRY,node_path(self.node+'/pools.csv'))
-        self.execute(node_command([NODE_PYTHON,NODE_SCRIPTS+'/pipeline/profiles.py',
+        profile_worker = SCRIPTS/'pipeline/profiles.py' if self.revert_worker else NODE_SCRIPTS+'/pipeline/profiles.py'
+        command = [NODE_PYTHON, profile_worker,
             '--source',self.node+'/previous-profiles','--output',self.node+'/profiles',
             '--start',self.cycle['start'],'--stop',self.cycle['end']+1,
-            '--contracts',self.node+'/pools.csv'],True))
+            '--contracts',self.node+'/pools.csv']
+        if self.revert_worker:
+            command.append('--wait-for-extraction-lock')
+        self.execute(node_command(command,True))
         self.profiles.mkdir(exist_ok=True)
         self.copy(node_path(self.node+'/profiles/'),str(self.profiles)+'/')
         if not self.verification:
@@ -176,25 +188,43 @@ class Stages:
         return progress
 
     def receipt_delivery_stage(self):
-        self.execute(ssh(REVERT,[REVERT_PYTHON,REVERT_SCRIPTS+'/reverted/receive_receipts.py',
-            '--root',self.revert+'/receipts','--source',NODE+':'+self.node+'/receipts/'],True))
-        progress=remote_json(REVERT,self.revert+'/receipts/progress.json');self.check_blocks(progress,'completed_blocks')
+        if self.revert_worker:
+            self.execute(self.revert_worker.command('receive'))
+            progress = self.revert_worker.progress('receipt-status')
+        else:
+            self.execute(ssh(REVERT,[REVERT_PYTHON,REVERT_SCRIPTS+'/reverted/receive_receipts.py',
+                '--root',self.revert+'/receipts','--source',NODE+':'+self.node+'/receipts/'],True))
+            progress=remote_json(REVERT,self.revert+'/receipts/progress.json')
+        self.check_blocks(progress,'completed_blocks')
         return progress
 
     def traces_stage(self):
+        def trace_status():
+            if self.revert_worker:
+                return self.revert_worker.progress('trace-status')
+            return remote_json(REVERT,self.revert+'/traces/progress.json')
+
         def progress():
-            p=remote_json(REVERT,self.revert+'/traces/progress.json')
+            p=trace_status()
             return (p.get('completed_blocks'),p.get('archived_blocks'))
-        self.execute(ssh(REVERT,[REVERT_PYTHON,REVERT_SCRIPTS+'/reverted/trace_received.py',
-            '--receipts',self.revert+'/receipts','--output',self.revert+'/traces',
-            '--reth-rpc','http://10.246.103.160:8545','--reth-workers','32'],True),progress=progress)
-        progress=remote_json(REVERT,self.revert+'/traces/progress.json');self.check_blocks(progress,'archived_blocks')
-        return {k:v for k,v in progress.items() if k not in ('accounts',)}
+
+        command = (self.revert_worker.command('trace') if self.revert_worker else
+                   ssh(REVERT,[REVERT_PYTHON,REVERT_SCRIPTS+'/reverted/trace_received.py',
+                       '--receipts',self.revert+'/receipts','--output',self.revert+'/traces',
+                       '--reth-rpc','http://10.246.103.160:8545','--reth-workers','32'],True))
+        self.execute(command,progress=progress)
+        status=trace_status();self.check_blocks(status,'archived_blocks')
+        return {k:v for k,v in status.items() if k not in ('accounts',)}
 
     def selected_delivery_stage(self):
         target=self.data/'reverted'
+        source = REVERT+':'+self.revert+'/traces/selected/'
+        if self.revert_worker:
+            incoming = self.root / 'revert-incoming'
+            self.execute(self.revert_worker.download('selected', incoming/'selected'))
+            source = str(incoming/'selected') + '/'
         self.execute([PYTHON,SCRIPTS/'reverted/deliver_selected.py','--root',target,
-                      '--source',REVERT+':'+self.revert+'/traces/selected/'])
+                      '--source',source])
         progress=read(target/'progress.json');self.check_blocks(progress,'accepted_blocks')
         accepted=read(target/'accepted.json');cursor=self.cycle['start']
         for item in sorted(accepted.values(),key=lambda x:x['start']):
@@ -203,7 +233,13 @@ class Stages:
         if cursor!=self.cycle['end']+1:raise ValueError('Selected coverage ends early')
         if rpc('eth_getBlockByNumber',[hex(self.cycle['end']),False])['hash']!=self.cycle['hash']:
             raise ValueError('Cycle target hash changed')
-        return dict(progress=progress,accepted=str(target/'accepted.json'))
+        result = dict(progress=progress,accepted=str(target/'accepted.json'))
+        if self.revert_worker:
+            archive = target/'archive'
+            self.execute(self.revert_worker.download('archive', archive))
+            result['archive'] = str(archive)
+            result['failed_transactions'] = verify_full_archive(archive, accepted)
+        return result
 
     def check_blocks(self, progress, key):
         if progress['state']!='complete' or progress[key]!=self.cycle['end']-self.cycle['start']+1:

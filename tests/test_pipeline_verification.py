@@ -30,6 +30,28 @@ class VerificationTests(unittest.TestCase):
             root=Path(directory);self.records(root/'old','same');self.records(root/'new','same')
             self.assertEqual(compare_archives(root/'old',root/'new',10,11),dict(exact_traces=1))
 
+    def test_node_replay_compares_downloaded_archives_against_local_baseline(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            old = root/'reference'
+            output = root/'cycles/10-10/datasets/reverted'
+            old.mkdir()
+            output.mkdir(parents=True)
+            self.records(old/'archive','same')
+            self.records(output/'archive','same')
+            for path in [old/'selected/chunks',output/'chunks']:
+                path.mkdir(parents=True)
+                with gzip.open(path/'10-10.jsonl.gz','wt') as out:
+                    out.write(json.dumps(dict(block_number=10,failed=[
+                        dict(receipt=dict(transactionHash='tx'),matched_contracts=['pool']),
+                    ])))
+            plan=root/'plan.json'
+            plan.write_text('{"jobs":[]}')
+            with patch.object(verify,'copy_legacy_revert_inputs',side_effect=AssertionError):
+                result=verify.compare(plan,plan,root,10,11,old)
+            self.assertEqual(result['traces'],dict(exact_traces=1))
+            self.assertEqual(result['selection_comparison'],'exact')
+
     def test_replay_cli_leaves_live_pointer_and_exact_gate_untouched(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

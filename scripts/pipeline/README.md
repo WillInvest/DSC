@@ -84,10 +84,19 @@ difference fails the gate and is recorded for inspection. No production coverage
 For a candidate installed on Node, set `DSC_PIPELINE_SITE=node` and
 `DSC_PIPELINE_SCRIPTS` to the candidate's `scripts` directory. The candidate
 loads the pool registry from `contracts/ethereum/pools.csv` alongside that
-directory. Run `pipeline/verify.py` with explicit `--root`, `--baseline-plan`
-and `--profiles` paths on Node. RETH, Cryo, receipt collection and Aave
-auxiliary collection use Node-local execution. Revert commands and archive
-comparison retain the Revert SSH route. Reuse the deployed Python environment.
+directory. Run `pipeline/verify.py` with explicit `--root`, `--baseline-plan`,
+`--profiles` and `--revert-baseline` paths on Node. Its Revert baseline points
+to the Node copy of the historical `drpc-v1` archive root.
+RETH, Cryo, receipt collection and Aave auxiliary collection run locally.
+
+Set `DSC_PIPELINE_REVERT_SSH_CONFIG` to the dedicated SSH client configuration
+with the alias `dsc-revert-pipeline`. Its public key on Revert has a Node LAN
+source restriction and the forced `scripts/reverted/node_worker.py` command.
+The worker pulls receipts from the matching Node verification scope, starts the
+existing tracing script with local credentials, and serves only redacted
+progress and read-only rsync downloads under the worker's data root. Node checks
+full archives against the same sealed batch receipts as the selected output.
+Reuse the deployed Python environments.
 The continuous entrypoint still uses the existing Data compaction layout.
 
 Deployment: disable the old extraction/offline watchdog and delivery timers before

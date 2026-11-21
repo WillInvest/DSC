@@ -81,7 +81,7 @@ def compare_archives(old,new,start,stop):
     return dict(exact_traces=exact)
 
 
-def compare(baseline_plan,new_plan,root,start,stop):
+def compare(baseline_plan,new_plan,root,start,stop,revert_baseline=None):
     report=dict(start=start,stop=stop,addresses=[],state='checking')
     old=read(baseline_plan);new=read(new_plan)
     original={j['address']:j for j in old['jobs']}
@@ -92,6 +92,23 @@ def compare(baseline_plan,new_plan,root,start,stop):
         checks['state']=rows(before.parent.parent/'reconstructed'/before.name/MODE,start,stop)==rows(after.parent.parent/'reconstructed'/after.name/MODE,start,stop)
         report['addresses'].append(dict(address=j['address'],checks=checks))
         if not all(checks.values()):raise ValueError(f'Replay differs: {j["address"]}: {checks}')
+    if revert_baseline is None:
+        old_archive, new_archive, old_selected, new_selected = copy_legacy_revert_inputs(root,start,stop)
+    else:
+        output = root/'cycles'/f'{start}-{stop-1}'/'datasets/reverted'
+        old_archive, new_archive = revert_baseline/'archive', output/'archive'
+        old_selected, new_selected = revert_baseline/'selected/chunks', output/'chunks'
+    report['traces']=compare_archives(old_archive,new_archive,start,stop)
+    a=archive_records(old_selected,start,stop);b=archive_records(new_selected,start,stop)
+    for n in a:
+        def selected(r):return [(e['receipt']['transactionHash'],e['matched_contracts']) for e in r['failed']]
+        if selected(a[n])!=selected(b[n]):raise ValueError(f'Selection differs at {n}')
+    report.update(state='passed',receipt_comparison='exact',selection_comparison='exact')
+    write_json(root/'verification.json',report)
+    return report
+
+
+def copy_legacy_revert_inputs(root,start,stop):
     archive=root/'comparison';archive.mkdir(exist_ok=True)
     cycle=f'{start}-{stop-1}';log=root/'comparison.log'
     new_traces = '/home/dsc-revert/data/' + verification_cycle_path(root, cycle) + '/traces'
@@ -103,27 +120,21 @@ def compare(baseline_plan,new_plan,root,start,stop):
             if a<stop and z>=start:transfer(remote+':'+folder+'/'+name,str(local)+'/',log,lambda:None)
     copy_batches(REVERT,'/home/dsc-revert/data/archive/reverted/drpc-v1/archive',archive/'old')
     copy_batches(REVERT,new_traces+'/archive',archive/'new')
-    report['traces']=compare_archives(archive/'old',archive/'new',start,stop)
     copy_batches(REVERT,'/home/dsc-revert/data/archive/reverted/drpc-v1/selected/chunks',archive/'old-selected')
     copy_batches(REVERT,new_traces+'/selected/chunks',archive/'new-selected')
-    a=archive_records(archive/'old-selected',start,stop);b=archive_records(archive/'new-selected',start,stop)
-    for n in a:
-        def selected(r):return [(e['receipt']['transactionHash'],e['matched_contracts']) for e in r['failed']]
-        if selected(a[n])!=selected(b[n]):raise ValueError(f'Selection differs at {n}')
-    report.update(state='passed',receipt_comparison='exact',selection_comparison='exact')
-    write_json(root/'verification.json',report)
-    return report
+    return archive/'old', archive/'new', archive/'old-selected', archive/'new-selected'
 
 
 def main():
     p=argparse.ArgumentParser();p.add_argument('--blocks',type=int,default=100);p.add_argument('--root',type=Path)
     p.add_argument('--baseline-plan',type=Path)
     p.add_argument('--profiles',type=Path)
+    p.add_argument('--revert-baseline',type=Path)
     p.add_argument('--check',action='store_true',help='Check the completed exact 100-block verification gate')
     args=p.parse_args()
     if NODE_LOCAL and (args.root is None or
-                       (not args.check and (args.baseline_plan is None or args.profiles is None))):
-        p.error('Node verification requires an explicit --root and, for replay, --baseline-plan and --profiles')
+                       (not args.check and None in (args.baseline_plan,args.profiles,args.revert_baseline))):
+        p.error('Node verification requires --root and, for replay, --baseline-plan, --profiles and --revert-baseline')
     args.root = args.root or DEFAULT/'verification'
     if args.check:
         r=read(args.root/'verification.json')
@@ -140,13 +151,13 @@ def main():
     root.mkdir(parents=True, exist_ok=True)
     with (root/'coordinator.lock').open('a') as lock:
         fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
-        report = replay(root, baseline, profiles, plan, start, stop)
+        report = replay(root, baseline, profiles, plan, start, stop, args.revert_baseline)
         if args.blocks == 100:
             write_json(args.root/'verification.json', report)
         print(json.dumps(report))
 
 
-def replay(root, baseline, profiles, plan, start, stop):
+def replay(root, baseline, profiles, plan, start, stop, revert_baseline=None):
     if rpc('eth_getBlockByNumber', [hex(stop-1), False])['hash'] != plan['end_hash']:
         raise ValueError('Historical verification target hash changed')
     for job in plan['jobs']:
@@ -166,7 +177,9 @@ def replay(root, baseline, profiles, plan, start, stop):
             write_json(root/'current.json',pointer)
             run_cycle(tracker,cycle,prior,profiles)
         tracker.publish(cycle,state='comparing')
-        try: report = compare(baseline,root/'cycles'/f'{start}-{stop-1}'/'events/plan.json',root,start,stop)
+        try:
+            report = compare(baseline,root/'cycles'/f'{start}-{stop-1}'/'events/plan.json',
+                             root,start,stop,revert_baseline)
         except Exception as error:
             tracker.publish(cycle,state='mismatch',error=str(error));raise
         tracker.publish(cycle,state='passed')
