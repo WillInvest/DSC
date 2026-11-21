@@ -4,17 +4,67 @@ from pathlib import Path
 import sys
 from tempfile import TemporaryDirectory
 import unittest
+from unittest.mock import patch
 
 import pyarrow as pa
 import pyarrow.parquet as pq
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'scripts'))
-from pipeline.research_layout import ENCODED, publish_archive, publish_historical_market, publish_protocol_reverts
+from pipeline.research_layout import (
+    ENCODED, PROTOCOLS, publish_archive, publish_historical_market,
+    publish_protocol_reverts, publish_selected, revert_publication_lock,
+)
 from reverted.trace_received import pack
 from shared.artifacts import checksum, digest, write_json
 
 
 class ResearchLayoutTests(unittest.TestCase):
+    def selected_archive(self, root, numbers, through):
+        write_json(root/'metadata/global-revert-publication.json',
+                   dict(stage='complete', start=10, through=through))
+        write_json(root/'metadata/accepted-sources/revert/historical-revert.json',
+                   dict(start=10, stop=through+1, selection=digest(['0x1'])))
+        for block in numbers:
+            row = dict(block_number=block, failed=[dict(matched_contracts=['0x1'])])
+            pack(root/f'revert/selected/{block}-{block}.jsonl.gz', [row])
+        return [{'address': '0x1', 'protocol': 'uniswap-v2'}]
+
+    def test_parallel_protocol_publication_checks_the_range_and_excludes_other_writers(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            contracts = self.selected_archive(root, [10, 12], through=12)
+            with revert_publication_lock(root):
+                with self.assertRaises(BlockingIOError):
+                    publish_protocol_reverts(root, contracts, workers=4)
+            with self.assertRaisesRegex(ValueError, 'gap or overlap'):
+                publish_protocol_reverts(root, contracts, workers=4)
+            self.assertFalse(list(root.glob('*/**/reverted-tx/*.jsonl.gz')))
+
+    def test_parallel_protocol_publication_resumes_from_last_complete_batch(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            serial, parallel = root/'serial', root/'parallel'
+            contracts = self.selected_archive(serial, range(10, 112), through=111)
+            self.selected_archive(parallel, range(10, 112), through=111)
+            publish_protocol_reverts(serial, contracts)
+
+            def fail_one_partition(path, target, start, stop, lower, addresses):
+                if lower == 110:
+                    raise OSError('injected partition failure')
+                publish_selected(path, target, start, stop, lower, addresses)
+
+            with patch('pipeline.research_layout.publish_selected', side_effect=fail_one_partition):
+                with self.assertRaisesRegex(OSError, 'injected partition failure'):
+                    publish_protocol_reverts(parallel, contracts, workers=4)
+            status = Path('metadata/protocol-revert-publication.json')
+            self.assertEqual(json.loads((parallel/status).read_text())['through'], 109)
+            publish_protocol_reverts(parallel, contracts, workers=4)
+            self.assertEqual((parallel/status).read_bytes(), (serial/status).read_bytes())
+            parts = list(serial.glob('*/**/reverted-tx/*.jsonl.gz'))
+            self.assertEqual(len(parts), 102*len(PROTOCOLS))
+            for path in parts:
+                self.assertEqual(path.read_bytes(), (parallel/path.relative_to(serial)).read_bytes())
+
     def test_protocol_publication_binds_the_registry_and_contiguous_global_scope(self):
         with TemporaryDirectory() as directory:
             root = Path(directory)

@@ -1,6 +1,8 @@
 """Publish accepted Node data in the protocol-oriented research directory."""
 import argparse
 from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor
+from contextlib import contextmanager
 import fcntl
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -22,6 +24,13 @@ PROTOCOLS = {
 }
 MARKET_KINDS = frozenset(('decoded', 'state'))
 ENCODED = frozenset(('encoded',))
+
+
+@contextmanager
+def revert_publication_lock(root):
+    with (root/'protocol-revert-publication.lock').open('a') as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        yield
 
 
 def link(source, target, expected_sha, size=None):
@@ -214,16 +223,24 @@ def publish(root, historical_markets, historical_reverts, market_tail, revert_ta
     status = root/'metadata'/'publication.json'
     addresses, through, index = publish_history(root, historical_markets, status, MARKET_KINDS)
     publish_tail_markets(market_tail, root, through+1)
-    publish_revert_history(root, historical_reverts, status,
-                           addresses=addresses, markets=index, cutoff=through+1)
-    publish_tail_reverts(revert_tail, root, through+1, addresses)
-    market_end = read(market_tail/'manifest.json')['through']
-    revert_end = read(revert_tail/'manifest.json')['through']
-    write_json(status, dict(stage='complete', markets=index, market_through=market_end,
-                           revert_through=revert_end))
+    with revert_publication_lock(root):
+        publish_revert_history(root, historical_reverts, status,
+                               addresses=addresses, markets=index, cutoff=through+1)
+        publish_tail_reverts(revert_tail, root, through+1, addresses)
+        market_end = read(market_tail/'manifest.json')['through']
+        revert_end = read(revert_tail/'manifest.json')['through']
+        write_json(status, dict(stage='complete', markets=index, market_through=market_end,
+                               revert_through=revert_end))
 
 
-def publish_protocol_reverts(root, contracts):
+def publish_protocol_reverts(root, contracts, *, workers=1):
+    if workers < 1:
+        raise ValueError('Protocol Revert publication requires at least one worker')
+    with revert_publication_lock(root):
+        _publish_protocol_reverts(root, contracts, workers)
+
+
+def _publish_protocol_reverts(root, contracts, workers):
     meta = root/'metadata'
     global_archive = read(meta/'global-revert-publication.json')
     if global_archive['stage'] != 'complete':
@@ -239,7 +256,7 @@ def publish_protocol_reverts(root, contracts):
         streams = {item['stream'] for item in tail['files'] if item['stream'].startswith('selected/')}
         if streams != {'selected/'+selection}:
             raise ValueError('Historical and incremental Revert selections differ')
-    addresses = defaultdict(set)
+    addresses = {protocol: set() for protocol in PROTOCOLS}
     for row in contracts:
         addresses[row['protocol']].add(row['address'].lower())
 
@@ -250,18 +267,25 @@ def publish_protocol_reverts(root, contracts):
         if (saved['start'], saved['selection']) != (start, selection) or not start <= saved['through']+1 <= stop:
             raise ValueError('Existing protocol Revert publication has a different identity')
         cursor = saved['through']+1
-    parts = sorted((bounds(path), path) for path in (root/'revert/selected').glob('*.jsonl.gz'))
-    for count, ((lower, upper), path) in enumerate(parts, 1):
-        if upper <= cursor or lower >= stop:
-            continue
-        if lower != cursor or upper > stop:
+    partitions = ((bounds(path), path) for path in (root/'revert/selected').glob('*.jsonl.gz'))
+    parts = sorted((span, path) for span, path in partitions if span[1] > cursor and span[0] < stop)
+    for (lower, upper), _ in parts:
+        if lower != cursor or not lower < upper <= stop:
             raise ValueError('Global selected archive has a gap or overlap')
-        publish_selected(path, root, lower, upper, lower, addresses)
         cursor = upper
-        if count % 100 == 0:
-            write_json(status, dict(stage='publishing', start=start, through=cursor-1, selection=selection))
     if cursor != stop:
         raise ValueError('Protocol publication does not reach the accepted global endpoint')
+
+    def publish_part(part):
+        (lower, upper), path = part
+        publish_selected(path, root, lower, upper, lower, addresses)
+
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        for begin in range(0, len(parts), 100):
+            batch = parts[begin:begin+100]
+            list(pool.map(publish_part, batch))
+            through = batch[-1][0][1]-1
+            write_json(status, dict(stage='publishing', start=start, through=through, selection=selection))
     write_json(status, dict(stage='complete', start=start, through=stop-1, selection=selection))
 
 
@@ -272,12 +296,16 @@ def main():
     scope.add_argument('--encoded-only', action='store_true')
     scope.add_argument('--global-revert-only', action='store_true')
     scope.add_argument('--protocol-revert-only', action='store_true')
+    parser.add_argument('--protocol-workers', type=int, default=1,
+                        help='Number of partition workers within the protocol publisher')
     for field in ('historical-markets', 'historical-reverts', 'market-tail', 'revert-tail',
                   'coordinator', 'registry'):
         parser.add_argument('--'+field, type=Path)
     args = parser.parse_args()
     if not args.root.is_dir():
         parser.error('Create the research root on the data disk first')
+    if args.protocol_workers < 1 or (args.protocol_workers != 1 and not args.protocol_revert_only):
+        parser.error('--protocol-workers requires --protocol-revert-only and must be positive')
     historical = (args.historical_markets, args.historical_reverts, args.market_tail, args.revert_tail)
     lock_name = 'publication.lock'
     if args.encoded_only:
@@ -295,8 +323,9 @@ def main():
     elif args.protocol_revert_only:
         if not args.registry or args.coordinator or any(historical):
             parser.error('Protocol Revert publication requires a contract registry')
-        sources = ()
-        lock_name = 'protocol-revert-publication.lock'
+        from registry.catalog import registry as tracked_contracts
+        publish_protocol_reverts(args.root, tracked_contracts(args.registry), workers=args.protocol_workers)
+        return
     elif args.coordinator:
         if not args.registry or any(historical):
             parser.error('Use a coordinator and registry, or the four historical import paths')
@@ -314,11 +343,9 @@ def main():
             publish_encoded(args.root, args.historical_markets, args.market_tail)
         elif args.global_revert_only:
             status = args.root/'metadata/global-revert-publication.json'
-            archive = publish_revert_history(args.root, args.historical_reverts, status)
-            write_json(status, dict(stage='complete', start=archive['start'], through=archive['stop']-1))
-        elif args.protocol_revert_only:
-            from registry.catalog import registry as tracked_contracts
-            publish_protocol_reverts(args.root, tracked_contracts(args.registry))
+            with revert_publication_lock(args.root):
+                archive = publish_revert_history(args.root, args.historical_reverts, status)
+                write_json(status, dict(stage='complete', start=archive['start'], through=archive['stop']-1))
         elif args.coordinator:
             publish_committed(args.root, args.coordinator, args.registry)
         else:
@@ -355,9 +382,10 @@ def publish_committed(root, coordinator, registry):
             raise ValueError('Raw replay input coverage does not join the published market boundary')
         publish_tail_markets(catalog, root, through+1)
         publish_tail_markets(catalog, root, raw_through+1, ENCODED)
-        publish_tail_reverts(catalog, root, through+1, addresses)
-        write_json(root/'metadata/encoded-publication.json', dict(encoded, market_through=committed['through']))
-        write_json(status, dict(previous, market_through=committed['through'], revert_through=committed['through']))
+        with revert_publication_lock(root):
+            publish_tail_reverts(catalog, root, through+1, addresses)
+            write_json(root/'metadata/encoded-publication.json', dict(encoded, market_through=committed['through']))
+            write_json(status, dict(previous, market_through=committed['through'], revert_through=committed['through']))
 
 
 if __name__ == '__main__':

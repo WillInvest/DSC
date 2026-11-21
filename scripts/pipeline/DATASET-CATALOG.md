@@ -46,6 +46,10 @@ normal publication pass also creates each protocol's matching subset.
 `--protocol-revert-only --registry REGISTRY` can publish those subsets in
 parallel with market placement. It joins only completed global selections
 and checks that the contract registry matches their accepted fingerprint.
+`--protocol-workers 4` lets one protocol publisher process independent
+partitions in parallel. Revert publication commands in this release share a
+lock. The standalone protocol publisher records contiguous coverage only
+after each batch succeeds and retries from its last recorded block.
 
 The `lending/aaveV3/health-factor/` directory holds historical indexed packs
 and completed incremental windows. Run `python -m pipeline.hf_storage
