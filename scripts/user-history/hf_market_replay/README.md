@@ -133,6 +133,10 @@ block. It records a pending interval before starting it and advances only
 after both Node acceptance and the successor checkpoint pass. With multiple
 helpers it rotates the preferred host between accepted windows. The market
 catalog's committed watermark caps each interval.
+Use `--continuous` in place of `--through` to follow a live catalog after
+handoff. Seed a new catalog epoch with the accepted HF checkpoint at its
+predecessor block and give that follower a separate work directory. It waits
+for the first committed market cycle before selecting an HF window.
 
 ```sh
 python -m hf_incremental_follow --opening /node/hf/accepted/successor \
@@ -148,6 +152,8 @@ checks the SHA-256 of every member, and restores the successor state and wallet
 dictionary before advancing the backup watermark. The archive stores the wallet
 dictionary once and records its successor path as an alias. The archive and
 calculation progress files represent separate watermarks.
+Its `--continuous` mode can resume the same backup cursor and follows each
+new contiguous accepted window in the same windows directory.
 
 Reserve registration, removal, or implementation changes require a reviewed
 profile before this position stage accepts the window. The incremental wallet tile format

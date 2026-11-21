@@ -55,3 +55,8 @@ class IncrementalArchiveTests(unittest.TestCase):
                 backup.return_value = dict(start=10, stop=11)
                 second = follow(windows, work, 'drive', 10, 12, once=True)
                 self.assertEqual(second['next_block'], 11)
+                backup.return_value = dict(start=11, stop=13)
+                third = follow(windows, work, 'drive', 10, None, once=True)
+                self.assertEqual(third['next_block'], 13)
+                next_window = follow(windows, work, 'drive', 10, None, once=True)
+                self.assertEqual(next_window['state'], 'waiting_for_window')

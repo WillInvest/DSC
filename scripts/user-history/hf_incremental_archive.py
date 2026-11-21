@@ -159,7 +159,7 @@ def follow(windows, work, remote, start, through, once=False):
         progress = load(path) if path.exists() else dict(identity=identity, next_block=start, verified_windows=0)
         if progress['identity'] != identity:
             raise ValueError('HF backup follower is bound to different sources')
-        while progress['next_block'] <= through:
+        while through is None or progress['next_block'] <= through:
             prefix = str(progress['next_block'])
             candidates = [p for p in windows.glob(prefix+'-*') if re.fullmatch(prefix+r'-\d+', p.name)
                           and (p/'progress.json').is_file()
@@ -195,7 +195,9 @@ def main():
     parser.add_argument('--work', type=Path, required=True)
     parser.add_argument('--remote', required=True)
     parser.add_argument('--start', type=int, required=True)
-    parser.add_argument('--through', type=int, required=True)
+    target = parser.add_mutually_exclusive_group(required=True)
+    target.add_argument('--through', type=int, help='Inclusive backup cutoff')
+    target.add_argument('--continuous', action='store_true', help='Follow all accepted HF windows')
     parser.add_argument('--once', action='store_true')
     args = parser.parse_args()
     print(json.dumps(follow(args.windows, args.work, args.remote, args.start, args.through, args.once)))

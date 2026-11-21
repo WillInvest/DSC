@@ -1,4 +1,4 @@
-"""Catch up finalized HF windows, advancing only through sealed Node results."""
+"""Follow committed market coverage and advance through sealed HF results."""
 import argparse
 from contextlib import closing
 import fcntl
@@ -33,11 +33,14 @@ def validate_opening(path, next_block=None):
     return report
 
 
-def advance(cursor, available, target, size):
-    if cursor['pending']:
-        return cursor['pending']
+def advance(cursor, limit, size):
+    if limit is None:
+        return None
+    pending = cursor['pending']
+    if pending:
+        return pending if pending['stop']-1 <= limit else None
     start = cursor['next_block']
-    last = min(available, target, start+size-1)
+    last = min(limit, start+size-1)
     return dict(start=start, stop=last+1) if last >= start else None
 
 
@@ -59,13 +62,22 @@ def follow(opening, catalog, historical_root, cryo, windows, work, target, size,
                        pending=None, completed_windows=0, last_accepted=None))
         if cursor['identity'] != identity:
             raise ValueError('HF follower is bound to different sources or window size')
-        cursor['target'] = target
+        cursor['mode'] = 'continuous' if target is None else 'bounded'
         while True:
-            if cursor['next_block'] > target and cursor['pending'] is None:
+            if target is not None and cursor['next_block'] > target and cursor['pending'] is None:
+                cursor['target'] = target
                 cursor['state'] = 'complete'
                 write_json(path, cursor)
                 return cursor
-            pending = advance(cursor, catalog_head(catalog), target, size)
+            if target is None and not (catalog/'progress.json').is_file():
+                available = None
+            else:
+                available = catalog_head(catalog)
+            cursor['target'] = available if target is None else target
+            if target is not None and cursor['pending'] and cursor['pending']['stop']-1 > target:
+                raise ValueError('Pending HF interval exceeds the requested target')
+            limit = min(available, target) if available is not None and target is not None else available
+            pending = advance(cursor, limit, size)
             if pending is None:
                 cursor['state'] = 'waiting_for_catalog'
                 write_json(path, cursor)
@@ -73,8 +85,8 @@ def follow(opening, catalog, historical_root, cryo, windows, work, target, size,
                     return cursor
                 time.sleep(30)
                 continue
-            if pending['start'] != cursor['next_block'] or pending['stop']-1 > target:
-                raise ValueError('Pending HF interval conflicts with the cursor or target')
+            if pending['start'] != cursor['next_block']:
+                raise ValueError('Pending HF interval conflicts with the cursor')
             source = Path(cursor['opening'])
             validate_opening(source, pending['start'])
             window = windows/f"{pending['start']}-{pending['stop']-1}"
@@ -105,7 +117,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for field in ('opening', 'catalog', 'historical-root', 'cryo', 'windows', 'work'):
         parser.add_argument('--'+field, type=Path, required=True)
-    parser.add_argument('--through', type=int, required=True)
+    target = parser.add_mutually_exclusive_group(required=True)
+    target.add_argument('--through', type=int, help='Inclusive finalized cutoff')
+    target.add_argument('--continuous', action='store_true', help='Follow the committed market catalog')
     parser.add_argument('--size', type=int, default=1024)
     parser.add_argument('--helpers', type=Path)
     parser.add_argument('--once', action='store_true')

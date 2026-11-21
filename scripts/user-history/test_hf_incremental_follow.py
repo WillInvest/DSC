@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+import sqlite3
 import sys
 from tempfile import TemporaryDirectory
 from types import SimpleNamespace
@@ -11,6 +12,41 @@ from shared.artifacts import checksum, write_json
 
 
 class IncrementalFollowerTests(unittest.TestCase):
+    def test_continuous_mode_follows_the_same_catalog_as_it_advances(self):
+        with TemporaryDirectory() as temporary:
+            root = Path(temporary).resolve()
+            opening, catalog, windows, work = (root/name for name in ('opening', 'catalog', 'windows', 'work'))
+            write_json(opening/'boundary.json', {'next_block': 101})
+            write_json(root/'plan.json', {'jobs': []})
+            accepted = []
+
+            def run(source, end, market_catalog, _history, _cryo, window, *, helpers):
+                self.assertEqual(market_catalog, catalog)
+                accepted.append((source, end))
+                successor = window/'successor'/'boundary.json'
+                write_json(successor, {'next_block': end+1})
+                return dict(next_block=end+1, successor_sha256=checksum(successor))
+
+            args = (opening, catalog, root, root/'cryo', windows, work, None, 10, [], True)
+            with (
+                patch.dict(sys.modules, {'hf_incremental_run': SimpleNamespace(run=run)}),
+                patch('hf_incremental_follow.validate_opening', return_value={'next_block': 101}),
+            ):
+                self.assertEqual(follow(*args)['state'], 'waiting_for_catalog')
+                catalog.mkdir()
+                with sqlite3.connect(catalog/'catalog.sqlite') as database:
+                    database.execute('create table meta(key text primary key, value text)')
+                    database.execute("insert into meta values ('through', '102')")
+                    database.commit()
+                    write_json(catalog/'progress.json', {'through': 102})
+                    self.assertEqual(follow(*args)['next_block'], 103)
+                    self.assertEqual(follow(*args)['state'], 'waiting_for_catalog')
+                    database.execute("update meta set value = '105' where key = 'through'")
+                    database.commit()
+                    result = follow(*args)
+                self.assertEqual((result['state'], result['next_block'], result['target']), ('accepted', 106, 105))
+            self.assertEqual(accepted, [(opening, 102), (windows/'101-102/successor', 105)])
+
     def test_retry_keeps_the_interval_and_advances_only_after_successor(self):
         with TemporaryDirectory() as temporary:
             root = Path(temporary).resolve()
