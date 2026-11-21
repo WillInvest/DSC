@@ -145,9 +145,11 @@ def main():
                        None in (args.baseline_plan, args.profiles, args.node_verification))):
         p.error('Node requires an explicit root, baseline, profiles and verification directory')
     node_production = NODE_LOCAL and args.mode == 'continuous'
-    if node_production != (args.node_production_fence is not None):
-        p.error('Node continuous mode requires --node-production-fence exclusively')
-    if node_production:
+    if node_production and args.node_production_fence is None:
+        p.error('Node continuous mode requires --node-production-fence')
+    if args.node_production_fence is not None:
+        if not NODE_LOCAL or args.mode == 'status':
+            p.error('--node-production-fence belongs to a Node writer')
         validate_production_fence(args.root, args.baseline_plan, args.node_production_fence)
     args.root = args.root or DEFAULT
     args.baseline_plan = args.baseline_plan or HISTORICAL

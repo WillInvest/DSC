@@ -177,18 +177,60 @@ def publish(root, historical_markets, historical_reverts, market_tail, revert_ta
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    for field in ('root', 'historical-markets', 'historical-reverts', 'market-tail', 'revert-tail'):
-        parser.add_argument('--'+field, required=True, type=Path)
+    parser.add_argument('--root', required=True, type=Path)
+    for field in ('historical-markets', 'historical-reverts', 'market-tail', 'revert-tail',
+                  'coordinator', 'registry'):
+        parser.add_argument('--'+field, type=Path)
     args = parser.parse_args()
     if not args.root.is_dir():
         parser.error('Create the research root on the data disk first')
-    for path in (args.historical_markets, args.historical_reverts, args.market_tail, args.revert_tail):
-        if path.stat().st_dev != args.root.stat().st_dev:
+    historical = (args.historical_markets, args.historical_reverts, args.market_tail, args.revert_tail)
+    if args.coordinator:
+        if not args.registry or any(historical):
+            parser.error('Use a coordinator and registry, or the four historical import paths')
+        sources = (args.coordinator,)
+    else:
+        if not all(historical) or args.registry:
+            parser.error('Provide the four historical import paths')
+        sources = historical
+    for source in sources:
+        if source.stat().st_dev != args.root.stat().st_dev:
             parser.error('Research publication and accepted imports must share the data disk')
     with (args.root/'publication.lock').open('a') as lock:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        publish(args.root, args.historical_markets, args.historical_reverts,
-                args.market_tail, args.revert_tail)
+        if args.coordinator:
+            publish_committed(args.root, args.coordinator, args.registry)
+        else:
+            publish(args.root, *historical)
+
+
+def publish_committed(root, coordinator, registry):
+    from registry.catalog import registry as tracked_contracts
+
+    status = root/'metadata/publication.json'
+    previous = read(status)
+    if previous['stage'] != 'complete' or previous['market_through'] != previous['revert_through']:
+        raise ValueError('The initial market and Revert publication must have a common accepted boundary')
+    through = previous['market_through']
+    with (coordinator/'coordinator.lock').open('a') as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        baseline = read(coordinator/'baseline.json')
+        catalog = coordinator/'canonical'
+        if baseline['end_block'] > through:
+            raise ValueError('Published data has a gap before the new coordinator baseline')
+        if not (coordinator/'compaction.json').is_file():
+            return
+        committed = read(coordinator/'compaction.json')
+        if committed['state'] != 'complete' or committed['through'] != read(catalog/'progress.json')['through']:
+            raise ValueError('The Node catalog and coordinator watermarks disagree')
+        if committed['through'] <= through:
+            return
+        addresses = defaultdict(set)
+        for contract in tracked_contracts(registry):
+            addresses[contract['protocol']].add(contract['address'])
+        publish_tail_markets(catalog, root, through+1)
+        publish_tail_reverts(catalog, root, through+1, addresses)
+        write_json(status, dict(previous, market_through=committed['through'], revert_through=committed['through']))
 
 
 if __name__ == '__main__':

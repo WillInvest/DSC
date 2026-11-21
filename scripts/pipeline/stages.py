@@ -188,7 +188,8 @@ class Stages:
         def progress():
             p=node_json(self.node+'/receipts/progress.json')
             return (p.get('completed_blocks'),p.get('inflight_completed'))
-        self.execute(node_command([NODE_PYTHON,NODE_SCRIPTS+'/reverted/scan_receipts.py',
+        scanner = SCRIPTS/'reverted/scan_receipts.py' if NODE_LOCAL else NODE_SCRIPTS+'/reverted/scan_receipts.py'
+        self.execute(node_command([NODE_PYTHON,scanner,
             '--start',self.cycle['start'],'--stop',self.cycle['end']+1,'--end-hash',self.cycle['hash'],
             '--workers','32','--executor','process','--output',self.node+'/receipts'],True),progress=progress)
         progress=node_json(self.node+'/receipts/progress.json');self.check_blocks(progress,'completed_blocks')
