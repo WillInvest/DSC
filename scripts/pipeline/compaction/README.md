@@ -75,3 +75,16 @@ The main entrypoint invokes `run.compact_completed`; `worker.py` is an internal
 role-local CLI. A second compactor cannot write the same catalog concurrently.
 The monitor shows extraction and compaction progress separately. A compaction
 failure preserves its evidence and stops the next pipeline cycle for recovery.
+## Materialized migration captures
+
+The capture manifest records every catalog-selected payload and pins the
+replaceable open files at capture time. To materialize the capture, copy the
+sealed payloads from the source store and the pinned open payloads from the
+capture's `open/` directory to their manifest paths. Copy `catalog.sqlite` and
+`manifest.json` to the destination root and create an empty `catalog.lock`.
+
+Run `PYTHONPATH=scripts python3 -m pipeline.compaction.verify_capture ROOT` to
+validate the SQLite file, manifest records and every payload's size and SHA-256.
+Run the same check after unpacking the Drive backup into a separate directory.
+Use a read-only snapshot for these imported catalogs. The catalogs also contain
+source-host retirement records, which belong to the original writer.

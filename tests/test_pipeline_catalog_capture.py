@@ -1,5 +1,6 @@
 from contextlib import closing
 from pathlib import Path
+import shutil
 import sqlite3
 import sys
 from tempfile import TemporaryDirectory
@@ -8,6 +9,7 @@ import unittest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
 from pipeline.compaction.capture import capture_catalog
 from pipeline.compaction.reader import snapshot
+from pipeline.compaction.verify_capture import verify_capture
 from shared.artifacts import checksum
 
 
@@ -30,6 +32,23 @@ def source_catalog(root):
 
 
 class CatalogCaptureTests(unittest.TestCase):
+    def test_verify_checks_both_materialized_sealed_and_open_payloads(self):
+        with TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source, destination = root / 'live', root / 'capture'
+            source_catalog(source)
+            capture_catalog(source, destination)
+            (destination / 'catalog.lock').touch()
+            shutil.copyfile(source / 'closed', destination / 'closed')
+            shutil.copyfile(destination / 'open/tail', destination / 'tail')
+
+            result = verify_capture(destination)
+            self.assertEqual((result['through'], result['files'], result['payload_bytes']), (115, 2, 10))
+
+            (destination / 'closed').write_bytes(b'broken')
+            with self.assertRaisesRegex(ValueError, 'payload checksum mismatch: closed'):
+                verify_capture(destination)
+
     def test_capture_keeps_the_exact_open_tail_and_online_ledger(self):
         with TemporaryDirectory() as temporary:
             root = Path(temporary)
