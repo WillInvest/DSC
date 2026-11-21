@@ -44,7 +44,8 @@ def advance(cursor, limit, size):
     return dict(start=start, stop=last+1) if last >= start else None
 
 
-def follow(opening, catalog, historical_root, cryo, windows, work, target, size, helpers, once=False):
+def follow(opening, catalog, historical_root, cryo, windows, work, target, size, helpers, once=False,
+           *, local_accepted=None):
     from hf_incremental_run import run
 
     opening = opening.resolve()
@@ -55,6 +56,8 @@ def follow(opening, catalog, historical_root, cryo, windows, work, target, size,
     identity = dict(opening=str(opening), opening_sha256=checksum(opening/'boundary.json'),
                     catalog=str(catalog.resolve()), windows=str(windows),
                     historical_plan_sha256=checksum(historical_root/'plan.json'), size=size)
+    if local_accepted is not None:
+        identity['local_accepted'] = str(local_accepted.resolve())
     with (work/'follow.lock').open('a') as lock:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         cursor = (read(path) if path.exists() else
@@ -102,6 +105,9 @@ def follow(opening, catalog, historical_root, cryo, windows, work, target, size,
                         or checksum(child/'boundary.json') != evidence['successor_sha256']):
                     raise ValueError('HF runner did not publish the exact successor')
                 validate_opening(child, pending['stop'])
+                if local_accepted is not None:
+                    from pipeline.hf_storage import place_local
+                    place_local(window, local_accepted)
             except Exception:
                 write_json(path, dict(cursor, state='retry_pending'))
                 raise
@@ -123,12 +129,13 @@ def main():
     parser.add_argument('--size', type=int, default=1024)
     parser.add_argument('--helpers', type=Path)
     parser.add_argument('--once', action='store_true')
+    parser.add_argument('--local-accepted', type=Path, help='Publish each accepted window here')
     args = parser.parse_args()
     if args.size < 1:
         parser.error('--size must be positive')
     helpers = read(args.helpers) if args.helpers else []
     result = follow(args.opening, args.catalog, args.historical_root, args.cryo, args.windows, args.work,
-                    args.through, args.size, helpers, args.once)
+                    args.through, args.size, helpers, args.once, local_accepted=args.local_accepted)
     print(json.dumps(result))
 
 

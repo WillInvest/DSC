@@ -12,6 +12,34 @@ from shared.artifacts import checksum, write_json
 
 
 class IncrementalFollowerTests(unittest.TestCase):
+    def test_local_placement_failure_keeps_the_window_pending(self):
+        with TemporaryDirectory() as temporary:
+            root = Path(temporary).resolve()
+            opening, windows, work = root/'opening', root/'windows', root/'work'
+            accepted = root/'local-accepted'
+            write_json(opening/'boundary.json', {'next_block': 101})
+            write_json(root/'plan.json', {'jobs': []})
+
+            def run(_opening, end, _catalog, _history, _cryo, window, *, helpers):
+                successor = window/'successor/boundary.json'
+                write_json(successor, {'next_block': end+1})
+                return dict(next_block=end+1, successor_sha256=checksum(successor))
+
+            args = (opening, root/'catalog', root, root/'cryo', windows, work, 102, 2, [], True)
+            with (
+                patch.dict(sys.modules, {'hf_incremental_run': SimpleNamespace(run=run)}),
+                patch('hf_incremental_follow.validate_opening', return_value={'next_block': 101}),
+                patch('hf_incremental_follow.catalog_head', return_value=102),
+                patch('pipeline.hf_storage.place_local', side_effect=[OSError('placement interrupted'), {}]) as place,
+            ):
+                with self.assertRaisesRegex(OSError, 'placement interrupted'):
+                    follow(*args, local_accepted=accepted)
+                cursor = json.loads((work/'progress.json').read_text())
+                self.assertEqual((cursor['next_block'], cursor['state']), (101, 'retry_pending'))
+                self.assertEqual(follow(*args, local_accepted=accepted)['next_block'], 103)
+            self.assertEqual([call.args for call in place.call_args_list],
+                             [(windows/'101-102', accepted)] * 2)
+
     def test_continuous_mode_follows_the_same_catalog_as_it_advances(self):
         with TemporaryDirectory() as temporary:
             root = Path(temporary).resolve()

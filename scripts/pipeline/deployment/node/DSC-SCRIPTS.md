@@ -22,7 +22,9 @@ its protocol directories, accepts one HF window when available, and advances
 each Drive backup. The launcher checks the mounted data disk before writing.
 
 Use `python3 /mnt/storage/dsc-scripts/main.py run --local-only --config CONFIG`
-to finish after publishing the local market and HF outputs.
+to finish after publishing the local market and HF outputs. The HF cursor
+advances only after the accepted wallet and cohort window has been placed
+under `lending/aaveV3/health-factor/local-accepted/`.
 
 For the consolidated Node runtime, set `hf_input_image` to the verified
 image on `vdb1` and `hf_python_overlay` to the deployed NumPy overlay on the

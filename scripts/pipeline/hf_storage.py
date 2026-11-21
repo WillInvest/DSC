@@ -1,6 +1,7 @@
-"""Place completed, Drive-verified HF windows under the canonical research root."""
+"""Place accepted HF windows under the canonical research root."""
 import argparse
 import fcntl
+import os
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
@@ -18,6 +19,56 @@ def member(root, name):
     if path.resolve() != path or not path.is_file():
         raise ValueError(f'Absent or redirected HF archive member: {path}')
     return path
+
+
+def install_window(output, files, receipt=None):
+    with TemporaryDirectory(dir=output.parent) as scratch:
+        stage = Path(scratch)/'publish'
+        for name, path in files.items():
+            target = stage/name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.hardlink_to(path)
+        if receipt is not None:
+            write_json(stage/'local-placement.json', receipt)
+        stage.rename(output)
+        parent = os.open(output.parent, os.O_RDONLY)
+        try:
+            os.fsync(parent)
+        finally:
+            os.close(parent)
+
+
+def place_local(window, target):
+    from hf_incremental_archive import window_inventory
+
+    window = window.resolve()
+    target.mkdir(parents=True, exist_ok=True)
+    if window.stat().st_dev != target.stat().st_dev:
+        raise ValueError('Local HF placement requires the source on the canonical disk')
+    with (target/'placement.lock').open('a') as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        manifest = window_inventory(window)
+        start, stop = manifest['start'], manifest['stop']
+        if window.name != f'{start}-{stop-1}' or start >= stop:
+            raise ValueError('Local HF window name differs from the accepted range')
+        members = set(manifest['files']) | set(manifest['derived_files'])
+        files = {name: member(window, name) for name in sorted(members)}
+        files['progress.json'] = member(window, 'progress.json')
+        proof = dict(start=start, stop=stop, files=len(files), accepted_locally=True,
+                     result_sha256=manifest['result_sha256'],
+                     successor_sha256=manifest['successor_sha256'])
+        output = target/window.name
+        if output.exists():
+            accepted = read(output/'progress.json')
+            if (read(output/'local-placement.json') != proof
+                    or (accepted['stage'], accepted['start'], accepted['stop'],
+                        accepted['result']['sha256'], accepted['successor_sha256']) != (
+                            'locally_verified', start, stop, proof['result_sha256'], proof['successor_sha256'])
+                    or any(not (output/name).samefile(files[name]) for name in members)):
+                raise ValueError(f'Existing local HF window differs: {output}')
+        else:
+            install_window(output, files, proof)
+        return proof
 
 
 def place(window, archive, output, start, stop):
@@ -58,13 +109,7 @@ def place(window, archive, output, start, stop):
         if any(not (output/name).samefile(path) for name, path in files.items()):
             raise ValueError(f'Existing canonical HF window differs: {output}')
     else:
-        with TemporaryDirectory(dir=output.parent) as scratch:
-            stage = Path(scratch)/'publish'
-            for name, path in files.items():
-                target = stage/name
-                target.parent.mkdir(parents=True, exist_ok=True)
-                target.hardlink_to(path)
-            stage.rename(output)
+        install_window(output, files)
     return dict(window=output.name, start=start, stop=stop, files=len(files),
                 manifest_sha256=receipt['manifest_sha256'], receipt_sha256=checksum(receipt_path))
 

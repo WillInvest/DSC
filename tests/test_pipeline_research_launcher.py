@@ -24,6 +24,8 @@ class ResearchLauncherTests(unittest.TestCase):
             'pipeline.compaction.backup_catalog', 'hf_incremental_archive'])
         self.assertIn('/mnt/storage/dsc-data/metadata/market', calls[0])
         self.assertIn('/mnt/storage/dsc-data/lending/aaveV3/health-factor/windows', calls[2])
+        self.assertEqual(calls[2][-2:], ['--local-accepted',
+                                       '/mnt/storage/dsc-data/lending/aaveV3/health-factor/local-accepted'])
         self.assertIn('--node-production-fence', calls[0])
 
     def test_local_pass_finishes_without_drive_configuration(self):

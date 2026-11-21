@@ -48,7 +48,7 @@ def run(config, *, local_only=False):
     invoke('hf_incremental_follow', '--continuous', '--once', '--catalog', catalog,
            '--opening', config['hf_opening'], '--historical-root', config['hf_history'],
            '--cryo', config['cryo'], '--helpers', config['hf_helpers'], '--windows', hf/'windows',
-           '--work', hf/'compute')
+           '--work', hf/'compute', '--local-accepted', hf/'local-accepted')
     if local_only:
         return
     invoke('pipeline.compaction.backup_catalog', 'follow', market,
