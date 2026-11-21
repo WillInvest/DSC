@@ -138,6 +138,21 @@ identities. The entrypoint binds that receipt when it initializes the Node
 ledger. The source catalogs remain readable and can continue to serve the
 historical data.
 
+The `pipeline.compaction.backup_import_delta` command publishes accepted
+Data and Revert tail changes as one compressed package per role. It reuses the
+verified physical baseline by manifest hash, includes the new SQLite snapshot
+and changed open/sealed files, and publishes a receipt only after a Drive
+download reconstructs and verifies the entire catalog. Pass an independently
+Drive-restored predecessor to both commands. The receipt records the Drive
+location and manifest SHA-256 of that predecessor.
+
+```sh
+python -m pipeline.compaction.backup_import_delta backup \
+  /restore/baseline /node/accepted-import REMOTE_BASE REMOTE_DELTAS /node/backup-work
+python -m pipeline.compaction.backup_import_delta restore \
+  /restore/baseline REMOTE_SNAPSHOT RECEIPT_SHA256 /restore/new-import
+```
+
 For shadow verification, run `pipeline.catalog_probe probe CATALOG BLOCK`
 on Node, Data and Revert for the same accepted block. The command
 `pipeline.catalog_probe compare NODE_JSON DATA_JSON REVERT_JSON` checks the
