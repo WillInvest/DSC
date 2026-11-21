@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if ROOT.name == 'scripts':
     ROOT = ROOT.parent
 sys.path.insert(0, str(ROOT / 'scripts'))
-from reverted.extract_reverted import make_rpc
+from reverted.common import make_rpc
 
 
 class RpcTests(unittest.TestCase):
