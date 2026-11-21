@@ -1,5 +1,33 @@
 # DSC research dataset catalog
 
+## Protocol directories on Node
+
+`/home/node/dsc-data` is the node-user mount of `/mnt/storage/dsc-data` on
+`vdb1`. The publication command reads accepted imports and exposes this
+layout without rewriting their historical Parquet files.
+
+```text
+dsc-data/
+  dex/{uniswapV2,uniswapV3}/
+  lending/{aaveV2,aaveV3}/
+    events/<contract>/<schema>/<event>/<first>-<last>.parquet
+    block-state/<contract>/<first>-<last>.parquet
+    reverted-tx/<first>-<last>.jsonl.gz
+  revert/{receipts,traces,selected}/<first>-<last>.jsonl.gz
+  metadata/publication.json
+```
+
+The three child datasets apply to each of the four protocol directories.
+File ranges are inclusive. Event rows contain `block_number`, `name` and
+the original decoded attributes. Several events can share a block number.
+State has one row per block per contract and uses the state schema. Protocol
+revert files contain matching transactions and retain the full call tree for
+each match. The global archive retains failed receipts, complete traces and
+all selected transactions. Coverage advances in `metadata/publication.json`.
+Accepted Parquet and archive files on the same disk are published as hard
+links. The publisher slices accepted inputs only where the historical and
+migrated block ranges overlap.
+
 Start with `integrated-pipeline/metadata/dataset-index.json` on Node. Its
 release entries identify the physical catalog, the Node acceptance record
 and the Drive verification record for each dataset. The index stores
