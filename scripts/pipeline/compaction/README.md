@@ -34,7 +34,9 @@ Role-local stores:
 
 `catalog.sqlite` is authoritative for active files, stream layout, original
 anchors, source checksums/identities, output checksums and pending retirements.
-`progress.json` is a monitor snapshot. The coordinator's `compactions` SQLite
+`progress.json` is a monitor snapshot. In-flight compaction updates are
+atomic and can be regenerated after an interruption. The final snapshot is
+synced to disk. The coordinator's `compactions` SQLite
 table records the all-role committed watermark. A request contains only cycles
 after that watermark, so it does not grow with the full extraction history.
 

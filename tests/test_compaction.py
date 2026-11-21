@@ -12,6 +12,7 @@ from pipeline.compaction.store import Store, Fragment
 from pipeline.compaction.reader import snapshot
 from pipeline.compaction.run import compact_completed
 from pipeline.tracker import Tracker,STAGES
+from shared.artifacts import write_json
 
 
 class CompactionTests(unittest.TestCase):
@@ -47,6 +48,20 @@ class CompactionTests(unittest.TestCase):
                     with self.assertRaises(OSError):store.compact(19,{'s':dict(format='parquet',anchor=3,size=10,dense=True,fragments=[b])})
                 self.assertEqual(store.files('s'),before);self.assertTrue(b.path.exists())
                 self.assertEqual(store.head,16)
+
+    def test_compaction_progress_precedes_the_durable_commit_report(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = self.parquet(root/'source.parquet', 13, 17)
+            spec = dict(format='parquet', anchor=3, size=10, dense=True, fragments=[source])
+            with Store(root/'store') as store:
+                with patch('pipeline.compaction.store.write_json', wraps=write_json) as writes:
+                    store.compact(16, {'pool/state': spec})
+                reports = [(call.args[1]['state'], call.args[1]['through'], call.kwargs['durable'])
+                           for call in writes.call_args_list]
+                self.assertEqual(reports, [('compacting', None, False), ('compacting', None, False),
+                                           ('retiring', 16, True), ('complete', 16, True)])
+                self.assertEqual(store.head, 16)
 
     def test_jsonl_preserves_complete_nested_records_and_original_interval(self):
         with tempfile.TemporaryDirectory() as directory:

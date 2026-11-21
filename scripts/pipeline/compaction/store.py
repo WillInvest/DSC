@@ -62,9 +62,11 @@ class Store:
             pending=self.db.execute("select count(*) from retirements where state='pending'").fetchone()[0]
             self._metrics=[*rows,retired,pending]
         rows=self._metrics[:3];retired,pending=self._metrics[3:]
+        # In-flight progress is observational. The finalized report and
+        # catalog commit still use their durable paths.
         write_json(self.root/'progress.json',dict(state=state,through=self.head,files=rows[0],sealed_files=rows[1],
                    open_files=rows[0]-rows[1],rows=rows[2],retired_files=retired,pending_retirements=pending,
-                   updated_at=time.time(),**extra))
+                   updated_at=time.time(),**extra),durable=state!='compacting')
 
     @staticmethod
     def identity(path):
