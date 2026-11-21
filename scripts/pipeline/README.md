@@ -147,7 +147,10 @@ verified physical baseline by manifest hash, includes the new SQLite snapshot
 and changed open/sealed files, and publishes a receipt only after a Drive
 download reconstructs and verifies the entire catalog. Pass an independently
 Drive-restored predecessor to both commands. The receipt records the Drive
-location and manifest SHA-256 of that predecessor.
+location and manifest SHA-256 of that predecessor. A retry reuses the
+previously verified archive package when it and both source manifests match
+the pending receipt. It still downloads and reconstructs the full destination
+snapshot before reporting Drive acceptance.
 
 ```sh
 python -m pipeline.compaction.backup_import_delta backup \

@@ -7,6 +7,12 @@ from pipeline.compaction.reader import snapshot
 from shared.artifacts import checksum
 
 
+def manifest_identity(manifest, manifest_sha256):
+    return dict(through=manifest['through'], manifest_sha256=manifest_sha256,
+                catalog_sha256=manifest['catalog_sha256'], files=len(manifest['files']),
+                payload_bytes=sum(row['bytes'] for row in manifest['files']))
+
+
 def verify_capture(root):
     root = Path(root).resolve()
     manifest_file = root / 'manifest.json'
@@ -33,9 +39,7 @@ def verify_capture(root):
             if path.stat().st_size != entry['bytes'] or checksum(path) != row['sha256']:
                 raise ValueError(f'Capture payload checksum mismatch: {relative}')
 
-    return dict(through=manifest['through'], manifest_sha256=checksum(manifest_file),
-                catalog_sha256=manifest['catalog_sha256'], files=len(entries),
-                payload_bytes=sum(row['bytes'] for row in entries.values()))
+    return manifest_identity(manifest, checksum(manifest_file))
 
 
 def main():

@@ -9,7 +9,7 @@ from tempfile import TemporaryDirectory
 
 from pipeline.compaction.backup_catalog import METADATA, descriptor, fetch, read
 from pipeline.compaction.delta_capture import build_plan, materialize, prepare
-from pipeline.compaction.verify_capture import verify_capture
+from pipeline.compaction.verify_capture import manifest_identity, verify_capture
 from shared.artifacts import checksum, write_json
 
 FORMAT = 'dsc-catalog-import-delta-v1'
@@ -70,24 +70,33 @@ def backup(previous, current, base_remote, drive, work):
     work.mkdir(parents=True, exist_ok=True)
     with (work/'backup.lock').open('a') as lock:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        current_proof = verify_capture(current)
-        plan = build_plan(previous, current)
-        remote = f"{drive.rstrip('/')}/{plan['through']}-{plan['capture_manifest_sha256']}"
-        identity = dict(format=FORMAT, remote=remote, base_remote=base_remote,
-                        previous_manifest_sha256=plan['previous_manifest_sha256'], catalog=current_proof)
         path = work/RECEIPT
         pending = work/'pending.json'
         pack = work/PACK
+        manifest = current/'manifest.json'
+        catalog = manifest_identity(read(manifest), checksum(manifest))
+        previous_sha256 = checksum(previous/'manifest.json')
+        remote = f"{drive.rstrip('/')}/{catalog['through']}-{catalog['manifest_sha256']}"
+        identity = dict(format=FORMAT, remote=remote, base_remote=base_remote,
+                        previous_manifest_sha256=previous_sha256, catalog=catalog)
         if path.exists():
             saved = read(path)
             if any(saved[key] != value for key, value in identity.items()):
                 raise ValueError('Existing Drive verification has a different delta identity')
+            if verify_capture(current) != catalog:
+                raise ValueError('Current Node import differs from the verified Drive receipt')
             return saved
         if pending.exists():
             receipt = read(pending)
             if receipt != dict(identity, package=descriptor(pack)):
                 raise ValueError('Pending Drive delta has a different identity')
         else:
+            if verify_capture(current) != catalog:
+                raise ValueError('Current Node import differs from the pinned manifest')
+            plan = build_plan(previous, current)
+            if (plan['previous_manifest_sha256'], plan['capture_manifest_sha256']) != (
+                    previous_sha256, catalog['manifest_sha256']):
+                raise ValueError('Catalog inputs changed while building the Drive package')
             write_pack(current, plan, pack)
             receipt = dict(identity, package=descriptor(pack))
             write_json(pending, receipt)

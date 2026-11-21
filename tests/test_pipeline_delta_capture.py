@@ -89,8 +89,13 @@ class DeltaCaptureTests(unittest.TestCase):
             imported, backup_work = root/'node-catalog', root/'drive-work'
             expected = materialize(base, capture, live, root/'plan', imported)
             drive = root/'mock-drive'
+            failed_once = False
 
             def copy_and_check(source, destination, names, _work):
+                nonlocal failed_once
+                if not failed_once:
+                    failed_once = True
+                    raise ConnectionError('simulated upload interruption')
                 destination = Path(destination)
                 destination.mkdir(parents=True, exist_ok=True)
                 for name in names:
@@ -107,7 +112,11 @@ class DeltaCaptureTests(unittest.TestCase):
             with (patch.dict(sys.modules, {'hf_flow_cloud': fake_cloud}),
                   patch.object(drive_delta, 'fetch',
                                side_effect=lambda remote, out, **_: shutil.copyfile(remote, out))):
-                result = drive_delta.backup(base, imported, 'prior-drive-pack', str(drive), backup_work)
+                with self.assertRaisesRegex(ConnectionError, 'upload interruption'):
+                    drive_delta.backup(base, imported, 'prior-drive-pack', str(drive), backup_work)
+                self.assertTrue((backup_work/'pending.json').is_file())
+                with patch.object(drive_delta, 'verify_capture', side_effect=AssertionError('redundant source read')):
+                    result = drive_delta.backup(base, imported, 'prior-drive-pack', str(drive), backup_work)
                 self.assertEqual(result['catalog'], expected)
                 self.assertEqual(result['base_remote'], 'prior-drive-pack')
                 receipt_sha = checksum(backup_work/drive_delta.RECEIPT)
