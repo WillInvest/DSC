@@ -1,0 +1,17 @@
+{
+  "fixes_applied": 7,
+  "proposed_fixes_count": 0,
+  "decisions_count": 0,
+  "fyi_count": 0,
+  "reviewers": ["coherence", "feasibility", "scope-guardian", "security-lens"],
+  "external_review": "The plan remained within the current workspace and its review agents.",
+  "resolved": [
+    {"section": "U3", "change": "Use an independent HF catch-up watermark.", "evidence": "The live extraction position is 56,095 blocks ahead of the historical HF endpoint."},
+    {"section": "Executable shape", "change": "Commit the next HF checkpoint with the numerical products.", "evidence": "The next interval requires that checkpoint as a named input."},
+    {"section": "Executable shape", "change": "Use the pinned tracking registry independently of ABI profile review.", "evidence": "Selection identity in trace_received.py follows the tracked address set."},
+    {"section": "Executable shape", "change": "Derive restartable Drive work from accepted catalog entries and pin its referenced bytes.", "evidence": "A separate transient enqueue can be lost after Node acceptance."},
+    {"section": "U2", "change": "Use a scoped dispatch identity and keep dRPC credential access on Revert.", "evidence": "The present generic SSH runner can execute arbitrary commands as the target login."},
+    {"section": "U4", "change": "Pin open payloads while reading the compaction catalog.", "evidence": "Store.compact replaces open intervals and can unlink the paths after releasing its lock."},
+    {"section": "U5", "change": "Fence the Data writer and verify the final delta and predecessor evidence before handing authority to Node.", "evidence": "An online inventory does not include files committed after its snapshot."}
+  ]
+}

@@ -167,6 +167,8 @@ class Stages:
         if progress['state']!='complete' or progress[key]!=self.cycle['end']-self.cycle['start']+1:
             raise ValueError(f'Incomplete stage: {key}')
 
-    def execute_stage(self, stage):
-        if stage in ('decode','reconstruct'):return self.offline(stage)
-        return getattr(self,stage+'_stage')()
+    def decode_stage(self):
+        return self.offline('decode')
+
+    def reconstruct_stage(self):
+        return self.offline('reconstruct')

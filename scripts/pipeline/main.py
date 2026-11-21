@@ -8,7 +8,7 @@ import sys
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from pipeline.runtime import REVERT,remote_json,rpc
 from pipeline.stages import Stages,read,validate_previous
-from pipeline.tracker import Tracker,STAGES
+from pipeline.tracker import Tracker
 from shared.artifacts import write_json
 
 DEFAULT=Path('/home/dsc-data/runs/pipeline')
@@ -35,22 +35,47 @@ def run_cycle(tracker, cycle, baseline_plan, profiles):
     previous=tracker.root/'cycles'/predecessor['id'] if predecessor else None
     previous_plan=previous/'events/plan.json' if previous else baseline_plan
     previous_profiles=previous/'profiles' if previous else profiles
-    def heartbeat():tracker.publish(cycle,current)
-    stages=Stages(tracker.root,cycle,previous_plan,previous_profiles,heartbeat)
-    current='preparing'
-    tracker.publish(cycle,current)
-    try:stages.prepare()
-    except Exception as error:
-        tracker.publish(cycle,current,'error',error=str(error));raise
-    for current in STAGES:
-        if tracker.done(cycle,current):continue
-        tracker.stage(cycle,current,'running',{});heartbeat()
-        try:evidence=stages.execute_stage(current)
+    current = 'preparing'
+
+    def heartbeat():
+        tracker.publish(cycle, current)
+
+    def accept_stage(name, operation):
+        nonlocal current
+        current = name
+        if tracker.done(cycle, name):
+            return
+        tracker.stage(cycle, name, 'running', {})
+        heartbeat()
+        try:
+            evidence = operation()
         except Exception as error:
-            tracker.stage(cycle,current,'error',{'error':str(error)})
-            tracker.publish(cycle,current,'error',error=str(error));raise
-        tracker.stage(cycle,current,'complete',evidence);heartbeat()
-    tracker.finish(cycle);tracker.publish(cycle,state='complete')
+            tracker.stage(cycle, name, 'error', {'error': str(error)})
+            tracker.publish(cycle, name, 'error', error=str(error))
+            raise
+        tracker.stage(cycle, name, 'complete', evidence)
+        heartbeat()
+
+    stages = Stages(tracker.root, cycle, previous_plan, previous_profiles, heartbeat)
+    heartbeat()
+    try:
+        stages.prepare()
+    except Exception as error:
+        tracker.publish(cycle, current, 'error', error=str(error))
+        raise
+
+    accept_stage('profiles', stages.profiles_stage)
+    accept_stage('events', stages.events_stage)
+    accept_stage('decode', stages.decode_stage)
+    accept_stage('reconstruct', stages.reconstruct_stage)
+
+    accept_stage('receipts', stages.receipts_stage)
+    accept_stage('receipt_delivery', stages.receipt_delivery_stage)
+    accept_stage('traces', stages.traces_stage)
+    accept_stage('selected_delivery', stages.selected_delivery_stage)
+
+    tracker.finish(cycle)
+    tracker.publish(cycle, state='complete')
 
 
 def main():
