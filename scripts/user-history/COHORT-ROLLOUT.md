@@ -188,6 +188,28 @@ published index SHA-256 and exact member name. The published paths and immutable
 two-copy acceptance receipt describe the original delivery. The availability
 record describes the current location of the verified payloads.
 
+### Verified old result locations
+
+The six old batches passed Drive size and checksum comparisons and SHA-256
+restore probes. The scoped services retired 546 certified Node files totaling
+978,424,020,124 logical bytes. The final audit matched every unlink to its
+certificate and rehashed all 36 retained metadata files. It records the six
+Drive destinations, the journal and proof digests, and the reconstruction-input
+verification. See [old retirement audit](../../docs/data-collection/aave-v3/evidence/cohort-20261120/old-retirement-complete.json).
+
+The current location record is `04_Validation_and_Provenance/node-payload-availability-20261120.json`
+under `/home/node/aave-research-dataset`. It identifies the six Drive backups
+and their Node archive roots, which still hold the small recovery files. The
+root-owned requests and unlink journals are under
+`/var/lib/dsc-hf-cohort-retirement-20261120/requests`. See the
+[final availability record](../../docs/data-collection/aave-v3/evidence/cohort-20261120/node-payload-availability-20261120-final.json).
+
+After retirement, a wallet Parquet and an aggregate Parquet were restored and
+opened from a raw Drive batch. A second restore opened an aggregate Parquet
+from the indexed Drive TAR using its exact byte range. All three matched their
+published SHA-256 values. See the [raw restore](../../docs/data-collection/aave-v3/evidence/cohort-20261120/old-drv-restore-after-retirement.json)
+and [indexed restore](../../docs/data-collection/aave-v3/evidence/cohort-20261120/old-indexed-drive-restore-after-retirement.json).
+
 Runtime proofs and current progress are under node `evidence/` and the local
 `docs/data-collection/aave-v3/evidence/cohort-20261120/`. The goal remains active
 until complete historical coverage, verified publication and scoped retirement.
