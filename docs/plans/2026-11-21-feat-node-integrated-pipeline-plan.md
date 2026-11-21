@@ -13,6 +13,33 @@ Preserve the existing application database, application runtime, RETH and Savva
 transfer paths. The requirement for organized database storage applies here to
 the research datasets and the SQLite catalogs that describe them.
 
+## Storage and deployment acceptance
+
+The sole canonical on-server research dataset root is
+`/mnt/storage/dsc-data` on dsc-node's `/dev/vdb1`. The `node` account can
+also open that directory at `/home/node/dsc-data`. RETH chain data remains
+on `/dev/vda3`. Google Drive holds the verified independent backup.
+
+Publish `events/`, `block-state/` and `reverted-tx/` under each of
+`dex/uniswapV2`, `dex/uniswapV3`, `lending/aaveV2` and `lending/aaveV3`.
+Keep the complete failed-receipt and trace archive under `revert/` and the
+wallet and cohort HF products under `lending/aaveV3/health-factor/`.
+Store catalogs, coverage and restore records under `metadata/`. Details
+are in the [dataset catalog](../../scripts/pipeline/DATASET-CATALOG.md).
+
+Deploy the tested release through `/home/node/dsc-scripts`, with the four
+stage directories and a top-level `main.py`. Verify the launcher with the
+real data mount and a bounded run after the production handoff. Leave
+scheduling for the later deployment step.
+
+After the single-writer cutover, check the published payloads and restore
+them independently from Node and Drive. Repoint the consumers and clear
+exact manifest-listed superseded research datasets from Data, Revert and
+Compute and from old Node paths on both disks. Do not retire a file whose
+new catalog, Drive coverage, or downstream dependency is still unresolved.
+Required inputs, worker runtime state, credentials and unrelated application
+data stay outside the retirement manifests.
+
 | Requirement | Completion evidence |
 | --- | --- |
 | R1. Readable executable main | One named call per stage, explicit inputs and outputs, and public `once`, `continuous` and `status` commands. A recovered cycle keeps the same finalized block/hash. |
