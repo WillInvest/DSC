@@ -117,9 +117,17 @@ def main():
     p.add_argument('--root',type=Path);p.add_argument('--end-block',type=int)
     p.add_argument('--baseline-plan',type=Path);p.add_argument('--profiles',type=Path)
     p.add_argument('--node-verification',type=Path,help='Directory with the accepted Node replay report')
+    p.add_argument('--status-config',type=Path,help='Read-only Node progress sources for status')
     p.add_argument('--poll-seconds',type=int,default=30);args=p.parse_args()
     if args.poll_seconds<5:p.error('poll-seconds must be at least 5')
     if args.mode=='continuous' and args.end_block is not None:p.error('end-block belongs to a bounded once run')
+    if args.status_config is not None and args.mode != 'status':
+        p.error('--status-config belongs to status')
+    if args.mode == 'status' and args.status_config is not None:
+        import json
+        from pipeline.node_status import report
+        print(json.dumps(report(read(args.status_config))))
+        return
     if NODE_LOCAL and (args.root is None or (args.mode != 'status' and
                        None in (args.baseline_plan, args.profiles, args.node_verification))):
         p.error('Node requires an explicit root, baseline, profiles and verification directory')

@@ -145,6 +145,17 @@ encoded events, decoded events and all 102 state rows. It also checks the
 failed receipts, complete call trees and contract matches. The fingerprints
 compare values across the different physical partition layouts.
 
+During shadow operation, `pipeline.node_status aggregate CONFIG --follow
+--output REPORT` publishes a read-only combined view. The configuration points
+to the Node coordinator and its comparison, handoff, HF and backup progress
+files. It also specifies the existing Node-only Data SSH alias, whose fixed
+`dsc-pipeline-status-v1` command returns the legacy producer's selected fields.
+The report keeps the calculation and Drive watermarks separate, includes
+source file timestamps, and preserves Node status when Data cannot be reached.
+Run `scripts/main.py status --status-config CONFIG` for an on-demand report.
+The existing status command without that option still prints the coordinator's
+own progress file.
+
 Deployment: disable the old extraction/offline watchdog and delivery timers before
 enabling `dsc-pipeline.service`; keep `dsc-pipeline-monitor.timer` active. The monitor
 uses `current.json` to follow the active cycle and shows all eight stages. It is
