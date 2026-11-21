@@ -14,6 +14,7 @@ dsc-data/
     block-state/<contract>/<first>-<last>.parquet
     reverted-tx/<first>-<last>.jsonl.gz
   revert/{receipts,traces,selected}/<first>-<last>.jsonl.gz
+  metadata/dataset-index.json
   metadata/publication.json
 ```
 
@@ -23,7 +24,9 @@ the original decoded attributes. Several events can share a block number.
 State has one row per block per contract and uses the state schema. Protocol
 revert files contain matching transactions and retain the full call tree for
 each match. The global archive retains failed receipts, complete traces and
-all selected transactions. Coverage advances in `metadata/publication.json`.
+all selected transactions. Historical market coverage advances in
+`metadata/publication.json`. Independently published tail intervals have
+receipts under `metadata/accepted-sources/`.
 Accepted Parquet and archive files on the same disk are published as hard
 links. The publisher slices accepted inputs only where the historical and
 migrated block ranges overlap.
@@ -49,15 +52,16 @@ and completed incremental windows. Run `python -m pipeline.hf_storage
 SOURCE_WINDOWS DRIVE_WORK HEALTH_FACTOR_ROOT` to place already accepted
 incremental windows from the same filesystem. Each window includes its
 original result and checkpoint plus the exact Drive manifest, pack index
-and verified receipt. `window-placement.json` records the contiguous
-published range. Archived input metadata retains its original replay paths.
+and verified receipt. `window-placement.json` records the contiguous range
+with Drive restore proof. `local-accepted/<first>-<last>/` holds windows
+whose inputs, outputs and checkpoints passed local validation.
+Archived input metadata retains its original replay paths.
 
-Start with `integrated-pipeline/metadata/dataset-index.json` on Node. Its
-release entries identify the physical catalog, the Node acceptance record
-and the Drive verification record for each dataset. The index stores
-references to existing catalogs and proofs. `availability=present` means a
-reference resolved when the index was written. Open the referenced proof
-to determine the verified coverage.
+Start with `/mnt/storage/dsc-data/metadata/dataset-index.json` on Node.
+Its release entries link the physical catalogs and available acceptance
+records. `availability=present` means the reference resolved when the
+index was written. Open the referenced proof to determine the verified
+coverage.
 
 | Layer | Unit of coverage | Authoritative catalog |
 | --- | --- | --- |
