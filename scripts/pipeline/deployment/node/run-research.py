@@ -21,13 +21,20 @@ def check_storage():
 
 
 def run(config, *, local_only=False):
+    image = config.get('hf_input_image')
+    if image is not None and not Path('/home/dsc-data').samefile(image):
+        raise ValueError('Mount the configured HF input image read-only at /home/dsc-data')
+    module_paths = [SCRIPTS, SCRIPTS/'user-history']
+    if overlay := config.get('hf_python_overlay'):
+        module_paths.append(Path(overlay))
+
     market = DATA/'metadata/market'
     hf = DATA/'lending/aaveV3/health-factor'
     catalog = market/'canonical'
     registry = SCRIPTS.parent/'contracts/ethereum/pools.csv'
     environment = dict(os.environ, DSC_PIPELINE_SITE='node', DSC_PIPELINE_SCRIPTS=str(SCRIPTS),
                        DSC_PIPELINE_REVERT_SSH_CONFIG=config['revert_ssh_config'],
-                       PYTHONPATH=os.pathsep.join(map(str, (SCRIPTS, SCRIPTS/'user-history'))))
+                       PYTHONPATH=os.pathsep.join(map(str, module_paths)))
 
     def invoke(module, *arguments):
         subprocess.run([str(PYTHON), '-u', '-m', module, *map(str, arguments)],

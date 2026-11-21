@@ -24,6 +24,18 @@ each Drive backup. The launcher checks the mounted data disk before writing.
 Use `python3 /mnt/storage/dsc-scripts/main.py run --local-only --config CONFIG`
 to finish after publishing the local market and HF outputs.
 
+For the consolidated Node runtime, set `hf_input_image` to the verified
+image on `vdb1` and `hf_python_overlay` to the deployed NumPy overlay on the
+same disk. Mount the image read-only at `/home/dsc-data` in the process
+namespace so the pinned HF receipts resolve their original paths.
+Run a single local pass as the Node user with:
+
+```sh
+sudo systemd-run --wait --pipe --uid=node \
+  --property="BindReadOnlyPaths=${HF_INPUT_IMAGE}:/home/dsc-data" \
+  /usr/bin/python3 /mnt/storage/dsc-scripts/main.py run --local-only --config "$CONFIG"
+```
+
 The configuration supplies `market_baseline`, `market_profiles`,
 `market_verification`, `production_fence` and `revert_ssh_config` as local
 paths. Supply `hf_opening`, `hf_history`, `cryo` and `hf_helpers` for the

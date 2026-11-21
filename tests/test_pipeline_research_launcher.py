@@ -34,3 +34,23 @@ class ResearchLauncherTests(unittest.TestCase):
             launcher.run(config, local_only=True)
         self.assertEqual([call.args[0][3] for call in execute.call_args_list], [
             'pipeline.main', 'pipeline.research_layout', 'hf_incremental_follow'])
+
+    def test_pinned_hf_runtime_is_available_to_the_local_pass(self):
+        config = {key: key for key in (
+            'market_baseline', 'market_profiles', 'market_verification', 'production_fence',
+            'revert_ssh_config', 'hf_opening', 'hf_history', 'cryo', 'hf_helpers')}
+        config.update(hf_input_image='/mnt/storage/dsc-data/example-hf-image',
+                      hf_python_overlay='/mnt/storage/dsc-script-releases/example-numpy')
+        with patch.object(Path, 'samefile', return_value=True) as samefile:
+            with patch.object(launcher.subprocess, 'run') as execute:
+                launcher.run(config, local_only=True)
+            samefile.assert_called_once_with(config['hf_input_image'])
+        self.assertTrue(execute.call_args.kwargs['env']['PYTHONPATH'].endswith(
+            config['hf_python_overlay']))
+
+    def test_mismatched_hf_mount_fails_before_writing(self):
+        with patch.object(Path, 'samefile', return_value=False):
+            with patch.object(launcher.subprocess, 'run') as execute:
+                with self.assertRaisesRegex(ValueError, 'Mount the configured HF input image'):
+                    launcher.run({'hf_input_image': '/mnt/storage/dsc-data/example-hf-image'})
+        execute.assert_not_called()
