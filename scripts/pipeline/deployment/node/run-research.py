@@ -25,13 +25,26 @@ def check_hf_opening(baseline_path, opening_path):
     hf = json.loads((Path(opening_path)/'boundary.json').read_text())
     if (hf['next_block'], hf['predecessor_hash']) != (market['end_block']+1, market['end_hash']):
         raise ValueError('HF opening block and hash must join the sealed market baseline')
+    return market['end_block']
+
+
+def check_published_baseline(metadata, boundary):
+    publication = json.loads((metadata/'publication.json').read_text())
+    encoded = json.loads((metadata/'encoded-publication.json').read_text())
+    through = publication.get('market_through', -1)
+    if (publication['stage'] != 'complete' or boundary > through
+            or publication.get('revert_through') != through):
+        raise ValueError('Published market and Revert data must cover the sealed baseline together')
+    if encoded['stage'] != 'complete' or encoded.get('market_through', -1) < through:
+        raise ValueError('Published raw events must cover the accepted market boundary')
 
 
 def run(config, *, local_only=False):
     image = config.get('hf_input_image')
     if image is not None and not Path('/home/dsc-data').samefile(image):
         raise ValueError('Mount the configured HF input image read-only at /home/dsc-data')
-    check_hf_opening(config['market_baseline'], config['hf_opening'])
+    boundary = check_hf_opening(config['market_baseline'], config['hf_opening'])
+    check_published_baseline(DATA/'metadata', boundary)
     module_paths = [SCRIPTS, SCRIPTS/'user-history']
     if overlay := config.get('hf_python_overlay'):
         module_paths.append(Path(overlay))

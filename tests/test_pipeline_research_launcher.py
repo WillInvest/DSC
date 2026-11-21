@@ -21,6 +21,15 @@ class ResearchLauncherTests(unittest.TestCase):
         baseline.write_text(json.dumps(dict(end_block=10, end_hash='0xab')))
         self.boundary = opening/'boundary.json'
         self.boundary.write_text(json.dumps(dict(next_block=11, predecessor_hash='0xab')))
+        self.metadata = opening/'metadata'
+        self.metadata.mkdir()
+        self.publication = self.metadata/'publication.json'
+        self.publication.write_text(json.dumps(dict(stage='complete', market_through=10, revert_through=10)))
+        self.encoded = self.metadata/'encoded-publication.json'
+        self.encoded.write_text(json.dumps(dict(stage='complete', market_through=10)))
+        data_dir = patch.object(launcher, 'DATA', opening)
+        data_dir.start()
+        self.addCleanup(data_dir.stop)
         self.config = {key: key for key in (
             'market_profiles', 'market_verification', 'production_fence', 'revert_ssh_config',
             'hf_history', 'cryo', 'hf_helpers', 'market_drive', 'hf_drive', 'hf_backup_start')}
@@ -33,10 +42,11 @@ class ResearchLauncherTests(unittest.TestCase):
         self.assertEqual([args[3] for args in calls], [
             'pipeline.main', 'pipeline.research_layout', 'hf_incremental_follow',
             'pipeline.compaction.backup_catalog', 'hf_incremental_archive'])
-        self.assertIn('/mnt/storage/dsc-data/metadata/market', calls[0])
-        self.assertIn('/mnt/storage/dsc-data/lending/aaveV3/health-factor/windows', calls[2])
+        self.assertIn(str(launcher.DATA/'metadata/market'), calls[0])
+        hf = launcher.DATA/'lending/aaveV3/health-factor'
+        self.assertIn(str(hf/'windows'), calls[2])
         self.assertEqual(calls[2][-2:], ['--local-accepted',
-                                       '/mnt/storage/dsc-data/lending/aaveV3/health-factor/local-accepted'])
+                                       str(hf/'local-accepted')])
         self.assertIn('--node-production-fence', calls[0])
 
     def test_local_pass_finishes_without_drive_configuration(self):
@@ -73,3 +83,20 @@ class ResearchLauncherTests(unittest.TestCase):
                     with self.assertRaisesRegex(ValueError, 'join the sealed market baseline'):
                         launcher.run(self.config, local_only=True)
                 execute.assert_not_called()
+
+    def test_lagging_or_inconsistent_publication_fails_before_writing(self):
+        for stage, market, revert in (('complete', 9, 9), ('complete', 10, 9), ('publishing', 10, 10)):
+            with self.subTest(stage=stage, market=market, revert=revert):
+                self.publication.write_text(json.dumps(dict(stage=stage, market_through=market,
+                                                           revert_through=revert)))
+                with patch.object(launcher.subprocess, 'run') as execute:
+                    with self.assertRaisesRegex(ValueError, 'Published market and Revert data'):
+                        launcher.run(self.config, local_only=True)
+                execute.assert_not_called()
+
+        self.publication.write_text(json.dumps(dict(stage='complete', market_through=10, revert_through=10)))
+        self.encoded.write_text(json.dumps(dict(stage='complete', market_through=9)))
+        with patch.object(launcher.subprocess, 'run') as execute:
+            with self.assertRaisesRegex(ValueError, 'Published raw events'):
+                launcher.run(self.config, local_only=True)
+        execute.assert_not_called()

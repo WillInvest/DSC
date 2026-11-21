@@ -47,6 +47,8 @@ paths. Supply `hf_opening`, `hf_history`, `cryo` and `hf_helpers` for the
 accepted HF checkpoint, frozen inputs, Cryo executable and helper configuration.
 The HF checkpoint must start at the block after the market baseline and
 carry its exact predecessor hash before the launcher opens a writer.
+The local market, Revert and raw-event publication records must already
+cover the same sealed baseline.
 For passes that include backup, `market_drive` and `hf_drive` identify the
 approved Drive roots. `hf_backup_start` is the first inclusive block for the
 configured HF archive.
