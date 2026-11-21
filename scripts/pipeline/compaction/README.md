@@ -89,6 +89,23 @@ Run the same check after unpacking the Drive backup into a separate directory.
 Use a read-only snapshot for these imported catalogs. The catalogs also contain
 source-host retirement records, which belong to the original writer.
 
+Use `delta_capture` when a newer SQLite capture extends an import already
+verified on Node. Its planning command pins both manifests and writes
+`open.txt` and `sealed.txt` for rsync. Fetch replaceable files from the pinned
+capture and sealed files from the source catalog. All remaining paths reuse
+matching SHA-256 payloads in the previous Node import.
+
+```sh
+python -m pipeline.compaction.delta_capture plan +  --previous /node/older-import --capture /node/new-capture --work /node/transfer-plan
+python -m pipeline.compaction.delta_capture materialize +  --previous /node/older-import --capture /node/new-capture --work /node/transfer-plan +  --sealed /node/staged-sealed --output /node/new-import
+```
+
+Assembly shares identical immutable payloads between Node imports using local
+hard links, with a file copy across filesystems. It verifies every assembled
+payload against the new captured SQLite catalog before publishing the new
+directory. It reads the previous Node import and the staged transfer roots,
+which keeps source-host state and retirement identities outside the operation.
+
 The unified Node catalog can be backed up directly with `backup_catalog`. Run
 it on Node with the pipeline scripts and the existing HF archive runtime on
 `PYTHONPATH`. Each work directory is bound to one captured catalog revision.
