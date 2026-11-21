@@ -28,6 +28,14 @@ Accepted Parquet and archive files on the same disk are published as hard
 links. The publisher slices accepted inputs only where the historical and
 migrated block ranges overlap.
 
+The `lending/aaveV3/health-factor/` directory holds historical indexed packs
+and completed incremental windows. Run `python -m pipeline.hf_storage
+SOURCE_WINDOWS DRIVE_WORK HEALTH_FACTOR_ROOT` to place already accepted
+incremental windows from the same filesystem. Each window includes its
+original result and checkpoint plus the exact Drive manifest, pack index
+and verified receipt. `window-placement.json` records the contiguous
+published range. Archived input metadata retains its original replay paths.
+
 Start with `integrated-pipeline/metadata/dataset-index.json` on Node. Its
 release entries identify the physical catalog, the Node acceptance record
 and the Drive verification record for each dataset. The index stores
