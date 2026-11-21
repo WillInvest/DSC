@@ -156,6 +156,18 @@ Run `scripts/main.py status --status-config CONFIG` for an on-demand report.
 The existing status command without that option still prints the coordinator's
 own progress file.
 
+To show Node status at the existing private monitor URL, the Node status
+configuration can include `publish_monitor` with an existing restricted SSH
+`host` and `ssh_config`. That alias must route the exact
+`dsc-node-monitor-v1` command to `pipeline.node_status receive-monitor`
+with a fixed output path. Keep the receiver's directory writable only by
+the receiver and readable by the web service. The monitor's
+`DSC_NODE_MONITOR_CACHE` path defaults to
+`/var/lib/dsc-pipeline-monitor/node-progress.json`. The receiver accepts a
+bounded JSON payload and stores only block watermarks, counts and status
+labels. The private page shows this report independently of the legacy Data
+connection and flags stale reports.
+
 ### Node production services
 
 `deployment/node/dsc-node-pipeline.target` groups the market coordinator, HF

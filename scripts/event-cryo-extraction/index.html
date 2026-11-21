@@ -8,6 +8,7 @@
 </style>
 <main>
 <header><div><small>DSC / ETHEREUM</small><h1>Extraction progress</h1></div><span id="state" class="tag">Connecting</span></header>
+<section class="card hidden" id="node-pipeline-card"><h2>Node pipeline</h2><div id="node-pipeline-progress" aria-live="polite"></div></section>
 <section class="card hidden" id="cycle-card"><h2 id="cycle-title">Continuous finalized pipeline</h2><div id="cycle-status"></div><div id="cycle-stages"></div><small>Each cycle has a fixed finalized target. Completed coverage advances only after all stages accept their output.</small></section>
 <section class="card hidden" id="oracle-card"><h2>Aave V3 · All-reserve oracle prices</h2><div id="oracle-progress"></div><small>End-of-block prices · Own RETH node · Accepted blocks require destination hash and value checks · User HF remains a separate stage</small></section>
 <section class="card hidden" id="nominal-card"><h2>Aave V3 · Actual supply and debt, including interest</h2><div id="nominal-progress"></div><small>Factorized balance history: scaled shares plus exact normalized interest indices. Share recovery alone does not complete this stage.</small></section>
@@ -33,6 +34,29 @@
 </main>
 <script>
 const el=id=>document.getElementById(id),number=n=>Number(n||0).toLocaleString();
+function renderNodePipeline(report){
+ const box=el('node-pipeline-progress');box.replaceChildren();
+ el('node-pipeline-card').classList.toggle('hidden',!report);
+ if(!report)return;
+ const line=(label,value)=>{
+  const row=document.createElement('div');row.className='line';
+  const title=document.createElement('span'), detail=document.createElement('strong');
+  title.textContent=label;detail.textContent=value;row.append(title,detail);box.append(row);
+ };
+ const block=n=>Number.isInteger(n)?number(n):'Waiting';
+ const {market,catalog,hf,hf_drive,market_drive,shadow,handoff,historical_market,historical_market_drive,historical_revert_drive}=report;
+ line('Market catalog committed through',block(catalog.through));
+ line('Market stage',market.stage||market.state||'Waiting');
+ line('Market Drive verified through',block(market_drive.verified_through));
+ line('Aave HF accepted through',block(hf.through));
+ line('Aave HF Drive restored through',block(hf_drive.through));
+ if(shadow.state==='passed')line('Shadow comparison passed',`Block ${block(shadow.block)} · ${number(shadow.state_addresses)} contracts`);
+ if(handoff.through)line('Sealed handoff',block(handoff.through));
+ if(historical_market.total_markets)line('Historical market snapshots verified on Drive',`${number(historical_market_drive.verified)} / ${number(historical_market.total_markets)}`);
+ line('Historical reverted archive verified on Drive through',block(historical_revert_drive.through));
+ const stale=Date.now()/1000-report.observed_at>90;
+ line(stale?'Last Node report · stale':'Node report',new Date(report.observed_at*1000).toLocaleString());
+}
 function renderAaveStage(id,stage,inputs){
  const box=el(`${id}-progress`);box.replaceChildren();el(`${id}-card`).classList.toggle('hidden',!stage?.state);
  if(!stage?.state)return;
@@ -87,7 +111,9 @@ function renderAaveStage(id,stage,inputs){
  if(!stale)stamp.className='muted';
 }
 async function refresh(){try{
- const r=await fetch('/api/progress',{cache:'no-store'});if(!r.ok)throw Error('Monitor unavailable');const s=await r.json(),d=s.data;if(!d)throw Error(s.error||'Waiting for first report');
+ const r=await fetch('/api/progress',{cache:'no-store'});if(!r.ok)throw Error('Monitor unavailable');const s=await r.json(),d=s.data;
+ renderNodePipeline(s.node_pipeline);
+ if(!d)throw Error(s.error||'Waiting for first legacy report');
  const coordinator=d.coordinator||{},cycle=coordinator.cycle;
  renderAaveStage('nominal',d.aave_nominal);renderAaveStage('hf',d.aave_hf,d.aave_hf_inputs);
  const oracle=d.aave_oracle||{},oracleBox=el('oracle-progress');oracleBox.replaceChildren();

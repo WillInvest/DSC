@@ -79,7 +79,14 @@ def progress():
             data['aave_hf']=with_recovery_notice(data['aave_hf'],notice)
         except (OSError,ValueError):
             pass
-    return JSONResponse({'data': data, 'fetched_at': fetched_at, 'error': error,
+    try:
+        path = Path(os.environ.get('DSC_NODE_MONITOR_CACHE', '/var/lib/dsc-pipeline-monitor/node-progress.json'))
+        node = json.loads(path.read_text())
+        if node['format'] != 'dsc-node-progress-v1':
+            node = None
+    except (OSError, ValueError, KeyError, TypeError):
+        node = None
+    return JSONResponse({'data': data, 'fetched_at': fetched_at, 'error': error, 'node_pipeline': node,
                          'hf_fallback_error':hf_fallback_error,'hf_fallback_fetched_at':hf_fallback_fetched_at},
                         headers={'Cache-Control': 'no-store'})
 

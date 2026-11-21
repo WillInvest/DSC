@@ -8,7 +8,9 @@ import unittest
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'scripts'))
-from pipeline.node_status import FORMAT, LEGACY_COMMAND, fetch_legacy, hf_progress, legacy_report
+from pipeline.node_status import (FORMAT, LEGACY_COMMAND, MAX_MONITOR_BYTES, MONITOR_COMMAND,
+                                  fetch_legacy, hf_progress, legacy_report, publish_monitor,
+                                  receive_monitor)
 from pipeline.main import main
 from shared.artifacts import write_json
 
@@ -61,3 +63,30 @@ class NodeStatusTests(unittest.TestCase):
                 main()
             assemble.assert_called_once_with({'version': 1})
             self.assertEqual(json.loads(output.getvalue()), {'format': FORMAT})
+
+    def test_private_monitor_accepts_node_watermarks_when_data_is_offline(self):
+        payload = dict(format=FORMAT, observed_at=20.0,
+                       node_market=dict(coordinator=dict(state='running', stage='receipts', error='private'),
+                                        compaction=dict(through=100, path='/private/catalog')),
+                       legacy=dict(availability='unreachable'), hf=dict(through=90), hf_drive=dict(through=80))
+        payload.update({key: {} for key in ('handoff', 'shadow', 'market_drive', 'historical_market',
+                                            'historical_market_drive', 'historical_revert_drive')})
+        with TemporaryDirectory() as directory:
+            path = Path(directory)/'report.json'
+            receive_monitor(path, io.BytesIO(json.dumps(payload).encode()))
+            saved = json.loads(path.read_text())
+            self.assertEqual(saved['catalog'], {'through': 100})
+            self.assertEqual(saved['legacy'], {'availability': 'unreachable'})
+            self.assertEqual((saved['hf']['through'], saved['hf_drive']['through']), (90, 80))
+            self.assertNotIn('private', json.dumps(saved))
+            with self.assertRaisesRegex(ValueError, 'size limit'):
+                receive_monitor(path, io.BytesIO(b'x' * (MAX_MONITOR_BYTES + 1)))
+            self.assertEqual(json.loads(path.read_text()), saved)
+
+    def test_monitor_publish_uses_a_fixed_ssh_command(self):
+        config = dict(host='dsc-hf-compute', ssh_config='read-only.conf')
+        with patch('pipeline.node_status.subprocess.run') as execute:
+            publish_monitor(config, {'format': FORMAT})
+        args, kwargs = execute.call_args
+        self.assertEqual(args[0][-2:], [config['host'], MONITOR_COMMAND])
+        self.assertEqual(json.loads(kwargs['input']), {'format': FORMAT})
