@@ -40,6 +40,9 @@ while market publication is still underway. It checks that all three
 archive families cover every block in each verified historical shard.
 `metadata/global-revert-publication.json` records this watermark. The
 normal publication pass also creates each protocol's matching subset.
+`--protocol-revert-only --registry REGISTRY` can publish those subsets in
+parallel with market placement. It joins only completed global selections
+and checks that the contract registry matches their accepted fingerprint.
 
 The `lending/aaveV3/health-factor/` directory holds historical indexed packs
 and completed incremental windows. Run `python -m pipeline.hf_storage

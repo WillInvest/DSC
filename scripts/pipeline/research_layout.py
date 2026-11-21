@@ -12,7 +12,7 @@ from pipeline.compaction.jsonl import records
 from pipeline.compaction.reader import snapshot
 from pipeline.compaction.store import Fragment
 from reverted.trace_received import pack
-from shared.artifacts import checksum, write_json
+from shared.artifacts import checksum, digest, write_json
 
 PROTOCOLS = {
     'uniswap-v2': 'dex/uniswapV2',
@@ -85,7 +85,11 @@ def publish_selected(path, root, start, stop, lower, addresses):
     rows = list(records([Fragment(path, start, stop)], lower, stop))
     for protocol, target in targets.items():
         if not target.exists():
-            pack(target, filtered_reverts(rows, addresses[protocol]))
+            target.parent.mkdir(parents=True, exist_ok=True)
+            with TemporaryDirectory(dir=target.parent) as scratch:
+                stage = Path(scratch)/target.name
+                pack(stage, filtered_reverts(rows, addresses[protocol]))
+                link(stage, target, checksum(stage))
 
 
 def archive_kind(relative):
@@ -219,12 +223,55 @@ def publish(root, historical_markets, historical_reverts, market_tail, revert_ta
                            revert_through=revert_end))
 
 
+def publish_protocol_reverts(root, contracts):
+    meta = root/'metadata'
+    global_archive = read(meta/'global-revert-publication.json')
+    if global_archive['stage'] != 'complete':
+        raise ValueError('Global Revert publication must finish before splitting it by protocol')
+    start, stop = global_archive['start'], global_archive['through']+1
+    accepted = meta/'accepted-sources/revert'
+    history = read(accepted/'historical-revert.json')
+    selection = digest(sorted(row['address'].lower() for row in contracts))
+    if history['start'] != start or history['selection'] != selection:
+        raise ValueError('Contract registry does not match the accepted Revert selection')
+    if history['stop'] < stop:
+        tail = read(accepted/f"{history['stop']}-{stop-1}"/'manifest.json')
+        streams = {item['stream'] for item in tail['files'] if item['stream'].startswith('selected/')}
+        if streams != {'selected/'+selection}:
+            raise ValueError('Historical and incremental Revert selections differ')
+    addresses = defaultdict(set)
+    for row in contracts:
+        addresses[row['protocol']].add(row['address'].lower())
+
+    status = meta/'protocol-revert-publication.json'
+    cursor = start
+    if status.exists():
+        saved = read(status)
+        if (saved['start'], saved['selection']) != (start, selection) or not start <= saved['through']+1 <= stop:
+            raise ValueError('Existing protocol Revert publication has a different identity')
+        cursor = saved['through']+1
+    parts = sorted((bounds(path), path) for path in (root/'revert/selected').glob('*.jsonl.gz'))
+    for count, ((lower, upper), path) in enumerate(parts, 1):
+        if upper <= cursor or lower >= stop:
+            continue
+        if lower != cursor or upper > stop:
+            raise ValueError('Global selected archive has a gap or overlap')
+        publish_selected(path, root, lower, upper, lower, addresses)
+        cursor = upper
+        if count % 100 == 0:
+            write_json(status, dict(stage='publishing', start=start, through=cursor-1, selection=selection))
+    if cursor != stop:
+        raise ValueError('Protocol publication does not reach the accepted global endpoint')
+    write_json(status, dict(stage='complete', start=start, through=stop-1, selection=selection))
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--root', required=True, type=Path)
     scope = parser.add_mutually_exclusive_group()
     scope.add_argument('--encoded-only', action='store_true')
     scope.add_argument('--global-revert-only', action='store_true')
+    scope.add_argument('--protocol-revert-only', action='store_true')
     for field in ('historical-markets', 'historical-reverts', 'market-tail', 'revert-tail',
                   'coordinator', 'registry'):
         parser.add_argument('--'+field, type=Path)
@@ -245,6 +292,11 @@ def main():
             parser.error('Global Revert publication requires the historical Revert import')
         sources = (args.historical_reverts,)
         lock_name = 'global-revert-publication.lock'
+    elif args.protocol_revert_only:
+        if not args.registry or args.coordinator or any(historical):
+            parser.error('Protocol Revert publication requires a contract registry')
+        sources = ()
+        lock_name = 'protocol-revert-publication.lock'
     elif args.coordinator:
         if not args.registry or any(historical):
             parser.error('Use a coordinator and registry, or the four historical import paths')
@@ -264,6 +316,9 @@ def main():
             status = args.root/'metadata/global-revert-publication.json'
             archive = publish_revert_history(args.root, args.historical_reverts, status)
             write_json(status, dict(stage='complete', start=archive['start'], through=archive['stop']-1))
+        elif args.protocol_revert_only:
+            from registry.catalog import registry as tracked_contracts
+            publish_protocol_reverts(args.root, tracked_contracts(args.registry))
         elif args.coordinator:
             publish_committed(args.root, args.coordinator, args.registry)
         else:

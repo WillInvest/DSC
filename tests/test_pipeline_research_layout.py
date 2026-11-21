@@ -9,12 +9,30 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'scripts'))
-from pipeline.research_layout import ENCODED, publish_archive, publish_historical_market
+from pipeline.research_layout import ENCODED, publish_archive, publish_historical_market, publish_protocol_reverts
 from reverted.trace_received import pack
-from shared.artifacts import checksum
+from shared.artifacts import checksum, digest, write_json
 
 
 class ResearchLayoutTests(unittest.TestCase):
+    def test_protocol_publication_binds_the_registry_and_contiguous_global_scope(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            contracts = [{'address': '0x1', 'protocol': 'uniswap-v2'}]
+            selection = digest(['0x1'])
+            write_json(root/'metadata/global-revert-publication.json',
+                       dict(stage='complete', start=10, through=11))
+            write_json(root/'metadata/accepted-sources/revert/historical-revert.json',
+                       dict(start=10, stop=12, selection=selection))
+            pack(root/'revert/selected/10-11.jsonl.gz',
+                 [dict(block_number=number, failed=[]) for number in (10, 11)])
+            with self.assertRaisesRegex(ValueError, 'registry'):
+                publish_protocol_reverts(root, [{'address': '0x2', 'protocol': 'uniswap-v2'}])
+            publish_protocol_reverts(root, contracts)
+            publish_protocol_reverts(root, contracts)
+            result = json.loads((root/'metadata/protocol-revert-publication.json').read_text())
+            self.assertEqual((result['stage'], result['through']), ('complete', 11))
+
     def test_original_logs_have_a_separate_replay_path_and_preserve_their_schema(self):
         with TemporaryDirectory() as directory:
             root = Path(directory)
