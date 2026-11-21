@@ -127,6 +127,9 @@ extraction acceptance, rerunning the command resumes publication without
 repeating the accepted extraction stages. `compaction.json` records the
 independent publication watermark.
 
+Use the [research dataset catalog](DATASET-CATALOG.md) to locate each
+historical, migrated or incremental release and its restore evidence.
+
 For a handoff from verified Node imports, `pipeline.node_handoff` reads the
 accepted Data and Revert catalogs at their common ending block. It checks
 every state payload it uses against its catalog SHA-256 and reads the single
