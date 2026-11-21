@@ -102,7 +102,30 @@ existing tracing script with local credentials, and serves only redacted
 progress and read-only rsync downloads under the worker's data root. Node checks
 full archives against the same sealed batch receipts as the selected output.
 Reuse the deployed Python environments.
-The continuous entrypoint still uses the existing Data compaction layout.
+
+The normal `once` and `continuous` commands also run on Node with an explicit
+coordinator root, accepted baseline plan, reviewed profile directory and
+verification directory. The baseline must include end-of-block state
+checkpoints for the 102 tracked contracts, and the Node replay gate must
+validate all three market layers, failed receipts, full traces and selection.
+
+```sh
+DSC_PIPELINE_SITE=node python scripts/main.py once \
+  --root /node/coordinator --baseline-plan /node/accepted/events/plan.json \
+  --profiles /node/accepted/profiles --node-verification /node/verified-replay \
+  --end-block 26266552
+```
+
+The Node coordinator writes a unified Parquet and JSONL catalog under
+`<root>/canonical`. The historical catalogs keep their existing partitions.
+The new catalog records its predecessor and anchors its 10,000-block market
+and 1,000-block receipt/trace partitions at the first block of the new storage
+epoch. It holds encoded events, decoded events, every-block state, failed
+receipts, full traces and selected traces. Accepted stage inputs stay in
+place during the candidate run. If the catalog commit is interrupted after
+extraction acceptance, rerunning the command resumes publication without
+repeating the accepted extraction stages. `compaction.json` records the
+independent publication watermark.
 
 Deployment: disable the old extraction/offline watchdog and delivery timers before
 enabling `dsc-pipeline.service`; keep `dsc-pipeline-monitor.timer` active. The monitor

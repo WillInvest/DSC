@@ -9,7 +9,7 @@ sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from pipeline.runtime import NODE_LOCAL,REVERT,remote_json,rpc
 from pipeline.stages import Stages,read,validate_previous
 from pipeline.tracker import Tracker
-from shared.artifacts import write_json
+from shared.artifacts import checksum,write_json
 
 DEFAULT=Path('/home/dsc-data/runs/pipeline')
 HISTORICAL=Path('/home/dsc-data/runs/sequential-events/plan.json')
@@ -28,6 +28,31 @@ def initialize(tracker, baseline_plan):
     if rpc('eth_getBlockByNumber',[hex(end),False])['hash']!=plan['end_hash']:raise ValueError('Historical hash changed')
     tracker.baseline(end,plan['end_hash'])
     write_json(tracker.root/'baseline.json',dict(plan=str(baseline_plan),end_block=end,end_hash=plan['end_hash']))
+
+
+def initialize_node(tracker, baseline_plan, verification_root):
+    from pipeline.verify import check_report
+
+    report = check_report(verification_root)
+    plan = read(baseline_plan)
+    end, block_hash = plan['end_block'], plan['end_hash']
+    if report['stop']-1 > end:
+        raise ValueError('Node baseline precedes the verified historical replay')
+    evidence = dict(site='node', end_block=end, end_hash=block_hash,
+                    plan_sha256=checksum(baseline_plan),
+                    verification_sha256=checksum(verification_root/'verification.json'))
+    marker = tracker.root/'baseline.json'
+    if marker.exists() and read(marker) != evidence:
+        raise ValueError('Node coordinator baseline changed')
+    if tracker.position() is not None:
+        if not marker.exists():
+            raise ValueError('Node coordinator ledger has no verified baseline')
+        return
+    validate_previous(plan, end+1)
+    if rpc('eth_getBlockByNumber',[hex(end),False])['hash'] != block_hash:
+        raise ValueError('Node baseline finalized hash changed')
+    write_json(marker, evidence)
+    tracker.baseline(end, block_hash)
 
 
 def run_cycle(tracker, cycle, baseline_plan, profiles):
@@ -81,25 +106,37 @@ def run_cycle(tracker, cycle, baseline_plan, profiles):
 
 def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('mode',choices=['once','continuous','status'])
-    p.add_argument('--root',type=Path,default=DEFAULT);p.add_argument('--end-block',type=int)
-    p.add_argument('--baseline-plan',type=Path,default=HISTORICAL);p.add_argument('--profiles',type=Path,default=PROFILES)
+    p.add_argument('--root',type=Path);p.add_argument('--end-block',type=int)
+    p.add_argument('--baseline-plan',type=Path);p.add_argument('--profiles',type=Path)
+    p.add_argument('--node-verification',type=Path,help='Directory with the accepted Node replay report')
     p.add_argument('--poll-seconds',type=int,default=30);args=p.parse_args()
     if args.poll_seconds<5:p.error('poll-seconds must be at least 5')
     if args.mode=='continuous' and args.end_block is not None:p.error('end-block belongs to a bounded once run')
+    if NODE_LOCAL and (args.root is None or (args.mode != 'status' and
+                       None in (args.baseline_plan, args.profiles, args.node_verification))):
+        p.error('Node requires an explicit root, baseline, profiles and verification directory')
+    args.root = args.root or DEFAULT
+    args.baseline_plan = args.baseline_plan or HISTORICAL
+    args.profiles = args.profiles or PROFILES
     if args.mode=='status':print((args.root/'progress.json').read_text());return
     if NODE_LOCAL:
-        p.error('This entrypoint still uses the legacy Data compaction layout. Use pipeline/verify.py for Node replays.')
+        from pipeline.compaction.node_store import compact_node as compact_completed
+    else:
+        from pipeline.compaction.run import compact_completed
     args.root.mkdir(parents=True,exist_ok=True)
     with (args.root/'coordinator.lock').open('w') as lock:
         fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
-        tracker=Tracker(args.root);initialize(tracker,args.baseline_plan)
+        tracker=Tracker(args.root)
+        if NODE_LOCAL:
+            initialize_node(tracker,args.baseline_plan,args.node_verification)
+        else:
+            initialize(tracker,args.baseline_plan)
         def stop(signum,frame):
             progress=read(args.root/'progress.json') if (args.root/'progress.json').exists() else {}
             tracker.publish(tracker.active(),progress.get('stage'),state='stopped')
             raise SystemExit(128+signum)
         signal.signal(signal.SIGTERM,stop);signal.signal(signal.SIGINT,stop)
         while True:
-            from pipeline.compaction.run import compact_completed
             compact_completed(tracker,args.baseline_plan)
             cycle=tracker.active()
             if not cycle:

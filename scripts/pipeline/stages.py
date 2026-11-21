@@ -36,15 +36,19 @@ def verification_cycle_path(root, cycle_id):
     return f"verification/{digest(str(Path(root).resolve()))[:24]}/{cycle_id}"
 
 
+def node_cycle_root(root, cycle_id):
+    return Path('/home/node/dsc-extraction') / verification_cycle_path(root, cycle_id)
+
+
 class Stages:
     def __init__(self, root, cycle, previous_plan, previous_profiles, heartbeat, *, verification=False):
         self.cycle=cycle;self.root=Path(root)/'cycles'/cycle['id'];self.root.mkdir(parents=True,exist_ok=True)
         self.previous_plan=Path(previous_plan);self.previous_profiles=Path(previous_profiles);self.heartbeat=heartbeat
         self.verification = verification
         self.revert_worker = None
-        if verification:
+        if verification or NODE_LOCAL:
             relative = verification_cycle_path(root, cycle['id'])
-            self.node = f'/home/node/dsc-extraction/{relative}'
+            self.node = str(node_cycle_root(root, cycle['id']))
             self.revert = f'/home/dsc-revert/data/{relative}'
             self.data = self.root / 'datasets'
             if NODE_LOCAL:
@@ -59,7 +63,7 @@ class Stages:
         self.events=self.root/'events';self.auto=self.root/'offline';self.profiles=self.root/'profiles'
         self.log=self.root/'workers.log'
         self.env=dict(DSC_EVENT_ROOT=str(self.events),DSC_AUTO_ROOT=str(self.auto),DSC_PROFILES=str(self.profiles))
-        if verification:
+        if verification or NODE_LOCAL:
             self.env['DSC_AAVE_INPUTS_NODE_ROOT'] = self.node + '/aave-inputs'
 
     def execute(self, command, env=None, progress=None):run(command,self.log,self.heartbeat,env,progress)
@@ -124,7 +128,7 @@ class Stages:
         self.execute(node_command(command,True))
         self.profiles.mkdir(exist_ok=True)
         self.copy(node_path(self.node+'/profiles/'),str(self.profiles)+'/')
-        if not self.verification:
+        if not self.verification and not NODE_LOCAL:
             for v in ('v2','v3'):
                 relative=f'protocols/lending/aave/{v}/history/'
                 self.copy(node_path(NODE_SCRIPTS+'/'+relative),str(SCRIPTS/relative)+'/')

@@ -125,6 +125,21 @@ def copy_legacy_revert_inputs(root,start,stop):
     return archive/'old', archive/'new', archive/'old-selected', archive/'new-selected'
 
 
+def check_report(root):
+    report = read(root/'verification.json')
+    checks = {'events', 'decoded', 'state'}
+    if (report['state'] != 'passed' or report['stop']-report['start'] != 100
+            or len(report['addresses']) != 102
+            or len({job['address'] for job in report['addresses']}) != 102
+            or any(set(job['checks']) != checks or not all(job['checks'].values())
+                   for job in report['addresses'])
+            or set(report['traces']) != {'exact_traces'}
+            or report.get('receipt_comparison') != 'exact'
+            or report.get('selection_comparison') != 'exact'):
+        raise ValueError('Exact 100-block pipeline verification has not passed')
+    return report
+
+
 def main():
     p=argparse.ArgumentParser();p.add_argument('--blocks',type=int,default=100);p.add_argument('--root',type=Path)
     p.add_argument('--baseline-plan',type=Path)
@@ -137,10 +152,7 @@ def main():
         p.error('Node verification requires --root and, for replay, --baseline-plan, --profiles and --revert-baseline')
     args.root = args.root or DEFAULT/'verification'
     if args.check:
-        r=read(args.root/'verification.json')
-        if (r['state']!='passed' or r['stop']-r['start']!=100 or len(r['addresses'])!=102 or
-            any(not all(j['checks'].values()) for j in r['addresses']) or set(r['traces'])!={'exact_traces'}):
-            raise ValueError('Exact 100-block verification has not passed')
+        check_report(args.root)
         print('Exact 100-block pipeline verification passed');return
     if args.blocks<1:p.error('blocks must be positive')
     baseline = args.baseline_plan or HISTORICAL
