@@ -1,6 +1,8 @@
 """Repeat an accepted interval and compare data values, independent of file layout."""
 import argparse
 from collections import Counter
+from contextlib import closing
+import fcntl
 import gzip
 import json
 import subprocess
@@ -10,7 +12,7 @@ sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 import pyarrow.parquet as pq
 from shared.artifacts import write_json,digest
 from pipeline.runtime import REVERT,rpc,ssh,transfer
-from pipeline.stages import read,state_path,MODE
+from pipeline.stages import read,state_path,verification_cycle_path,MODE
 from pipeline.tracker import Tracker
 from pipeline.main import run_cycle,DEFAULT,HISTORICAL,PROFILES
 
@@ -92,6 +94,7 @@ def compare(baseline_plan,new_plan,root,start,stop):
         if not all(checks.values()):raise ValueError(f'Replay differs: {j["address"]}: {checks}')
     archive=root/'comparison';archive.mkdir(exist_ok=True)
     cycle=f'{start}-{stop-1}';log=root/'comparison.log'
+    new_traces = '/home/dsc-revert/data/' + verification_cycle_path(root, cycle) + '/traces'
     def copy_batches(remote,folder,local):
         local.mkdir(exist_ok=True)
         listing=subprocess.check_output(ssh(remote,['find',folder,'-maxdepth','1','-name','*.jsonl.gz','-printf','%f\n']),text=True)
@@ -99,10 +102,10 @@ def compare(baseline_plan,new_plan,root,start,stop):
             a,z=map(int,name.split('.')[0].split('-'))
             if a<stop and z>=start:transfer(remote+':'+folder+'/'+name,str(local)+'/',log,lambda:None)
     copy_batches(REVERT,'/home/dsc-revert/data/archive/reverted/drpc-v1/archive',archive/'old')
-    copy_batches(REVERT,f'/home/dsc-revert/data/cycles/{cycle}/traces/archive',archive/'new')
+    copy_batches(REVERT,new_traces+'/archive',archive/'new')
     report['traces']=compare_archives(archive/'old',archive/'new',start,stop)
     copy_batches(REVERT,'/home/dsc-revert/data/archive/reverted/drpc-v1/selected/chunks',archive/'old-selected')
-    copy_batches(REVERT,f'/home/dsc-revert/data/cycles/{cycle}/traces/selected/chunks',archive/'new-selected')
+    copy_batches(REVERT,new_traces+'/selected/chunks',archive/'new-selected')
     a=archive_records(archive/'old-selected',start,stop);b=archive_records(archive/'new-selected',start,stop)
     for n in a:
         def selected(r):return [(e['receipt']['transactionHash'],e['matched_contracts']) for e in r['failed']]
@@ -123,33 +126,43 @@ def main():
             raise ValueError('Exact 100-block verification has not passed')
         print('Exact 100-block pipeline verification passed');return
     if args.blocks<1:p.error('blocks must be positive')
-    args.root.mkdir(parents=True,exist_ok=True)
-    import fcntl
-    lock=(args.root/'coordinator.lock').open('w');fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
-    baseline=read(HISTORICAL);stop=baseline['end_block']+1;start=stop-args.blocks
     plan=read(HISTORICAL)
+    stop=plan['end_block']+1;start=stop-args.blocks
+    root = args.root.resolve() / 'isolated' / f'{start}-{stop-1}'
+    root.mkdir(parents=True, exist_ok=True)
+    with (root/'coordinator.lock').open('a') as lock:
+        fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
+        report = replay(root, plan, start, stop)
+        if args.blocks == 100:
+            write_json(args.root/'verification.json', report)
+        print(json.dumps(report))
+
+
+def replay(root, plan, start, stop):
+    if rpc('eth_getBlockByNumber', [hex(stop-1), False])['hash'] != plan['end_hash']:
+        raise ValueError('Historical verification target hash changed')
     for job in plan['jobs']:
         folder=state_path(job).parent
         matches=[r for f in source_files(folder,start-1,start) for r in table_rows(f,start-1,start)]
         if len(matches)!=1:raise ValueError('Missing replay predecessor state row')
-        checkpoint=args.root/'seeds'/f"{job['address']}.json"
+        checkpoint=root/'seeds'/f"{job['address']}.json"
         write_json(checkpoint,dict(state='complete',next_block=start,last_state=integers(json.loads(matches[0]['state_json'])),
                                   identity=dict(mode=MODE,address=job['address'])))
         job['checkpoint']=str(checkpoint)
-    prior=args.root/'predecessor-plan.json';write_json(prior,plan)
-    tracker=Tracker(args.root,purpose='verification')
-    tracker.baseline(start-1,rpc('eth_getBlockByNumber',[hex(start-1),False])['hash'])
-    cycle=tracker.active() or tracker.begin(stop-1,baseline['end_hash'])
-    if cycle:
-        pointer=dict(cycle=cycle,root=str(args.root/'cycles'/cycle['id']))
-        write_json(DEFAULT/'current.json',pointer)
-        run_cycle(tracker,cycle,prior,PROFILES)
-    tracker.publish(cycle,state='comparing')
-    try:compare(HISTORICAL,args.root/'cycles'/f'{start}-{stop-1}'/'events/plan.json',args.root,start,stop)
-    except Exception as error:
-        tracker.publish(cycle,state='mismatch',error=str(error));raise
-    tracker.publish(cycle,state='passed')
-    print((args.root/'verification.json').read_text())
+    prior=root/'predecessor-plan.json';write_json(prior,plan)
+    with closing(Tracker(root,purpose='verification')) as tracker:
+        tracker.baseline(start-1,rpc('eth_getBlockByNumber',[hex(start-1),False])['hash'])
+        cycle=tracker.active() or tracker.begin(stop-1,plan['end_hash'])
+        if cycle:
+            pointer=dict(cycle=cycle,root=str(root/'cycles'/cycle['id']))
+            write_json(root/'current.json',pointer)
+            run_cycle(tracker,cycle,prior,PROFILES)
+        tracker.publish(cycle,state='comparing')
+        try: report = compare(HISTORICAL,root/'cycles'/f'{start}-{stop-1}'/'events/plan.json',root,start,stop)
+        except Exception as error:
+            tracker.publish(cycle,state='mismatch',error=str(error));raise
+        tracker.publish(cycle,state='passed')
+        return report
 
 
 if __name__=='__main__':

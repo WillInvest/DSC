@@ -4,7 +4,11 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import Mock, patch
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
+from pipeline import verify
+from pipeline.stages import Stages
+from pipeline.tracker import STAGES
 from pipeline.verify import compare_archives
 
 
@@ -25,6 +29,62 @@ class VerificationTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root=Path(directory);self.records(root/'old','same');self.records(root/'new','same')
             self.assertEqual(compare_archives(root/'old',root/'new',10,11),dict(exact_traces=1))
+
+    def test_replay_cli_leaves_live_pointer_and_exact_gate_untouched(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            production = root / 'production'
+            production.mkdir()
+            pointer = production / 'current.json'
+            pointer.write_text('production pointer')
+            output = root / 'verification'
+            output.mkdir()
+            gate = output / 'verification.json'
+            gate.write_text('previous exact verification')
+            baseline = root / 'baseline.json'
+            baseline.write_text(json.dumps(dict(end_block=20, end_hash='0x20', jobs=[])))
+            report = {'state': 'passed', 'start': 20, 'stop': 21}
+
+            def complete(tracker, cycle, *_):
+                self.assertEqual(tracker.purpose, 'verification')
+                for stage in STAGES:
+                    tracker.stage(cycle, stage, 'complete', {})
+                tracker.finish(cycle)
+
+            with (
+                patch.object(sys, 'argv', ['verify.py', '--root', str(output), '--blocks', '1']),
+                patch.object(verify, 'DEFAULT', production),
+                patch.object(verify, 'HISTORICAL', baseline),
+                patch.object(verify, 'rpc', side_effect=lambda m, p: {'hash': '0x20' if p[0] == '0x14' else '0x19'}),
+                patch.object(verify, 'run_cycle', side_effect=complete),
+                patch.object(verify, 'compare', return_value=report),
+                patch('builtins.print'),
+            ):
+                verify.main()
+
+            self.assertEqual(pointer.read_text(), 'production pointer')
+            self.assertEqual(gate.read_text(), 'previous exact verification')
+            current = json.loads((output / 'isolated/20-20/current.json').read_text())
+            self.assertEqual(current['cycle']['hash'], '0x20')
+
+    def test_verification_separates_all_root_paths_and_rejects_unreviewed_abi(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            cycle = dict(start=10, end=20, id='10-20')
+            args = (cycle, root / 'prior.json', root / 'profiles', lambda: None)
+            production = Stages(root / 'production', *args)
+            replay = Stages(root / 'replay', *args, verification=True)
+            other = Stages(root / 'another-replay', *args, verification=True)
+            self.assertNotEqual(replay.node, production.node)
+            self.assertNotEqual(replay.revert, production.revert)
+            self.assertNotEqual(replay.node, other.node)
+            self.assertNotEqual(replay.revert, other.revert)
+            self.assertTrue(replay.data.is_relative_to(replay.root))
+            self.assertEqual(replay.env['DSC_AAVE_INPUTS_NODE_ROOT'], replay.node + '/aave-inputs')
+            replay.execute = Mock()
+            with self.assertRaisesRegex(ValueError, 'requires reviewed aave-v2 coverage'):
+                replay.profiles_stage()
+            replay.execute.assert_not_called()
 
 
 if __name__=='__main__':unittest.main()

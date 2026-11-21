@@ -28,7 +28,8 @@ class PipelineMainTests(unittest.TestCase):
                 raise RuntimeError('worker interrupted')
             return {'accepted': stage}
 
-        def workers(root, cycle, previous_plan, previous_profiles, heartbeat):
+        def workers(root, cycle, previous_plan, previous_profiles, heartbeat, *, verification):
+            self.assertFalse(verification)
             stages = Mock()
             stages.prepare.side_effect = lambda: run_stage('prepare', cycle)
             for name in stage_order[1:]:

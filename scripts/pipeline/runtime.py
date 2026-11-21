@@ -8,8 +8,8 @@ import time
 
 NODE='node@10.246.103.160'
 REVERT='dsc-revert@10.246.103.26'
-SCRIPTS=Path('/home/dsc-data/scripts')
-PYTHON=str(SCRIPTS/'.venv-abi/bin/python')
+SCRIPTS=Path(os.environ.get('DSC_PIPELINE_DATA_SCRIPTS','/home/dsc-data/scripts'))
+PYTHON='/home/dsc-data/scripts/.venv-abi/bin/python'
 NODE_SCRIPTS='/home/node/dsc-extraction/scripts'
 NODE_PYTHON='/home/node/dsc-extraction/.venv-abi/bin/python'
 REVERT_SCRIPTS='/home/dsc-revert/scripts'

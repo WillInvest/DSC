@@ -2,9 +2,10 @@
 import json
 from pathlib import Path
 import shutil
+from tempfile import TemporaryDirectory
 from pipeline.runtime import (NODE,REVERT,SCRIPTS,PYTHON,NODE_SCRIPTS,NODE_PYTHON,
                               REVERT_SCRIPTS,REVERT_PYTHON,ssh,remote_json,run,transfer,rpc)
-from shared.artifacts import checksum,write_json
+from shared.artifacts import checksum,digest,write_json
 from automation.common import paths
 
 MODE='event-derived-unchecked-v1'
@@ -28,16 +29,29 @@ def validate_previous(plan, next_block):
             raise ValueError(f'Incomplete predecessor state: {p}')
 
 
+def verification_cycle_path(root, cycle_id):
+    return f"verification/{digest(str(Path(root).resolve()))[:24]}/{cycle_id}"
+
+
 class Stages:
-    def __init__(self, root, cycle, previous_plan, previous_profiles, heartbeat):
+    def __init__(self, root, cycle, previous_plan, previous_profiles, heartbeat, *, verification=False):
         self.cycle=cycle;self.root=Path(root)/'cycles'/cycle['id'];self.root.mkdir(parents=True,exist_ok=True)
         self.previous_plan=Path(previous_plan);self.previous_profiles=Path(previous_profiles);self.heartbeat=heartbeat
-        self.node=f"/home/node/dsc-extraction/cycles/{cycle['id']}"
-        self.revert=f"/home/dsc-revert/data/cycles/{cycle['id']}"
-        self.data=Path('/home/dsc-data/data/incremental')/cycle['id']
+        self.verification = verification
+        if verification:
+            relative = verification_cycle_path(root, cycle['id'])
+            self.node = f'/home/node/dsc-extraction/{relative}'
+            self.revert = f'/home/dsc-revert/data/{relative}'
+            self.data = self.root / 'datasets'
+        else:
+            self.node=f"/home/node/dsc-extraction/cycles/{cycle['id']}"
+            self.revert=f"/home/dsc-revert/data/cycles/{cycle['id']}"
+            self.data=Path('/home/dsc-data/data/incremental')/cycle['id']
         self.events=self.root/'events';self.auto=self.root/'offline';self.profiles=self.root/'profiles'
         self.log=self.root/'workers.log'
         self.env=dict(DSC_EVENT_ROOT=str(self.events),DSC_AUTO_ROOT=str(self.auto),DSC_PROFILES=str(self.profiles))
+        if verification:
+            self.env['DSC_AAVE_INPUTS_NODE_ROOT'] = self.node + '/aave-inputs'
 
     def execute(self, command, env=None, progress=None):run(command,self.log,self.heartbeat,env,progress)
     def copy(self, source, destination):transfer(source,destination,self.log,self.heartbeat)
@@ -62,8 +76,34 @@ class Stages:
         return plan
 
     def profiles_stage(self):
+        source = self.previous_profiles
+        if self.verification:
+            # Freeze only reviewed profiles whose ranges cover the replay. The
+            # existing worker audits these ranges without invoking the ABI writer.
+            source = self.root / 'reviewed-profiles'
+            if not source.exists():
+                with TemporaryDirectory(dir=self.root) as temporary:
+                    snapshot = Path(temporary) / 'profiles'
+                    snapshot.mkdir()
+                    for path in self.previous_profiles.glob('aave-*.json'):
+                        shutil.copyfile(path, snapshot / path.name)
+                    snapshot.rename(source)
+            for protocol in ('aave-v2', 'aave-v3'):
+                cursor = self.cycle['start']
+                profiles = sorted((read(path) for path in source.glob(protocol + '-*.json')),
+                                  key=lambda profile: profile['from_block'])
+                for profile in profiles:
+                    if profile['to_block'] <= cursor:
+                        continue
+                    if profile['from_block'] > cursor or profile['protocol'] != protocol:
+                        break
+                    cursor = profile['to_block']
+                    if cursor > self.cycle['end']:
+                        break
+                if cursor <= self.cycle['end']:
+                    raise ValueError(f'Historical replay requires reviewed {protocol} coverage')
         self.execute(ssh(NODE,['mkdir','-p',self.node+'/previous-profiles']))
-        self.copy(str(self.previous_profiles)+'/',NODE+':'+self.node+'/previous-profiles/')
+        self.copy(str(source)+'/',NODE+':'+self.node+'/previous-profiles/')
         self.copy('/home/dsc-data/contracts/ethereum/pools.csv',NODE+':'+self.node+'/pools.csv')
         self.execute(ssh(NODE,[NODE_PYTHON,NODE_SCRIPTS+'/pipeline/profiles.py',
             '--source',self.node+'/previous-profiles','--output',self.node+'/profiles',
@@ -71,9 +111,10 @@ class Stages:
             '--contracts',self.node+'/pools.csv'],True))
         self.profiles.mkdir(exist_ok=True)
         self.copy(NODE+':'+self.node+'/profiles/',str(self.profiles)+'/')
-        for v in ('v2','v3'):
-            relative=f'protocols/lending/aave/{v}/history/'
-            self.copy(NODE+':'+NODE_SCRIPTS+'/'+relative,str(SCRIPTS/relative)+'/')
+        if not self.verification:
+            for v in ('v2','v3'):
+                relative=f'protocols/lending/aave/{v}/history/'
+                self.copy(NODE+':'+NODE_SCRIPTS+'/'+relative,str(SCRIPTS/relative)+'/')
         accepted=read(self.profiles/'accepted.json')
         for n,h in accepted['files'].items():
             if checksum(self.profiles/n)!=h:raise ValueError('Profile transfer checksum mismatch')

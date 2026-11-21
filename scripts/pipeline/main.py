@@ -56,7 +56,8 @@ def run_cycle(tracker, cycle, baseline_plan, profiles):
         tracker.stage(cycle, name, 'complete', evidence)
         heartbeat()
 
-    stages = Stages(tracker.root, cycle, previous_plan, previous_profiles, heartbeat)
+    stages = Stages(tracker.root, cycle, previous_plan, previous_profiles, heartbeat,
+                    verification=tracker.purpose == 'verification')
     heartbeat()
     try:
         stages.prepare()

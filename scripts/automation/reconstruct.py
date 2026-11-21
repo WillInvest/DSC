@@ -32,7 +32,8 @@ def aave_inputs(job,plan):
     key=digest(request);root=AUTO/'aave-inputs'/key
     cache=root/'decoded-inputs.json'
     if cache.exists(): return read(cache)
-    request['output']='/home/node/dsc-extraction/direct-core-inputs/'+key
+    node_inputs = os.environ.get('DSC_AAVE_INPUTS_NODE_ROOT', '/home/node/dsc-extraction/direct-core-inputs')
+    request['output'] = str(Path(node_inputs) / key)
     if not (root/'inputs.json').exists():
         encoded=base64.b64encode(json.dumps(request).encode()).decode()
         subprocess.run(SSH+[shlex.join(['/home/node/dsc-extraction/.venv-abi/bin/python',

@@ -67,7 +67,14 @@ Before enabling production, repeat the final accepted 100 blocks:
 /home/dsc-data/scripts/.venv-abi/bin/python /home/dsc-data/scripts/pipeline/verify.py --blocks 100
 ```
 
-The replay uses separate paths and a separate ledger under `runs/pipeline/verification`.
+The replay uses a separate ledger, progress pointer and datasets under
+`runs/pipeline/verification/isolated/START-END`. Node and Revert use separate
+verification directories keyed by the local run root. The archival Aave ABI
+profiles must cover the interval before the replay starts. The replay audits them
+on Node and uses the existing ABI files for offline decoding.
+
+The 100-block run publishes the `verification.json` gate at the verification
+root. A shorter diagnostic run leaves the gate in place.
 `verification.json` records per-address event/decoded/state matches, exact failed
 receipts, trace comparisons, and selected transaction/contract matches. All call
 structure, addresses, gas, values and raw input/output must match. Human-readable
