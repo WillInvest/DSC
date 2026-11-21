@@ -89,6 +89,33 @@ Run the same check after unpacking the Drive backup into a separate directory.
 Use a read-only snapshot for these imported catalogs. The catalogs also contain
 source-host retirement records, which belong to the original writer.
 
+The unified Node catalog can be backed up directly with `backup_catalog`. Run
+it on Node with the pipeline scripts and the existing HF archive runtime on
+`PYTHONPATH`. Each work directory is bound to one captured catalog revision.
+
+```sh
+python -m pipeline.compaction.backup_catalog backup \
+  /node/coordinator/canonical /node/backup-work/REVISION REMOTE
+python -m pipeline.compaction.backup_catalog restore \
+  SNAPSHOT_REMOTE RECEIPT_SHA256 /node/isolated-restore
+python -m pipeline.compaction.backup_catalog follow \
+  /node/coordinator /node/backup-work REMOTE
+```
+
+Drive stores payloads under `objects/<SHA-256>`, so later catalog snapshots can
+reference identical bytes without uploading them again. The snapshot
+directory holds its SQLite backup, capture manifest and Drive receipt. The
+receipt is published after remote size and MD5 checks, SHA-256 readback of the
+metadata, and one SHA-256 probe per data family. A full restore needs only the
+snapshot remote path and the accepted receipt hash. It downloads each unique
+object once, reconstructs the original paths, and verifies every payload
+against the restored SQLite catalog before publishing the destination.
+The independent follower reads the coordinator's committed catalog watermark.
+It saves a pending revision before upload and retries that capture after a
+transfer failure. Its own `progress.json` records the last Drive-verified
+watermark and the pending revision, so a Drive outage leaves Node extraction
+and catalog publication free to advance.
+
 To inventory the accepted pre-compaction market backfill, run
 `PYTHONPATH=scripts python3 -m pipeline.compaction.historical_market` with the
 source home as `--source`, the accepted sequential extraction plan as
