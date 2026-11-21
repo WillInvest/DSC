@@ -97,3 +97,24 @@ decoded files, the per-block state and its final checkpoint, and the original
 acceptance receipts. It checkpoints one manifest per contract and carries
 explicit empty event coverage. The migration receiver must verify these hashes
 against the copied bytes before publishing an import.
+
+On Node, `backup_historical_market` follows that published import inventory.
+Run it with the pipeline scripts and the existing HF archive runtime on
+`PYTHONPATH`.
+
+```sh
+python -m pipeline.compaction.backup_historical_market \
+  --import-root /node/storage/imports/historical-market \
+  --output /node/storage/imports/operations/historical-market \
+  --remote dsc_hf:DSC_Research/imports/historical/markets --follow
+```
+
+Each contract has a Drive directory keyed by protocol, address and source
+manifest SHA-256. It holds indexed uncompressed TAR packages, a pack index and
+a `verified.json` catalog record. The catalog record is published after every
+package passes the Drive size and MD5 check and one member of each present
+artifact type is independently read back and SHA-256 verified. Restore uses the
+catalog's `index_sha256` with the existing indexed TAR reader
+`scripts/user-history/releases/read_archive.py`. Local `progress.json` lists
+verified contracts and the active contract. The backup worker preserves Node
+and helper originals.
