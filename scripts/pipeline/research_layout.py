@@ -20,6 +20,8 @@ PROTOCOLS = {
     'aave-v2': 'lending/aaveV2',
     'aave-v3': 'lending/aaveV3',
 }
+MARKET_KINDS = frozenset(('decoded', 'state'))
+ENCODED = frozenset(('encoded',))
 
 
 def link(source, target, expected_sha, size=None):
@@ -41,23 +43,27 @@ def market_path(root, protocol, address, kind, start, stop, event=None, schema=N
     base = root/PROTOCOLS[protocol]
     if kind == 'decoded':
         directory = base/'events'/address/schema/event
+    elif kind == 'encoded':
+        directory = root/'metadata/replay-inputs/encoded'/protocol/address
+        if schema:
+            directory /= schema
     else:
         directory = base/'block-state'/address
     return directory/filename(start, stop, 'parquet')
 
 
-def publish_historical_market(source, root, manifest):
+def publish_historical_market(source, root, manifest, kinds=MARKET_KINDS):
     address = manifest['identity']['address'].lower()
     protocol = manifest['protocol']
     for row in manifest['files']:
         kind = row['kind']
-        if kind not in ('state', 'decoded'):
+        if kind not in kinds:
             continue
         path = source/row['path']
-        interval = path if kind == 'state' else path.parents[1].with_suffix('.parquet')
+        interval = path.parents[1].with_suffix('.parquet') if kind == 'decoded' else path
         start, stop = bounds(interval)
         target = market_path(root, protocol, address, kind, start, stop,
-                             event=path.stem, schema=path.parent.name)
+                             event=path.stem, schema=path.parent.name if kind == 'decoded' else None)
         link(path, target, row['sha256'], row['bytes'])
 
 
@@ -100,17 +106,19 @@ def publish_archive(path, root, kind, start, stop, lower, sha, addresses):
         publish_selected(path, root, start, stop, lower, addresses)
 
 
-def publish_tail_markets(catalog, root, cutoff):
+def publish_tail_markets(catalog, root, cutoff, kinds=MARKET_KINDS):
     with snapshot(catalog) as rows:
         for row in rows:
             kind, *parts = row['stream'].split('/')
-            if kind not in ('decoded', 'state') or row['stop'] <= cutoff:
+            if kind not in kinds or row['stop'] <= cutoff:
                 continue
             protocol, address = parts[:2]
             path = Path(row['absolute_path'])
             start = max(row['start'], cutoff)
             stop = row['stop']
             schema = '-'.join(parts[2:4]+parts[-1:]) if kind == 'decoded' else None
+            if kind == 'encoded':
+                schema = parts[-1]
             event = parts[-2] if kind == 'decoded' else None
             target = market_path(root, protocol, address.lower(), kind, start, stop, event, schema)
             if start == row['start']:
@@ -133,8 +141,7 @@ def publish_tail_reverts(catalog, root, cutoff, addresses):
                                 max(row['start'], cutoff), row['sha256'], addresses)
 
 
-def publish(root, historical_markets, historical_reverts, market_tail, revert_tail):
-    status = root/'metadata'/'publication.json'
+def publish_history(root, historical_markets, status, kinds):
     history = read(historical_markets/'progress.json')
     if history['state'] != 'complete':
         raise ValueError('Historical market import is incomplete')
@@ -147,8 +154,22 @@ def publish(root, historical_markets, historical_reverts, market_tail, revert_ta
             raise ValueError(f'Historical market manifest changed: {manifest_path}')
         data = read(manifest_path)
         addresses[data['protocol']].add(data['identity']['address'].lower())
-        publish_historical_market(source, root, data)
+        publish_historical_market(source, root, data, kinds)
         write_json(status, dict(stage='historical-markets', markets=index, through=through))
+    return addresses, through, index
+
+
+def publish_encoded(root, historical_markets, market_tail):
+    status = root/'metadata'/'encoded-publication.json'
+    _, through, markets = publish_history(root, historical_markets, status, ENCODED)
+    publish_tail_markets(market_tail, root, through+1, ENCODED)
+    write_json(status, dict(stage='complete', markets=markets,
+                           market_through=read(market_tail/'manifest.json')['through']))
+
+
+def publish(root, historical_markets, historical_reverts, market_tail, revert_tail):
+    status = root/'metadata'/'publication.json'
+    addresses, through, index = publish_history(root, historical_markets, status, MARKET_KINDS)
     publish_tail_markets(market_tail, root, through+1)
 
     archive = read(historical_reverts/'historical-revert.json')
@@ -178,6 +199,7 @@ def publish(root, historical_markets, historical_reverts, market_tail, revert_ta
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--root', required=True, type=Path)
+    parser.add_argument('--encoded-only', action='store_true')
     for field in ('historical-markets', 'historical-reverts', 'market-tail', 'revert-tail',
                   'coordinator', 'registry'):
         parser.add_argument('--'+field, type=Path)
@@ -185,7 +207,12 @@ def main():
     if not args.root.is_dir():
         parser.error('Create the research root on the data disk first')
     historical = (args.historical_markets, args.historical_reverts, args.market_tail, args.revert_tail)
-    if args.coordinator:
+    if args.encoded_only:
+        if not args.historical_markets or not args.market_tail or any(
+                (args.historical_reverts, args.revert_tail, args.coordinator, args.registry)):
+            parser.error('Raw publication requires historical markets and a market tail')
+        sources = args.historical_markets, args.market_tail
+    elif args.coordinator:
         if not args.registry or any(historical):
             parser.error('Use a coordinator and registry, or the four historical import paths')
         sources = (args.coordinator,)
@@ -196,9 +223,12 @@ def main():
     for source in sources:
         if source.stat().st_dev != args.root.stat().st_dev:
             parser.error('Research publication and accepted imports must share the data disk')
-    with (args.root/'publication.lock').open('a') as lock:
+    lock_name = 'encoded-publication.lock' if args.encoded_only else 'publication.lock'
+    with (args.root/lock_name).open('a') as lock:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        if args.coordinator:
+        if args.encoded_only:
+            publish_encoded(args.root, args.historical_markets, args.market_tail)
+        elif args.coordinator:
             publish_committed(args.root, args.coordinator, args.registry)
         else:
             publish(args.root, *historical)
@@ -228,8 +258,14 @@ def publish_committed(root, coordinator, registry):
         addresses = defaultdict(set)
         for contract in tracked_contracts(registry):
             addresses[contract['protocol']].add(contract['address'])
+        encoded = read(root/'metadata/encoded-publication.json')
+        raw_through = encoded['market_through']
+        if encoded['stage'] != 'complete' or not through <= raw_through <= committed['through']:
+            raise ValueError('Raw replay input coverage does not join the published market boundary')
         publish_tail_markets(catalog, root, through+1)
+        publish_tail_markets(catalog, root, raw_through+1, ENCODED)
         publish_tail_reverts(catalog, root, through+1, addresses)
+        write_json(root/'metadata/encoded-publication.json', dict(encoded, market_through=committed['through']))
         write_json(status, dict(previous, market_through=committed['through'], revert_through=committed['through']))
 
 

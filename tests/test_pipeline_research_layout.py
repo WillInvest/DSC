@@ -9,12 +9,26 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'scripts'))
-from pipeline.research_layout import publish_archive, publish_historical_market
+from pipeline.research_layout import ENCODED, publish_archive, publish_historical_market
 from reverted.trace_received import pack
 from shared.artifacts import checksum
 
 
 class ResearchLayoutTests(unittest.TestCase):
+    def test_original_logs_have_a_separate_replay_path_and_preserve_their_schema(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            original = root/'ethereum__logs__00000010_to_00000015.parquet'
+            pq.write_table(pa.table({'block_number': [11], 'topic0': ['0x1']}), original)
+            item = dict(kind='encoded', path=original.name, sha256=checksum(original),
+                        bytes=original.stat().st_size)
+            publish_historical_market(root, root/'dsc-data',
+                                      dict(protocol='aave-v3', identity={'address': '0xa'}, files=[item]),
+                                      ENCODED)
+            encoded = root/'dsc-data/metadata/replay-inputs/encoded/aave-v3/0xa/10-15.parquet'
+            self.assertTrue(encoded.samefile(original))
+            self.assertEqual(pq.read_schema(encoded).names, ['block_number', 'topic0'])
+
     def test_historical_events_and_state_keep_their_rows_and_get_range_names(self):
         with TemporaryDirectory() as directory:
             root = Path(directory)

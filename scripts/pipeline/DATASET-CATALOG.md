@@ -28,6 +28,12 @@ Accepted Parquet and archive files on the same disk are published as hard
 links. The publisher slices accepted inputs only where the historical and
 migrated block ranges overlap.
 
+Original encoded Cryo logs live under
+`metadata/replay-inputs/encoded/<protocol>/<contract>/` with inclusive
+range filenames and schema folders for compacted inputs. Historical
+acceptance manifests establish empty ranges. The raw publication watermark
+is in `metadata/encoded-publication.json`.
+
 The `lending/aaveV3/health-factor/` directory holds historical indexed packs
 and completed incremental windows. Run `python -m pipeline.hf_storage
 SOURCE_WINDOWS DRIVE_WORK HEALTH_FACTOR_ROOT` to place already accepted
