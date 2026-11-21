@@ -22,6 +22,11 @@ class HFStorageTests(unittest.TestCase):
             inventory = dict(start=10, stop=12, files={'result/wallets.json': {}}, derived_files={},
                              result_sha256='result', successor_sha256='next')
             with patch('hf_incremental_archive.window_inventory', return_value=inventory):
+                unrelated = root/'another/10-11'
+                unrelated.mkdir(parents=True)
+                with self.assertRaisesRegex(ValueError, 'different directories'):
+                    place_local(window, accepted, link_source=unrelated)
+                self.assertFalse(accepted.exists())
                 proof = place_local(window, accepted)
                 self.assertEqual((proof['start'], proof['stop'], proof['files']), (10, 12, 2))
                 published = accepted/'10-11'

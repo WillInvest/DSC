@@ -38,12 +38,15 @@ def install_window(output, files, receipt=None):
             os.close(parent)
 
 
-def place_local(window, target):
+def place_local(window, target, *, link_source=None):
     from hf_incremental_archive import window_inventory
 
     window = window.resolve()
+    physical = window if link_source is None else link_source.resolve()
+    if not physical.samefile(window):
+        raise ValueError('HF link source and verified window refer to different directories')
     target.mkdir(parents=True, exist_ok=True)
-    if window.stat().st_dev != target.stat().st_dev:
+    if physical.stat().st_dev != target.stat().st_dev:
         raise ValueError('Local HF placement requires the source on the canonical disk')
     with (target/'placement.lock').open('a') as lock:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
@@ -52,8 +55,7 @@ def place_local(window, target):
         if window.name != f'{start}-{stop-1}' or start >= stop:
             raise ValueError('Local HF window name differs from the accepted range')
         members = set(manifest['files']) | set(manifest['derived_files'])
-        files = {name: member(window, name) for name in sorted(members)}
-        files['progress.json'] = member(window, 'progress.json')
+        files = {name: member(physical, name) for name in sorted(members | {'progress.json'})}
         proof = dict(start=start, stop=stop, files=len(files), accepted_locally=True,
                      result_sha256=manifest['result_sha256'],
                      successor_sha256=manifest['successor_sha256'])
