@@ -17,7 +17,9 @@ from hf_incremental_window import pin_window
 from shared.artifacts import checksum, write_json
 
 
-def run(opening, end_block, catalog, historical_root, cryo, output):
+def run(opening, end_block, catalog, historical_root, cryo, output, *, candidate=None, candidate_sha256=None):
+    if (candidate is None) != (candidate_sha256 is None):
+        raise ValueError('An offline candidate and its receipt SHA-256 are required together')
     from_block = json.loads((opening/'boundary.json').read_text())
     state = opening/'state.json.gz'
     if from_block['format'] != FORMAT:
@@ -65,8 +67,14 @@ def run(opening, end_block, catalog, historical_root, cryo, output):
         replay_tokens(window_path, state, raw/'registered-token-inputs.json', historical_root, tokens, w3)
         progress('collect_configuration')
         collect_factors(window_path, state, pool/'pool-inputs.json', oracle/'oracle-inputs.json', tokens, factors)
-        progress('compute_hf')
-        computed = compute(window_path, state, factors, tokens, historical_root, result)
+        if candidate is None:
+            progress('compute_hf')
+            computed = compute(window_path, state, factors, tokens, historical_root, result)
+        else:
+            from hf_incremental_offload import accept
+            progress('verify_offline_hf')
+            computed = accept(window_path, state, factors, tokens, historical_root,
+                              candidate, candidate_sha256, result)
         progress('seal_successor')
         sealed = seal_successor(window_path, state, factors, tokens, historical_root, result, successor)
         evidence = dict(window_sha256=window['window_sha256'], result=computed,
@@ -80,9 +88,12 @@ def main():
     for field in ('opening', 'catalog', 'historical-root', 'cryo', 'output'):
         parser.add_argument('--'+field, required=True, type=Path)
     parser.add_argument('--end-block', required=True, type=int)
+    parser.add_argument('--candidate', type=Path)
+    parser.add_argument('--candidate-sha256')
     args = parser.parse_args()
     print(json.dumps(run(args.opening, args.end_block, args.catalog, args.historical_root,
-                         args.cryo, args.output)))
+                         args.cryo, args.output, candidate=args.candidate,
+                         candidate_sha256=args.candidate_sha256)))
 
 
 if __name__ == '__main__':

@@ -95,6 +95,20 @@ registry is bound to a verified profile throughout each window. Token log
 extraction uses bounded Cryo queries and compares the complete event identities
 with RETH, including ranges that return zero logs.
 
+For offloaded calculation, transfer the pinned window, opening state and wallet
+dictionary, factors, and token replay to a helper with the same frozen scientific
+runtime. `hf_incremental_offload compute` writes a portable `candidate.json` and
+Parquet products without RPC. Run it with a private network namespace when
+available. The candidate receipt is bound to the window and input checksums.
+
+On Node, `hf_incremental_offload accept` requires that receipt's SHA-256. It
+verifies the copied parts, full wallet tile coverage, the aggregate partitions
+and cohort reductions, and that each reported wallet sample is present in the
+returned Parquet. It then compares the sampled account, debt, and eMode results
+with RETH before publishing `result.json`. The regular window runner accepts
+the same receipt through `--candidate` and `--candidate-sha256` and seals its
+successor only after Node acceptance.
+
 Reserve registration, removal, or implementation changes require a reviewed
 profile before this position stage accepts the window. The incremental wallet tile format
 `hf-vector-f64-v3` requires an explicit range, window SHA-256 and wallet

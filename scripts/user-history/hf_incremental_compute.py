@@ -115,8 +115,8 @@ def compute_parts(evaluator, model, scope, output):
     return wallet_parts, aggregate_parts, proofs, samples
 
 
-def check_published(output, provenance):
-    manifest_path = output/'result.json'
+def check_published(output, provenance, manifest='result.json'):
+    manifest_path = output/manifest
     record = json.loads(manifest_path.read_text())
     if any(record[key] != value for key, value in provenance.items()):
         raise ValueError('Existing HF result belongs to a different input generation')
@@ -176,42 +176,53 @@ def run(window_path, state_path, factors_path, tokens_path, root, output):
                 sample_accounts=record['validation']['account_getter_samples'])
 
 
-def publish_window(output, root, plan, model, window, boundary, factors, tokens, provenance):
+def calculate_window(work, stage, root, plan, model, window, boundary, factors, tokens, provenance):
     scope = provenance['scope']
     start, stop = scope['start'], scope['stop']
+    with closing(connect(work)) as db:
+        initialize_database(db, window, boundary, factors, tokens['result'])
+        seeded = SeededDatabase(db, boundary['state'], start)
+        with closing(WindowEvaluator(root, seeded, plan, start, stop, factors['prices'])) as evaluator:
+            wallets, aggregates, proofs, samples = compute_parts(evaluator, model, scope, stage)
+    job = dict(start=start, stop=stop)
+    result = dict(format=FORMAT, job=job, reserves=model.reserves, parts=aggregates, cohort_proofs=proofs)
+    verified = validate_result(result)
+    values = sum(part['rows'] for part in wallets)
+    if values != row_count(model.owners, start, stop):
+        raise ValueError('Wallet values do not cover the entire published dictionary')
+    for record in aggregates:
+        record['path'] = Path(record['path']).name
+    write_json(stage/'wallets.json', model.owners)
+    record = dict(**provenance,
+                  wallet_dictionary_sha256=checksum(stage/'wallets.json'), wallet_parts=wallets,
+                  aggregates=result, coverage=verified, wallet_values=values)
+    return record, samples
+
+
+def commit_directory(stage, output, manifest, record):
+    for part in (*record['wallet_parts'], *record['aggregates']['parts']):
+        with (stage/part['path']).open('rb') as payload:
+            os.fsync(payload.fileno())
+    write_json(stage/manifest, record)
+    stage.rename(output)
+    parent = os.open(output.parent, os.O_RDONLY)
+    try:
+        os.fsync(parent)
+    finally:
+        os.close(parent)
+
+
+def publish_window(output, root, plan, model, window, boundary, factors, tokens, provenance):
     with TemporaryDirectory(dir=output.parent) as temporary:
         work = Path(temporary)
         stage = work/'publish'
         stage.mkdir()
-        with closing(connect(work)) as db:
-            initialize_database(db, window, boundary, factors, tokens['result'])
-            seeded = SeededDatabase(db, boundary['state'], start)
-            with closing(WindowEvaluator(root, seeded, plan, start, stop, factors['prices'])) as evaluator:
-                wallets, aggregates, proofs, samples = compute_parts(evaluator, model, scope, stage)
-        job = dict(start=start, stop=stop)
-        result = dict(format=FORMAT, job=job, reserves=model.reserves, parts=aggregates, cohort_proofs=proofs)
-        verified = validate_result(result)
-        if sum(part['rows'] for part in wallets) != row_count(model.owners, start, stop):
-            raise ValueError('Wallet values do not cover the entire published dictionary')
+        record, samples = calculate_window(work, stage, root, plan, model, window, boundary, factors,
+                                           tokens, provenance)
         expected_headers = {row['block']: row['hash'] for row in window['headers']}
-        samples_verified = validate_node_samples(samples, job, expected_headers=expected_headers)
-        for record in aggregates:
-            record['path'] = Path(record['path']).name
-        write_json(stage/'wallets.json', model.owners)
-        record = dict(**provenance,
-                      wallet_dictionary_sha256=checksum(stage/'wallets.json'), wallet_parts=wallets,
-                      aggregates=result, coverage=verified, validation=samples_verified,
-                      wallet_values=sum(part['rows'] for part in wallets))
-        for part in (*wallets, *aggregates):
-            with (stage/part['path']).open('rb') as payload:
-                os.fsync(payload.fileno())
-        write_json(stage/'result.json', record)
-        stage.rename(output)
-        parent = os.open(output.parent, os.O_RDONLY)
-        try:
-            os.fsync(parent)
-        finally:
-            os.close(parent)
+        record['validation'] = validate_node_samples(samples, record['aggregates']['job'],
+                                                     expected_headers=expected_headers)
+        commit_directory(stage, output, 'result.json', record)
         return record
 
 
