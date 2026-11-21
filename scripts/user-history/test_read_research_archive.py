@@ -1,4 +1,5 @@
 import hashlib
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -26,6 +27,15 @@ class ResearchArchiveReaderTests(unittest.TestCase):
             self.assertEqual(target.read_bytes(), data)
             with self.assertRaises(FileExistsError):
                 restore(out, 'input.parquet', target, pin)
+
+            item = json.loads((out/'pack-index.json').read_text())['members']['input.parquet']
+            with (out/item['pack']).open('r+b') as package:
+                package.seek(item['offset'])
+                package.write(b'!')
+            failed = Path(tmp)/'corrupt-readback.parquet'
+            with self.assertRaisesRegex(ValueError, 'failed SHA256'):
+                restore(out, 'input.parquet', failed, pin)
+            self.assertFalse(failed.exists())
 
 
 if __name__ == '__main__':

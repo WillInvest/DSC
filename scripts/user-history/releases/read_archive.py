@@ -3,8 +3,8 @@ import argparse
 import fnmatch
 import hashlib
 import json
-import tarfile
 from pathlib import Path
+from tempfile import TemporaryDirectory
 
 
 def restore(folder, member, output, index_sha256):
@@ -20,21 +20,31 @@ def restore(folder, member, output, index_sha256):
     package = folder/relative
     if not package.resolve().is_relative_to(folder.resolve()):
         raise ValueError('Package escaped archive folder')
-    with tarfile.open(package, 'r:') as archive:
-        info = archive.getmember(member)
-        if not info.isfile() or info.size != item['bytes']:
-            raise ValueError('Member metadata differs from pinned index')
-        sha = hashlib.sha256()
-        output = Path(output)
-        output.parent.mkdir(parents=True, exist_ok=True)
-        # Exclusive creation protects the reader's existing analysis files.
-        with archive.extractfile(info) as source, output.open('xb') as target:
-            for data in iter(lambda: source.read(2**20), b''):
+    offset, size = item['offset'], item['bytes']
+    if (type(offset) is not int or type(size) is not int or offset < 0 or size < 0
+            or offset + size > package.stat().st_size):
+        raise ValueError('Member range differs from pinned index')
+    output = Path(output)
+    if output.exists():
+        raise FileExistsError(output)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    sha = hashlib.sha256()
+    with TemporaryDirectory(dir=output.parent) as directory:
+        candidate = Path(directory)/'member'
+        with package.open('rb') as source, candidate.open('xb') as target:
+            source.seek(offset)
+            remaining = size
+            while remaining:
+                data = source.read(min(remaining, 2**20))
+                if not data:
+                    raise ValueError('Archived package ended inside the member range')
                 sha.update(data)
                 target.write(data)
+                remaining -= len(data)
         if sha.hexdigest() != item['sha256']:
-            raise ValueError('Restored member failed SHA256; do not use output')
-    return dict(output=str(output), bytes=info.size, sha256=sha.hexdigest(), exact=True)
+            raise ValueError('Restored member failed SHA256')
+        output.hardlink_to(candidate)
+    return dict(output=str(output), bytes=size, sha256=sha.hexdigest(), exact=True)
 
 
 if __name__ == '__main__':
