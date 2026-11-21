@@ -3,35 +3,53 @@
 Every row retains the user's true first index. The file's declared contiguous
 block range determines which part of that logical vector the row represents.
 """
-import json
+import re
 import numpy as np
 import pyarrow as pa
 import pyarrow.parquet as pq
 ORIGIN=16291127
 STOP=26407882
 FORMAT='hf-vector-f64-v2'
+INCREMENTAL_FORMAT='hf-vector-f64-v3'
 
 
-def encode_users(matrix,start,first_blocks,wallet_start=0):
+def _tile_contract(scope):
+    if scope is None:
+        return ORIGIN, STOP, {b'format':FORMAT.encode()}
+    from shared.artifacts import digest
+    start, stop = scope['start'], scope['stop']
+    if not STOP<=start<stop or any(
+            not re.fullmatch(r'[0-9a-f]{64}',scope[field])
+            for field in ('window_sha256','wallet_registry_sha256')):
+        raise ValueError('Invalid incremental wallet scope')
+    metadata = {b'format':INCREMENTAL_FORMAT.encode(),b'scope_sha256':digest(scope).encode(),
+                b'window_sha256':scope['window_sha256'].encode(),
+                b'wallet_registry_sha256':scope['wallet_registry_sha256'].encode()}
+    return start, stop, metadata
+
+
+def encode_users(matrix,start,first_blocks,wallet_start=0,*,scope=None):
     matrix=np.asarray(matrix,dtype=np.float64);first=np.asarray(first_blocks,dtype=np.int64)
-    if matrix.ndim!=2 or matrix.shape[1]!=len(first) or not ORIGIN<=start<start+matrix.shape[0]<=STOP:raise ValueError('Invalid tile scope')
+    lower,upper,contract=_tile_contract(scope)
+    if matrix.ndim!=2 or matrix.shape[1]!=len(first) or not lower<=start<start+matrix.shape[0]<=upper:raise ValueError('Invalid tile scope')
     stop=start+matrix.shape[0];eligible=np.flatnonzero(first<stop);first=first[eligible];matrix=matrix[:,eligible]
     valid=np.arange(start,stop)[None,:]>=first[:,None];values=matrix.T[valid]
     if np.any(np.isnan(values)) or np.any(values<0):raise ValueError('Missing/invalid user HF')
     lengths=np.sum(valid,axis=1,dtype=np.int64);offsets=np.concatenate(([0],np.cumsum(lengths)))
     if len(values)>1_000_000:raise ValueError('Unbounded HF tile')
     lists=pa.ListArray.from_arrays(pa.array(offsets,type=pa.int32()),pa.array(values,type=pa.float64()))
-    metadata={b'format':FORMAT.encode(),b'chunk_start':str(start).encode(),b'chunk_stop':str(stop).encode(),b'block_origin':str(ORIGIN).encode(),b'wallet_start':str(wallet_start).encode(),b'wallet_stop':str(wallet_start+len(first_blocks)).encode()}
+    metadata={**contract,b'chunk_start':str(start).encode(),b'chunk_stop':str(stop).encode(),b'block_origin':str(ORIGIN).encode(),b'wallet_start':str(wallet_start).encode(),b'wallet_stop':str(wallet_start+len(first_blocks)).encode()}
     table=pa.table({'wallet_id':pa.array(eligible+wallet_start,type=pa.uint32()),'first_block_index':pa.array(first-ORIGIN,type=pa.uint32()),'hf_vector':lists}).replace_schema_metadata(metadata)
     sink=pa.BufferOutputStream();pq.write_table(table,sink,compression='zstd',compression_level=9,row_group_size=1024)
     return sink.getvalue().to_pybytes()
 
 
-def decode_users(data,first_blocks):
+def decode_users(data,first_blocks,*,scope=None):
     t=pq.read_table(pa.BufferReader(data));meta=t.schema.metadata or {}
-    if meta.get(b'format')!=FORMAT.encode() or t.column_names!=['wallet_id','first_block_index','hf_vector']:raise ValueError('Wrong float64 vector schema')
+    lower,upper,contract=_tile_contract(scope)
+    if any(meta.get(k)!=v for k,v in contract.items()) or t.column_names!=['wallet_id','first_block_index','hf_vector']:raise ValueError('Wrong float64 vector schema or scope')
     start=int(meta[b'chunk_start']);stop=int(meta[b'chunk_stop']);first=np.asarray(first_blocks,dtype=np.int64)
-    if meta.get(b'block_origin')!=str(ORIGIN).encode() or not ORIGIN<=start<stop<=STOP:raise ValueError('Invalid block range/origin')
+    if meta.get(b'block_origin')!=str(ORIGIN).encode() or not lower<=start<stop<=upper:raise ValueError('Invalid block range/origin')
     low=int(meta[b'wallet_start']);high=int(meta[b'wallet_stop'])
     if not 0<=low<=high<=len(first):raise ValueError('User tile outside dictionary')
     expected=np.arange(low,high)[first[low:high]<stop]

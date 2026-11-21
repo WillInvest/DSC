@@ -35,6 +35,34 @@ It returns bounded Parquet parts and provenance. The caller owns durable
 publication, validation and acceptance. Production source pins are required by
 the worker plan, and the plan has its own generation and output schema.
 
+## Incremental input handoff
+
+The Node candidate uses a separate run directory and the accepted image mounted
+read-only. It prepares the first successor window as follows.
+
+1. `hf_incremental_boundary` reads the accepted cohort publication, restores a
+   historical replay seed, and advances to block 26,407,881. It seals scaled
+   positions, collateral flags, eMode, GHO and reserve state only after the
+   existing account and category comparisons against RETH pass.
+2. `hf_incremental_window` pins contiguous finalized headers after the sealed
+   checkpoint. Its receipt identifies the parent release, checkpoint hash,
+   half-open block range, and final hash.
+3. `hf_incremental_oracle` verifies Oracle routes and reserve lists at every
+   block in the window. It runs the existing Cryo price collector and verifies
+   the raw and decoded files and direct getter samples before publishing input
+   receipts for the window.
+4. `hf_incremental_pool` slices existing Pool events through the shared-lock
+   Node catalog. Its receipt links the source hashes and records an exact
+   comparison with the corresponding bounded RETH log query.
+
+These receipts describe input coverage. Numerical coverage also requires the
+versioned token and configuration changes, complete wallet and cohort
+outputs, and their own validation. The incremental wallet tile format
+`hf-vector-f64-v3` requires an explicit range, window SHA-256 and wallet
+dictionary SHA-256 when encoding and decoding. Calls for the frozen historical
+window still use `hf-vector-f64-v2`. Keep the deployed historical scientific
+source pins when verifying the original archive.
+
 ## Output
 
 Parquet rows identify block, reserve/protocol scope and cohort. Each row retains

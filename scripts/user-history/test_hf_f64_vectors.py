@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from hf_f64_vectors import encode_users,decode_users,encode_aggregates,ORIGIN
+from hf_f64_vectors import encode_users,decode_users,encode_aggregates,ORIGIN,STOP
 import pyarrow as pa
 import pyarrow.parquet as pq
 class FloatVectorRoundtrip(unittest.TestCase):
@@ -18,6 +18,20 @@ class FloatVectorRoundtrip(unittest.TestCase):
     def test_dictionary_reindex_rejected(self):
         data=encode_users([[1,2]],ORIGIN,[ORIGIN,ORIGIN])
         with self.assertRaises(ValueError):decode_users(data,[ORIGIN,ORIGIN+1])
+    def test_incremental_tile_pins_window_and_wallet_registry(self):
+        scope=dict(start=STOP,stop=STOP+3,window_sha256='a'*64,wallet_registry_sha256='b'*64)
+        first=[ORIGIN,STOP+1]
+        matrix=np.array([[1.,np.nan],[np.inf,3.]])
+        data=encode_users(matrix,STOP,first,scope=scope)
+        start,stop,ids,values=decode_users(data,first,scope=scope)
+        self.assertEqual((start,stop,ids.tolist()),(STOP,STOP+2,[0,1]))
+        np.testing.assert_array_equal(values.view(np.uint64),matrix.view(np.uint64))
+        with self.assertRaisesRegex(ValueError,'scope'):
+            decode_users(data,first,scope={**scope,'wallet_registry_sha256':'c'*64})
+        with self.assertRaisesRegex(ValueError,'scope'):
+            decode_users(data,first)
+        with self.assertRaisesRegex(ValueError,'scope'):
+            encode_users(matrix,STOP+2,first,scope=scope)
     def test_aggregate_null_and_proof_retained(self):
         data=encode_aggregates([ORIGIN],[[0,2]],[[0,6]],[[0,3]],[0,1]);t=pq.read_table(pa.BufferReader(data))
         self.assertEqual(t['hf_vector'].to_pylist(),[[None],[2.]])
