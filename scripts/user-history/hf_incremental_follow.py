@@ -46,6 +46,9 @@ def advance(cursor, limit, size):
 
 def follow(opening, catalog, historical_root, cryo, windows, work, target, size, helpers, once=False,
            *, local_accepted=None):
+    if local_accepted is not None:
+        # Resolve the release publisher before historical workers extend sys.path.
+        from pipeline.hf_storage import place_local
     from hf_incremental_run import run
 
     opening = opening.resolve()
@@ -106,7 +109,6 @@ def follow(opening, catalog, historical_root, cryo, windows, work, target, size,
                     raise ValueError('HF runner did not publish the exact successor')
                 validate_opening(child, pending['stop'])
                 if local_accepted is not None:
-                    from pipeline.hf_storage import place_local
                     place_local(window, local_accepted)
             except Exception:
                 write_json(path, dict(cursor, state='retry_pending'))
