@@ -127,6 +127,24 @@ extraction acceptance, rerunning the command resumes publication without
 repeating the accepted extraction stages. `compaction.json` records the
 independent publication watermark.
 
+For a handoff from verified Node imports, `pipeline.node_handoff` reads the
+accepted Data and Revert catalogs at their common ending block. It checks
+every state payload it uses against its catalog SHA-256 and reads the single
+terminal Parquet row for each of the 102 contracts. It independently compares
+failed receipts with RETH and checks the full traces and both copies of the
+selection. The resulting directory contains sealed checkpoints, `plan.json`
+for the normal Node entrypoint, and `handoff.json` with the exact source
+identities. The entrypoint binds that receipt when it initializes the Node
+ledger. The source catalogs remain readable and can continue to serve the
+historical data.
+
+For shadow verification, run `pipeline.catalog_probe probe CATALOG BLOCK`
+on Node, Data and Revert for the same accepted block. The command
+`pipeline.catalog_probe compare NODE_JSON DATA_JSON REVERT_JSON` checks the
+encoded events, decoded events and all 102 state rows. It also checks the
+failed receipts, complete call trees and contract matches. The fingerprints
+compare values across the different physical partition layouts.
+
 Deployment: disable the old extraction/offline watchdog and delivery timers before
 enabling `dsc-pipeline.service`; keep `dsc-pipeline-monitor.timer` active. The monitor
 uses `current.json` to follow the active cycle and shows all eight stages. It is

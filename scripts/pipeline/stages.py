@@ -26,7 +26,10 @@ def validate_previous(plan, next_block):
     jobs=plan['jobs']
     if len(jobs)!=102 or len({j['address'] for j in jobs})!=102:raise ValueError('Expected the accepted 102-address registry')
     for job in jobs:
-        p=state_path(job);saved=read(p)
+        p=state_path(job)
+        if job.get('checkpoint_sha256') and checksum(p)!=job['checkpoint_sha256']:
+            raise ValueError(f'Predecessor state checksum differs: {p}')
+        saved=read(p)
         if (saved['state']!='complete' or saved['next_block']!=next_block or
             saved['identity']['address']!=job['address'] or saved['identity']['mode']!=MODE):
             raise ValueError(f'Incomplete predecessor state: {p}')
@@ -82,7 +85,7 @@ class Stages:
                 if (source/'metadata.json').exists():shutil.copyfile(source/'metadata.json',folder/'metadata.json')
             item={**old,'start_block':self.cycle['start'],'destination':str(destination),
                   'node_dir':self.node+'/events/'+old['address'], 'previous_state':str(state_path(old))}
-            item.pop('checkpoint',None);jobs.append(item)
+            item.pop('checkpoint',None);item.pop('checkpoint_sha256',None);jobs.append(item)
         plan={**previous,'jobs':jobs,'end_block':self.cycle['end'],'end_hash':self.cycle['hash'],
               'node_plan':self.node+'/plan.json','poll_seconds':1}
         write_json(planfile,plan)

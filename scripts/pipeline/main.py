@@ -41,6 +41,14 @@ def initialize_node(tracker, baseline_plan, verification_root):
     evidence = dict(site='node', end_block=end, end_hash=block_hash,
                     plan_sha256=checksum(baseline_plan),
                     verification_sha256=checksum(verification_root/'verification.json'))
+    handoff_path = baseline_plan.with_name('handoff.json')
+    if handoff_path.is_file():
+        handoff = read(handoff_path)
+        if (handoff['format'] != 'dsc-node-handoff-v1'
+                or handoff['baseline_sha256'] != evidence['plan_sha256']
+                or (handoff['identity']['through'], handoff['identity']['hash']) != (end, block_hash)):
+            raise ValueError('Node handoff receipt differs from the baseline')
+        evidence['handoff_sha256'] = checksum(handoff_path)
     marker = tracker.root/'baseline.json'
     if marker.exists() and read(marker) != evidence:
         raise ValueError('Node coordinator baseline changed')
