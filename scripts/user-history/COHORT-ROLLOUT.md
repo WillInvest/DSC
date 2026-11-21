@@ -210,6 +210,32 @@ from the indexed Drive TAR using its exact byte range. All three matched their
 published SHA-256 values. See the [raw restore](../../docs/data-collection/aave-v3/evidence/cohort-20261120/old-drv-restore-after-retirement.json)
 and [indexed restore](../../docs/data-collection/aave-v3/evidence/cohort-20261120/old-indexed-drive-restore-after-retirement.json).
 
-Runtime proofs and current progress are under node `evidence/` and the local
-`docs/data-collection/aave-v3/evidence/cohort-20261120/`. The goal remains active
-until complete historical coverage, verified publication and scoped retirement.
+## Verified production release (2026-11-21)
+
+Node accepted all 10,124 disjoint jobs across 10,116,755 blocks. The SQLite
+ledger and every accepted job range match the frozen plan. The final RETH audit
+sampled one category-zero and one category-40 borrower from each host. All eight
+samples passed the account, debt attribution and eMode checks. All 26 deployment
+tests passed in the pinned Linux environment. See the
+[coverage audit](../../docs/data-collection/aave-v3/evidence/cohort-20261120/replay-full-coverage-verified.json)
+[RETH audit](../../docs/data-collection/aave-v3/evidence/cohort-20261120/live-audit-1795245518.json)
+and [test log](../../docs/data-collection/aave-v3/evidence/cohort-20261120/cohort-final-release-tests.txt).
+
+The production archive contains 50,623 members in five TARs, plus the standalone
+manifest, pack index and acceptance report. Drive matched all seven archive
+objects and the separately published acceptance receipt. The archive service
+verified three indexed member readbacks and one full TAR. An independent restore
+also opened the Drive index, the complete SQLite catalog, the sparse eMode
+history and the aggregate Parquet at the frozen cutoff. See the
+[Drive release](https://drive.google.com/drive/folders/1GsaZ-4BH3Hs_B51RtZA2vK7StUIJN7A3),
+[acceptance receipt](../../docs/data-collection/aave-v3/evidence/cohort-20261120/archive-accepted.json)
+and [release audit](../../docs/data-collection/aave-v3/evidence/cohort-20261120/cohort-full-archive-release-verified.json).
+
+On Node, the archive directory is
+`/home/node/hf-cohort-20261120/storage/archive-51f12482118a`. To locate a
+particular observation, use the archived catalog to map the block to its job,
+then use the pack index to resolve the matching aggregate Parquet and verify its
+SHA-256. `metadata/dataset.json` specifies the schema, cohort definition and
+units. At block 26,407,881, the restored protocol HF was 1.44347 for all
+borrowers, 1.79316 for category-zero borrowers and 1.06245 for eMode borrowers.
+See the [publication receipt](../../docs/data-collection/aave-v3/evidence/cohort-20261120/archive-complete.json).

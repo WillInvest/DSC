@@ -1,0 +1,36 @@
+Running as unit: dsc-hf-cohort-final-release-tests-20261121.service
+test_category_transition_changes_membership_at_that_block (hf_market_replay.test_calculation.CohortTests) ... ok
+test_filter_removes_all_reserve_debt_of_emode_wallet (hf_market_replay.test_calculation.CohortTests) ... ok
+test_hf_input_is_not_mutated_and_infinity_has_no_weight (hf_market_replay.test_calculation.CohortTests) ... ok
+test_multiple_edges_for_wallet_have_consistent_category (hf_market_replay.test_calculation.CohortTests) ... ok
+test_no_debt_and_all_emode_have_null_filtered_hf (hf_market_replay.test_calculation.CohortTests) ... ok
+test_no_emode_matches_unfiltered_and_input_hf_stays_unchanged (hf_market_replay.test_calculation.CohortTests) ... ok
+test_parquet_scope_and_partition_roundtrip (hf_market_replay.test_calculation.CohortTests) ... ok
+test_assignments_never_overlap_without_expiry (hf_market_replay.test_execution.LedgerTests) ... ok
+test_dispatch_publishes_assignments_and_closed_results_only (hf_market_replay.test_execution.LedgerTests) ... ok
+test_late_matching_result_is_counted_once_and_conflict_rejected (hf_market_replay.test_execution.LedgerTests) ... ok
+test_local_results_reject_a_different_generation_on_restart (hf_market_replay.test_execution.LedgerTests) ... ok
+test_offline_assignment_expires_and_online_work_stays_owned (hf_market_replay.test_execution.LedgerTests) ... ok
+test_plan_binds_jobs_and_original_source_pins (hf_market_replay.test_execution.LedgerTests) ... ok
+test_restart_preserves_acceptance_and_rejects_scope_changes (hf_market_replay.test_execution.LedgerTests) ... ok
+test_worker_rejects_a_host_encoding_override (hf_market_replay.test_execution.LedgerTests) ... ok
+test_disappearing_worker_read_times_out_and_releases_future (hf_market_replay.test_transport.TransportTests) ... ok
+test_explicit_assignment_does_not_read_stdin (hf_market_replay.test_transport.TransportTests) ... ok
+test_receipt_traversal_is_rejected_before_fetching_other_files (hf_market_replay.test_transport.TransportTests) ... ok
+test_status_uses_exact_host_worker_and_releases_future (hf_market_replay.test_transport.TransportTests) ... ok
+test_transfer_copies_only_closed_receipt_and_declared_parts (hf_market_replay.test_transport.TransportTests) ... ok
+test_catalog_backup_is_consistent_and_retained (hf_market_replay.test_archive.ArchiveManifestTests) ... ok
+test_incomplete_coverage_cannot_be_archived (hf_market_replay.test_archive.ArchiveManifestTests) ... ok
+test_only_accepted_receipt_members_enter_the_manifest (hf_market_replay.test_archive.ArchiveManifestTests) ... ok
+test_publication_waits_for_checks_then_resumes_packing (hf_market_replay.test_archive.ArchiveManifestTests) ... ok
+test_receipt_cannot_point_outside_the_authority_root (hf_market_replay.test_archive.ArchiveManifestTests) ... ok
+test_receipt_payload_must_match_node_acceptance (hf_market_replay.test_archive.ArchiveManifestTests) ... ok
+
+----------------------------------------------------------------------
+Ran 26 tests in 5.142s
+
+OK
+Finished with result: success
+Main processes terminated with: code=exited/status=0
+Service runtime: 5.630s
+CPU time consumed: 954ms
