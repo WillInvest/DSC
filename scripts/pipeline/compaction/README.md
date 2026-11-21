@@ -88,3 +88,12 @@ validate the SQLite file, manifest records and every payload's size and SHA-256.
 Run the same check after unpacking the Drive backup into a separate directory.
 Use a read-only snapshot for these imported catalogs. The catalogs also contain
 source-host retirement records, which belong to the original writer.
+
+To inventory the accepted pre-compaction market backfill, run
+`PYTHONPATH=scripts python3 -m pipeline.compaction.historical_market` with the
+source home as `--source`, the accepted sequential extraction plan as
+`--plan`, and a separate `--output` directory. It records the encoded and
+decoded files, the per-block state and its final checkpoint, and the original
+acceptance receipts. It checkpoints one manifest per contract and carries
+explicit empty event coverage. The migration receiver must verify these hashes
+against the copied bytes before publishing an import.
