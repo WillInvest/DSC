@@ -61,6 +61,18 @@ with Drive restore proof. `local-accepted/<first>-<last>/` holds windows
 whose inputs, outputs and checkpoints passed local validation.
 Archived input metadata retains its original replay paths.
 
+For historical wallet HF, open `historical/catalog/wallet-coverage.json`
+under the health-factor root. Each accepted batch gives the directory under
+`historical/wallets/` and the SHA-256 of its `pack-index.json`. This index
+maps each archive member to its pack, byte offset, size and SHA-256. Use the
+[indexed TAR reader](../user-history/releases/read_archive.py) with
+`--folder`, `--member`, `--output` and `--index-sha256` to restore one member
+and verify its bytes. A batch's `local-accepted.json` records Node acceptance
+for a local publication. Earlier batches use `accepted.json`. A null `drive`
+in the coverage entry means the newly published batch has no verified Drive
+copy registered. Empty wallet intervals use their original job receipts and
+validation records as evidence of zero wallet values.
+
 Start with `/mnt/storage/dsc-data/metadata/dataset-index.json` on Node.
 Its release entries link the physical catalogs and available acceptance
 records. `availability=present` means the reference resolved when the
