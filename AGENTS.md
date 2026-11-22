@@ -2,7 +2,18 @@
 
 ## Purpose
 
-Extract events, state, and failed-transaction call traces on dsc-node; archive and filter reverted transactions by contract address on dsc-revert; store the application database and run the extraction coordinator on dsc-data; and run both the backend and frontend on dsc-web.
+Collect Ethereum market events, reconstruct block state, archive failed transactions and call traces, and compute Aave V3 health factors for research. The Node consolidation below defines the current storage and orchestration decisions for these datasets.
+
+## Node research consolidation (2026-11-21)
+
+This supersedes the earlier research storage and coordinator architecture in this file. The historical notes still describe deployments and source paths that may be needed during migration.
+
+- Keep RETH on `/dev/vda3`. Use `/mnt/storage/dsc-data` on `/dev/vdb1` as the canonical research root, also accessible at `/home/node/dsc-data`. Use `/mnt/storage/dsc-scripts` on the same disk for the versioned pipeline, also accessible at `/home/node/dsc-scripts`.
+- Node is the target orchestrator. It runs event extraction, state replay, receipt collection, HF input extraction and acceptance. Revert runs the restricted dRPC trace and contract-selection worker. Data and Compute can return HF candidates over restricted SSH for Node to verify. Worker scratch and preserved rollback inputs remain operational dependencies during migration.
+- Store Uniswap V2/V3 and Aave V2/V3 products in `dex/uniswapV2`, `dex/uniswapV3`, `lending/aaveV2`, and `lending/aaveV3`. Each protocol has `events`, `block-state`, and `reverted-tx`. Partition filenames contain inclusive start and end blocks. Store the complete failed-receipt and trace archive under `revert/` and Aave V3 wallet HF and the all, eMode, and non-eMode aggregates under `lending/aaveV3/health-factor/`.
+- Read `metadata/dataset-index.json` for the accepted layers, locations and evidence. The [dataset catalog guide](scripts/pipeline/DATASET-CATALOG.md) describes the schemas, and the [Node launcher guide](scripts/pipeline/deployment/node/DSC-SCRIPTS.md) describes `main.py` and the four stage directories.
+- Data remains the sole production writer until the [Node production handoff](scripts/pipeline/README.md#node-production-handoff) is verified. Finish the Data cycle, seal the corresponding market, Revert, and HF boundaries, and fence the legacy writer before running the Node production entrypoint. Run the first pass manually.
+- Google Drive backup is deferred while local consolidation proceeds. Retire superseded research copies only after verified Node coverage, independent Drive restores and exact dependency checks for the listed source files. Preserve credentials, active runtime and control state, RETH, Savva transfers, and unrelated application dependencies. The private monitor continues to report migration progress.
 
 ## Required reuse check before implementation
 
