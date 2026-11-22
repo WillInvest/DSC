@@ -55,3 +55,16 @@ configured HF archive.
 The Node market ledger and canonical catalog live under
 `/mnt/storage/dsc-data/metadata/market`. The HF window, work and archive
 cursors live under `/mnt/storage/dsc-data/lending/aaveV3/health-factor`.
+
+## Release recovery
+
+Use the source tar and Git bundle under
+`/mnt/storage/dsc-script-releases/source-recovery/<commit>/`. After extracting
+the source into an isolated directory, run `layout-release.sh` from
+`scripts/pipeline/deployment/node/` with that directory as its argument.
+Extract `runtime-supplement/hf-generated-runtime.tar.gz` into the resulting
+`engine/` directory. Its `restore-validation.json` records the expected hashes
+and tested runtime versions. The supplement provides the GHO and math kernels,
+the lockfile-pinned JavaScript packages and the Python dependency overlay.
+The launcher still needs the Node Python environment and the verified HF input
+image described above.
