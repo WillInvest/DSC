@@ -37,6 +37,25 @@ class HelperDispatchTests(unittest.TestCase):
                 read_archive(wire, target, lambda _: True, 1024)
             self.assertEqual(list(target.iterdir()), [])
 
+    def test_tar_import_syncs_each_file_after_all_members_are_staged(self):
+        with TemporaryDirectory() as temporary:
+            target = Path(temporary)
+            wire = io.BytesIO()
+            files = {'a.parquet': b'abc', 'b.parquet': b'def'}
+            with tarfile.open(fileobj=wire, mode='w') as archive:
+                for name, content in files.items():
+                    item = tarfile.TarInfo(name)
+                    item.size = len(content)
+                    archive.addfile(item, io.BytesIO(content))
+            wire.seek(0)
+
+            def sync(_descriptor):
+                self.assertEqual({p.name: p.read_bytes() for p in target.iterdir()}, files)
+
+            with patch('hf_incremental_transport.os.fsync', side_effect=sync) as fsync:
+                self.assertEqual(read_archive(wire, target, files.__contains__, 1024), set(files))
+            self.assertEqual(fsync.call_count, len(files))
+
     def test_control_request_does_not_consume_the_coordinator_input(self):
         with patch('hf_incremental_dispatch.subprocess.run') as execute:
             execute.return_value.stdout = b'{"state":"missing"}'

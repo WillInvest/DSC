@@ -99,6 +99,8 @@ def read_archive(stream, destination, allowed, limit):
             seen.add(item.name)
             with archive.extractfile(item) as source, (destination/item.name).open('xb') as target:
                 shutil.copyfileobj(source, target)
-                target.flush()
-                os.fsync(target.fileno())
+    # Stage the whole archive first so the filesystem can group its writes.
+    for name in sorted(seen):
+        with (destination/name).open('rb') as target:
+            os.fsync(target.fileno())
     return seen
