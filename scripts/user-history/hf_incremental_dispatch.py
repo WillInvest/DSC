@@ -33,7 +33,7 @@ def dispatch(helper, paths, output):
     target = output/scope
     state = request(helper, 'status', scope)
     if state['state'] == 'missing':
-        with TemporaryDirectory(dir=output) as temporary, TemporaryFile() as wire:
+        with TemporaryDirectory(dir=output) as temporary, TemporaryFile(dir=temporary) as wire:
             marker = Path(temporary)/BUNDLE
             write_json(marker, manifest)
             write_archive(wire, {**paths, BUNDLE: marker})
@@ -49,7 +49,7 @@ def dispatch(helper, paths, output):
             raise ValueError('Previously received HF result conflicts with helper')
         result_paths(target)
     else:
-        with TemporaryDirectory(dir=output) as temporary, TemporaryFile() as wire:
+        with TemporaryDirectory(dir=output) as temporary, TemporaryFile(dir=temporary) as wire:
             stage = Path(temporary)/'receive'
             stage.mkdir()
             request(helper, 'download', scope, stdout=wire)

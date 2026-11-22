@@ -5,7 +5,7 @@ from pathlib import Path
 import subprocess
 import sys
 import tarfile
-from tempfile import TemporaryDirectory
+from tempfile import TemporaryDirectory, TemporaryFile
 import unittest
 from unittest.mock import patch
 
@@ -73,12 +73,16 @@ class HelperDispatchTests(unittest.TestCase):
                                         check=True, stderr=subprocess.PIPE)
                 return json.loads(result.stdout) if stdout == subprocess.PIPE else None
 
-            with patch('hf_incremental_dispatch.request', side_effect=request):
-                first = dispatch({'host': 'helper'}, paths, root/'received')
-                again = dispatch({'host': 'helper'}, paths, root/'received')
+            received = root/'received'
+            with (patch('hf_incremental_dispatch.request', side_effect=request),
+                  patch('hf_incremental_dispatch.TemporaryFile', wraps=TemporaryFile) as spool):
+                first = dispatch({'host': 'helper'}, paths, received)
+                again = dispatch({'host': 'helper'}, paths, received)
             self.assertEqual(first, again)
             self.assertEqual(checksum(Path(first['path'])/CANDIDATE), first['sha256'])
             self.assertEqual(marker.read_text().splitlines(), ['one'])
+            self.assertEqual([Path(call.kwargs.get('dir', '')).parent for call in spool.call_args_list],
+                             [received, received])
 
     def test_scheduler_skips_unavailable_helper_but_not_invalid_evidence(self):
         path = Path('/token')
