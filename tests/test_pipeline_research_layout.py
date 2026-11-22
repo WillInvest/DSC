@@ -11,7 +11,7 @@ import pyarrow.parquet as pq
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'scripts'))
 from pipeline.research_layout import (
-    ENCODED, PROTOCOLS, publish_archive, publish_historical_market,
+    ENCODED, PROTOCOLS, publish_archive, publish_committed, publish_historical_market,
     publish_protocol_reverts, publish_selected, revert_publication_lock,
 )
 from reverted.trace_received import pack
@@ -19,6 +19,46 @@ from shared.artifacts import checksum, digest, write_json
 
 
 class ResearchLayoutTests(unittest.TestCase):
+    def test_committed_publication_advances_and_repairs_revert_watermarks(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            metadata = root/'metadata'
+            coordinator = metadata/'market'
+            write_json(coordinator/'baseline.json', dict(end_block=11))
+            write_json(coordinator/'compaction.json', dict(state='complete', through=12))
+            write_json(coordinator/'canonical/progress.json', dict(through=12))
+            write_json(metadata/'publication.json', dict(stage='complete', market_through=11, revert_through=11))
+            write_json(metadata/'encoded-publication.json', dict(stage='complete', market_through=11))
+            global_status = metadata/'global-revert-publication.json'
+            protocol_status = metadata/'protocol-revert-publication.json'
+            old = dict(stage='complete', start=10, through=11)
+            write_json(global_status, old)
+            write_json(protocol_status, dict(old, selection='registry-digest'))
+
+            with (patch('registry.catalog.registry', return_value=[]),
+                  patch('pipeline.research_layout.publish_tail_markets') as markets,
+                  patch('pipeline.research_layout.publish_tail_reverts') as reverts):
+                reverts.side_effect = OSError('injected Revert publication failure')
+                with self.assertRaises(OSError):
+                    publish_committed(root, coordinator, root/'registry.csv')
+                self.assertEqual(json.loads(global_status.read_text()), old)
+                self.assertEqual(json.loads(protocol_status.read_text())['through'], 11)
+                self.assertEqual(json.loads((metadata/'publication.json').read_text())['revert_through'], 11)
+
+                reverts.side_effect = None
+                publish_committed(root, coordinator, root/'registry.csv')
+                self.assertEqual(json.loads(global_status.read_text()), dict(old, through=12))
+                self.assertEqual(json.loads(protocol_status.read_text()), dict(old, through=12, selection='registry-digest'))
+                self.assertEqual(json.loads((metadata/'publication.json').read_text())['revert_through'], 12)
+
+                write_json(global_status, old)
+                markets.reset_mock()
+                reverts.reset_mock()
+                publish_committed(root, coordinator, root/'registry.csv')
+                self.assertEqual(json.loads(global_status.read_text()), dict(old, through=12))
+                markets.assert_not_called()
+                reverts.assert_not_called()
+
     def selected_archive(self, root, numbers, through):
         write_json(root/'metadata/global-revert-publication.json',
                    dict(stage='complete', start=10, through=through))

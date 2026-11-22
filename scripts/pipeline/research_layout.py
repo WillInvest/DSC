@@ -2,7 +2,7 @@
 import argparse
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
-from contextlib import contextmanager
+from contextlib import ExitStack, contextmanager
 import fcntl
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -371,21 +371,43 @@ def publish_committed(root, coordinator, registry):
         committed = read(coordinator/'compaction.json')
         if committed['state'] != 'complete' or committed['through'] != read(catalog/'progress.json')['through']:
             raise ValueError('The Node catalog and coordinator watermarks disagree')
-        if committed['through'] <= through:
+        target = committed['through']
+        if target < through:
             return
-        addresses = defaultdict(set)
-        for contract in tracked_contracts(registry):
-            addresses[contract['protocol']].add(contract['address'])
-        encoded = read(root/'metadata/encoded-publication.json')
-        raw_through = encoded['market_through']
-        if encoded['stage'] != 'complete' or not through <= raw_through <= committed['through']:
-            raise ValueError('Raw replay input coverage does not join the published market boundary')
-        publish_tail_markets(catalog, root, through+1)
-        publish_tail_markets(catalog, root, raw_through+1, ENCODED)
-        with revert_publication_lock(root):
-            publish_tail_reverts(catalog, root, through+1, addresses)
-            write_json(root/'metadata/encoded-publication.json', dict(encoded, market_through=committed['through']))
-            write_json(status, dict(previous, market_through=committed['through'], revert_through=committed['through']))
+        metadata = root/'metadata'
+        with ExitStack() as locks:
+            for name in ('encoded-publication.lock', 'global-revert-publication.lock'):
+                lock = locks.enter_context((root/name).open('a'))
+                fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            locks.enter_context(revert_publication_lock(root))
+
+            encoded_path = metadata/'encoded-publication.json'
+            encoded = read(encoded_path)
+            raw_through = encoded['market_through']
+            if encoded['stage'] != 'complete' or not through <= raw_through <= target:
+                raise ValueError('Raw replay input coverage does not join the published market boundary')
+            revert_paths = (metadata/'global-revert-publication.json',
+                            metadata/'protocol-revert-publication.json')
+            revert_markers = [(path, read(path)) for path in revert_paths]
+            if any(marker['stage'] != 'complete' or not marker['start'] <= marker['through'] <= target
+                   for _, marker in revert_markers):
+                raise ValueError('Revert coverage does not join the committed catalog')
+
+            if target > through:
+                addresses = defaultdict(set)
+                for contract in tracked_contracts(registry):
+                    addresses[contract['protocol']].add(contract['address'])
+                publish_tail_markets(catalog, root, through+1)
+                publish_tail_markets(catalog, root, raw_through+1, ENCODED)
+                publish_tail_reverts(catalog, root, through+1, addresses)
+
+            if raw_through != target:
+                write_json(encoded_path, dict(encoded, market_through=target))
+            for path, marker in revert_markers:
+                if marker['through'] != target:
+                    write_json(path, dict(marker, through=target))
+            if target > through:
+                write_json(status, dict(previous, market_through=target, revert_through=target))
 
 
 if __name__ == '__main__':
