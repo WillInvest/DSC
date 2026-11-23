@@ -5,9 +5,16 @@
 <style>
 :root{font-family:system-ui,sans-serif;color:#182b36;background:#f2f5f4}body{margin:0;padding:48px 24px}main{max-width:800px;margin:auto}header{display:flex;justify-content:space-between;align-items:center;margin-bottom:42px}small,.muted{color:#647780}h1{font-size:25px;margin:6px 0}h2{font-size:19px;margin:0 0 16px}.card{background:white;border:1px solid #dce5e2;border-radius:18px;padding:28px;margin:20px 0}.number{font-size:64px;font-weight:650;letter-spacing:-3px}.number span{font-size:25px;color:#647780;letter-spacing:0}progress{width:100%;height:14px;accent-color:#147d64;margin:14px 0}.line{display:flex;justify-content:space-between;gap:16px;margin:10px 0}.tag{border-radius:20px;background:#dceee6;padding:8px 14px;font-size:13px}code{font-size:12px;overflow-wrap:anywhere}.warning{color:#a43b22}footer{font-size:13px;line-height:1.6}.hidden{display:none}@media(max-width:520px){body{padding:24px 16px}.card{padding:22px}.number{font-size:52px}header{margin-bottom:24px}.line{flex-wrap:wrap}}
 #nominal-progress,#hf-progress{overflow-wrap:anywhere}
+.node-health{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 28px}
+.node-health h3{margin:20px 0 8px;font-size:15px}
+.node-stages{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.node-stages :is(th,td){padding:10px 6px;border-bottom:1px solid #dce5e2;vertical-align:top;text-align:left}
+.node-stages td small{display:block;margin-top:4px}
+.node-stages details{margin-top:5px}
+@media(max-width:560px){.node-health{grid-template-columns:minmax(0,1fr);gap:0}.node-stages{font-size:13px}.node-stages :is(th,td){padding:8px 4px}}
 </style>
 <main>
-<header><div><small>DSC / ETHEREUM</small><h1>Extraction progress</h1></div><span id="state" class="tag">Connecting</span></header>
+<header><div><small>DSC / ETHEREUM</small><h1>Extraction progress</h1><a href="/">Back to overview</a></div><span id="state" class="tag">Connecting</span></header>
 <section class="card hidden" id="node-pipeline-card"><h2>Node pipeline</h2><div id="node-pipeline-progress" aria-live="polite"></div></section>
 <section class="card hidden" id="cycle-card"><h2 id="cycle-title">Continuous finalized pipeline</h2><div id="cycle-status"></div><div id="cycle-stages"></div><small>Each cycle has a fixed finalized target. Completed coverage advances only after all stages accept their output.</small></section>
 <section class="card hidden" id="oracle-card"><h2>Aave V3 · All-reserve oracle prices</h2><div id="oracle-progress"></div><small>End-of-block prices · Own RETH node · Accepted blocks require destination hash and value checks · User HF remains a separate stage</small></section>
@@ -34,8 +41,11 @@
 </main>
 <script>
 const el=id=>document.getElementById(id),number=n=>Number(n||0).toLocaleString();
+let lastNodeReport=null;
 function renderNodePipeline(report){
- const box=el('node-pipeline-progress');box.replaceChildren();
+ const box=el('node-pipeline-progress');
+ const open=new Set([...box.querySelectorAll('details[open]')].map(item=>item.dataset.stage));
+ box.replaceChildren();
  el('node-pipeline-card').classList.toggle('hidden',!report);
  if(!report)return;
  const line=(label,value)=>{
@@ -44,6 +54,89 @@ function renderNodePipeline(report){
   title.textContent=label;detail.textContent=value;row.append(title,detail);box.append(row);
  };
  const block=n=>Number.isInteger(n)?number(n):'Waiting';
+ const health=report.health;
+ if(health?.chain?.availability){
+  const when=n=>Number.isInteger(n)?new Date(n*1000).toLocaleString():'—';
+  const size=n=>Number.isInteger(n)?new Intl.NumberFormat(undefined,{maximumFractionDigits:1}).format(n/1e9)+' GB':'—';
+  const label=s=>s?.replaceAll('_',' ')||'—';
+  const stale=Date.now()/1000-report.observed_at>90;
+  line(stale?'Snapshot · stale':'Snapshot',when(report.observed_at));
+  if(stale)box.lastElementChild.classList.add('warning');
+  const {chain,schedule,storage,workers,drive,stages}=health;
+  line('RETH latest / finalized',`${block(chain.latest)} / ${block(chain.finalized)}`);
+  line('RETH RPC',`${label(chain.availability)} · last success ${when(chain.last_success)}`);
+  if(chain.latest_time&&Date.now()/1000-chain.latest_time>180)line('RETH latest is behind wall clock',when(chain.latest_time));
+  if(chain.finalized_time&&Date.now()/1000-chain.finalized_time>1800)line('Finalized block time is over 30 min old',when(chain.finalized_time));
+  const table=document.createElement('table');table.className='node-stages';
+  const header=table.createTHead().insertRow();
+  for(const name of ['Stage','Accepted through','Blocks behind','Activity']){
+   const cell=document.createElement('th');cell.scope='col';cell.textContent=name;header.append(cell);
+  }
+  const body=table.createTBody();
+  for(const [key,name] of Object.entries({events:'Events',state:'Block state',revert:'Revert',hf:'Aave HF'})){
+   const item=stages[key]||{},row=body.insertRow();
+   const title=document.createElement('th');title.scope='row';title.textContent=name;row.append(title);
+   row.insertCell().textContent=block(item.through);
+   row.insertCell().textContent=Number.isInteger(item.lag)?number(item.lag):'—';
+   const activity=row.insertCell();
+   activity.textContent=item.phase?label(item.phase):label(item.state||(item.lag===0?'caught_up':undefined));
+   if(item.state==='error')activity.classList.add('warning');
+   const drill=document.createElement('details');drill.dataset.stage=key;drill.open=open.has(key);
+   const summary=document.createElement('summary');summary.textContent='Details';drill.append(summary);
+   for(const value of [
+    item.start&&item.end?`Current batch ${block(item.start)}–${block(item.end)}`:null,
+    item.accepted_at?`Last acceptance ${when(item.accepted_at)}`:null,
+    Number.isInteger(item.advance_24h)?`${number(item.advance_24h)} blocks advanced in about 24 hours`:null,
+    item.heartbeat?`Last stage heartbeat ${when(item.heartbeat)}`:null,
+    item.heartbeat&&Date.now()/1000-item.heartbeat>900?'Stage heartbeat has not updated for 15 min':null,
+    item.state==='error'?'Stage failed. The accepted watermark is held.':null,
+    ...(item.protocols||[]).map(p=>`${p.name} · ${block(p.through)}`)
+   ].filter(Boolean)){
+    const detail=document.createElement('small');detail.textContent=value;drill.append(detail);
+   }
+   if(drill.children.length>1)activity.append(drill);
+  }
+  box.append(table);
+  const grid=document.createElement('div');grid.className='node-health';box.append(grid);
+  const section=(title,rows)=>{
+   const group=document.createElement('section'),heading=document.createElement('h3');
+   heading.textContent=title;group.append(heading);
+   for(const [key,value] of rows){
+    const item=document.createElement('div');item.className='line';
+    const name=document.createElement('span'),data=document.createElement('strong');
+    name.textContent=key;data.textContent=value;item.append(name,data);group.append(item);
+   }
+   grid.append(group);
+  };
+  section('Five-minute schedule',[
+   ['Service',`${label(schedule.state)} · timer ${label(schedule.timer)}`],
+   ['Last start',when(schedule.last_start)],['Last success',when(schedule.last_success)],
+   ['Next trigger',schedule.state==='running'&&!schedule.next_run?'After the active pass':when(schedule.next_run)],
+   ['Current runtime',Number.isInteger(schedule.elapsed)?`${Math.floor(schedule.elapsed/60)} min`:'—'],
+   ['systemd result',label(schedule.result)]
+  ]);
+  section('Storage and workers',[
+   ['vdb1',storage.availability==='available'?`${size(storage.free_bytes)} free of ${size(storage.total_bytes)}`:label(storage.availability)],
+   ['Recent growth',Number.isInteger(storage.growth_bytes_per_day)?`${size(storage.growth_bytes_per_day)}/day`:'Collecting samples'],
+   ...Object.entries(workers).map(([name,worker])=>[name,[label(worker.availability),worker.task,worker.fallback?'fallback':null].filter(Boolean).join(' · ')])
+  ]);
+  const names={market_historical:'Historical markets',market_new:'Incremental markets',revert:'Revert',
+    wallet_historical:'Historical wallets · current upload batch',hf_historical_aggregates:'Historical reserve / protocol HF',
+    hf_contiguous:'Incremental HF · continuous prefix',hf_tail:'Incremental HF · separate tail'};
+  section('Google Drive',Object.entries(names).map(([key,title])=>{
+   const row=drive[key]||{};
+   const parts=[
+    Number.isInteger(row.uploaded_pack_count)?`${number(row.uploaded_pack_count)} / ${number(row.expected_pack_count)} packs uploaded`:null,
+    Number.isInteger(row.pending_pack_count)?`${number(row.pending_pack_count)} packs pending`:null,
+    Number.isInteger(row.verified_count)?`${number(row.verified_count)} verified`:null,
+    Number.isInteger(row.pending_count)?`${number(row.pending_count)} pending verification`:null,
+    Number.isInteger(row.verified_through)?`Restored through ${block(row.verified_through)}`:null,
+    row.state?label(row.state):null
+   ].filter(Boolean);
+   return [title,parts.join(' · ')||'Waiting for receipt'];
+  }));
+  return;
+ }
  const {market,catalog,hf,hf_drive,market_drive,shadow,handoff,historical_market,historical_market_drive,historical_revert_drive}=report;
  line('Market catalog committed through',block(catalog.through));
  line('Market stage',market.stage||market.state||'Waiting');
@@ -112,7 +205,8 @@ function renderAaveStage(id,stage,inputs){
 }
 async function refresh(){try{
  const r=await fetch('/api/progress',{cache:'no-store'});if(!r.ok)throw Error('Monitor unavailable');const s=await r.json(),d=s.data;
- renderNodePipeline(s.node_pipeline);
+ lastNodeReport=s.node_pipeline||lastNodeReport;
+ renderNodePipeline(lastNodeReport);
  if(!d)throw Error(s.error||'Waiting for first legacy report');
  const coordinator=d.coordinator||{},cycle=coordinator.cycle;
  renderAaveStage('nominal',d.aave_nominal);renderAaveStage('hf',d.aave_hf,d.aave_hf_inputs);
@@ -254,7 +348,7 @@ async function refresh(){try{
  el('updated').textContent=`Last update: ${new Date(stamp*1000).toLocaleString()}`;
  if(c?.connection_error&&(!coordinator.state||coordinator.stage==='events')){el('warning').textContent='Cannot refresh current extraction from dsc-node';el('warning').classList.remove('hidden');}
  if(coordinator.state){el('state').textContent=coordinator.state==='running'?`Running · ${coordinator.stage}`:coordinator.state;if(coordinator.state==='running'&&Date.now()/1000-coordinator.updated_at>90){el('warning').textContent='Coordinator heartbeat is stale';el('warning').classList.remove('hidden');}}
- }catch(e){el('warning').textContent=e.message;el('warning').classList.remove('hidden');el('state').textContent='Unavailable';}}
+ }catch(e){renderNodePipeline(lastNodeReport);el('warning').textContent=e.message;el('warning').classList.remove('hidden');el('state').textContent='Unavailable';}}
 refresh();setInterval(refresh,10000);
 </script>
 </html>

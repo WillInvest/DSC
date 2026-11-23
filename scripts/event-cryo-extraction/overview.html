@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>DSC Pipeline</title>
+<style>
+:root{font-family:system-ui,sans-serif;color:#172521;background:#f5f7f6;--muted:#51625b;--border:#dce4df;--green:#136147;--amber:#825109;--red:#a52b2b}
+*{box-sizing:border-box}
+body{margin:0;padding:clamp(22px,6vw,72px) 20px}
+main{margin:auto;max-width:660px}
+header{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:24px}
+h1{font-size:1.15rem;margin:0;letter-spacing:-.025em}
+a{color:var(--green);font-size:.88rem;text-underline-offset:3px}
+a:focus-visible{outline:2px solid var(--green);outline-offset:4px}
+.panel{background:#fff;border:1px solid var(--border);border-radius:16px;overflow:hidden}
+.hero{padding:24px clamp(16px,4vw,28px);border-bottom:1px solid var(--border);background:#f0f4f2}
+.hero[data-tone="warn"]{background:#fff7e9}
+.hero[data-tone="bad"]{background:#fff0ef}
+.hero[data-tone="ok"]{background:#eaf5ef}
+h2{margin:0;font-size:clamp(1.45rem,4vw,2rem);letter-spacing:-.035em;line-height:1.15}
+.hero p{margin:7px 0 0;color:var(--muted);line-height:1.45}
+.rows{margin:0;padding:0 clamp(16px,4vw,28px)}
+.row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;gap:5px 12px;padding:16px 0}
+.row+.row{border-top:1px solid var(--border)}
+dt,dd{margin:0}
+dt{font-weight:640}
+dd.label{font-weight:650;font-size:.83rem;align-self:center;color:var(--muted)}
+dd[data-tone="ok"]{color:var(--green)}
+dd[data-tone="warn"]{color:var(--amber)}
+dd[data-tone="bad"]{color:var(--red)}
+.secondary{grid-column:1/-1;color:var(--muted);font-size:.84rem;line-height:1.45}
+.stages{display:flex;flex-wrap:wrap;gap:3px 14px;font-variant-numeric:tabular-nums}
+.stage{white-space:nowrap}
+footer{display:flex;justify-content:space-between;gap:8px 12px;flex-wrap:wrap;color:var(--muted);font-size:.79rem;margin:13px 1px}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main>
+<header><h1>DSC Pipeline</h1><a href="/details">Detailed monitor <span aria-hidden="true">↗</span></a></header>
+<div class="panel">
+  <section class="hero" id="summary" role="status" aria-atomic="true">
+    <h2 id="headline">Checking status</h2>
+    <p id="reason">Waiting for a live snapshot from Node.</p>
+  </section>
+  <dl class="rows">
+    <div class="row"><dt>Ethereum chain</dt><dd class="label" id="chain-state">—</dd><dd class="secondary" id="chain-detail" hidden></dd></div>
+    <div class="row"><dt>Data pipeline</dt><dd class="label" id="pipeline-state">—</dd><dd class="secondary stages" id="stages" aria-label="Blocks behind finalized" hidden></dd></div>
+    <div class="row"><dt>Google Drive</dt><dd class="label" id="drive-state">—</dd></div>
+  </dl>
+</div>
+<footer><span id="timestamp">Waiting for first snapshot</span><span id="runtime"></span></footer>
+</main>
+<script>
+const el=id=>document.getElementById(id);
+const number=new Intl.NumberFormat();
+const labels={events:'Events',state:'State',revert:'Revert',hf:'HF'};
+
+function classify(snapshot,now){
+  const health=snapshot?.health;
+  if(!health?.chain?.availability || !Number.isFinite(snapshot.observed_at) || now-snapshot.observed_at>90){
+    return {headline:'Status unavailable',reason:snapshot?'The latest Node snapshot is stale.':'Waiting for a live snapshot from Node.',
+      tone:'bad',chain:['Unknown'],pipeline:['Unknown'],drive:['Unknown']};
+  }
+  const {chain,schedule,storage,workers,drive,stages}=health;
+  const issues=[];
+  let chainState=['Live','ok'];
+  if(chain.availability!=='available'){
+    chainState=['Unreachable','bad'];
+    issues.push('RETH RPC is unreachable.');
+  }else if((Number.isFinite(chain.latest_time)&&now-chain.latest_time>180)
+           || (Number.isFinite(chain.finalized_time)&&now-chain.finalized_time>1800)){
+    chainState=['Delayed','warn'];
+    issues.push(now-chain.latest_time>180?'RETH chain head is delayed.':'Ethereum finality is delayed.');
+  }
+  const rows=Object.entries(labels).map(([key,name])=>[name,stages[key]||{}]);
+  const blocked=rows.find(([,row])=>['error','stopped'].includes(row.state));
+  const backlogged=rows.some(([,row])=>row.lag>0);
+  const stalled=rows.find(([,row])=>(
+    row.state==='running' && Number.isFinite(row.heartbeat) && now-row.heartbeat>900
+  ) || (
+    row.lag>0 && Number.isFinite(row.accepted_at) && now-row.accepted_at>3600 && schedule.state!=='running'
+  ));
+  const missingCoverage=rows.some(([,row])=>!Number.isInteger(row.lag));
+  const lowSpace=storage.availability==='available' && storage.free_bytes<storage.total_bytes*.05;
+  const unavailableWorkers=Object.entries(workers).filter(([,value])=>value.availability!=='reachable').map(([name])=>name);
+  let pipeline=['Up to date','ok'];
+  if(storage.availability!=='available'){
+    pipeline=['Storage unavailable','bad'];
+    issues.push('Node storage is unavailable.');
+  }else if(blocked||schedule.state==='failed'||schedule.timer!=='enabled'){
+    pipeline=['Needs attention','bad'];
+    issues.push(blocked?`${blocked[0]} stopped advancing.`:schedule.state==='failed'?'The last pipeline run failed.':'The schedule is disabled.');
+  }else if(stalled){
+    pipeline=['Needs attention','warn'];
+    issues.push(`${stalled[0]} has not reported progress.`);
+  }else if(missingCoverage){
+    pipeline=['Waiting for data','warn'];
+    issues.push('One or more stage watermarks are unavailable.');
+  }else if(backlogged){
+    pipeline=['Catching up','ok'];
+  }
+  const backups=Object.values(drive);
+  const quota=backups.some(row=>row.state?.includes('quota'));
+  const stopped=backups.some(row=>row.state==='backup_job_stopped');
+  const needsBackup=backups.length===0 || backups.some(row=>!Object.keys(row).length ||
+    row.pending_count>0 || row.pending_pack_count>0 || row.state==='backing_up') ||
+    (drive.market_new?.verified_through ?? -1)<(stages.events?.through ?? 0) ||
+    (drive.hf_contiguous?.verified_through ?? -1)<(stages.hf?.through ?? 0);
+  const driveState=quota||stopped?['Paused','warn']:needsBackup?['Pending','warn']:['Verified','ok'];
+  if(quota||stopped)issues.push(quota?'Drive has reached its upload limit.':'One or more Drive backup jobs stopped.');
+  if(lowSpace)issues.push('Node storage is below 5% free.');
+  if(unavailableWorkers.length)issues.push(`${unavailableWorkers.join(', ')} unreachable from Node.`);
+  if(!issues.length&&needsBackup)issues.push('Drive backup verification is pending.');
+  const degraded=[chainState,pipeline].some(([,tone])=>tone==='bad');
+  return {
+    headline:degraded?'Action needed':issues.length?'Needs attention':backlogged?'Catching up':'All systems normal',
+    reason:issues.slice(0,2).join(' ') || (backlogged?'The pipeline is processing finalized blocks.':'Chain, pipeline, and backup are up to date.'),
+    tone:degraded?'bad':issues.length?'warn':'ok',chain:chainState,pipeline,drive:driveState,
+    finalized:chain.finalized,rows,running:schedule.state==='running'
+  };
+}
+
+function render(snapshot){
+  const status=classify(snapshot,Date.now()/1000);
+  el('summary').dataset.tone=status.tone;
+  for(const key of ['headline','reason']){
+    if(el(key).textContent!==status[key])el(key).textContent=status[key];
+  }
+  for(const key of ['chain','pipeline','drive']){
+    const node=el(key+'-state');
+    node.textContent=status[key][0];
+    node.dataset.tone=status[key][1]||'';
+  }
+  const write=(id,text)=>{
+    el(id).textContent=text||'';
+    el(id).hidden=!text;
+  };
+  write('chain-detail',Number.isInteger(status.finalized)?`Finalized block ${number.format(status.finalized)}`:null);
+  const stages=el('stages');
+  stages.replaceChildren();
+  stages.hidden=!status.rows;
+  if(status.rows){
+    const caption=document.createElement('span');
+    caption.textContent='Blocks behind';
+    stages.append(caption);
+    for(const [name,row] of status.rows){
+      const chip=document.createElement('span');
+      chip.className='stage';
+      const gap=Number.isInteger(row.lag)?number.format(row.lag):'—';
+      chip.textContent=`${name} ${gap}`;
+      if(Number.isInteger(row.through))chip.title=`Accepted through ${number.format(row.through)}`;
+      stages.append(chip);
+    }
+  }
+  el('timestamp').textContent=snapshot?.observed_at?
+    `Node snapshot · ${new Date(snapshot.observed_at*1000).toLocaleTimeString()}`:'Waiting for first snapshot';
+  el('runtime').textContent=status.running?'Scheduled pass running':'';
+}
+
+let latest;
+async function refresh(){
+  try{
+    const response=await fetch('/api/progress',{cache:'no-store',signal:AbortSignal.timeout(8000)});
+    if(response.ok){
+      const data=await response.json();
+      latest=data.node_pipeline||latest;
+    }
+  }catch(error){
+    // Snapshot age keeps an interrupted connection visible.
+  }finally{
+    render(latest);
+    setTimeout(refresh,10000);
+  }
+}
+refresh();
+</script>
+</body>
+</html>

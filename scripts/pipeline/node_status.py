@@ -11,6 +11,7 @@ import sys
 import time
 
 from shared.artifacts import write_json
+from pipeline import monitor_health
 
 LEGACY_COMMAND = 'dsc-pipeline-status-v1'
 MONITOR_COMMAND = 'dsc-node-monitor-v1'
@@ -46,6 +47,8 @@ def market(root):
     def project(value):
         report = fields(value, ('completed_through', 'observed_finalized'),
                         ('stage', 'state', 'purpose'))
+        if type(value.get('updated_at')) in (int, float):
+            report['heartbeat'] = int(value['updated_at'])
         cycle = value.get('cycle')
         if isinstance(cycle, dict):
             report['cycle'] = fields(cycle, ('start', 'end'), ('id', 'state'))
@@ -127,10 +130,10 @@ def handoff(value):
     return result
 
 
-def report(config):
+def report(config, previous=None):
     if config['version'] != 1:
         raise ValueError('Unknown Node monitoring configuration')
-    return dict(
+    data = dict(
         format=FORMAT,
         observed_at=time.time(),
         legacy=fetch_legacy(config['legacy']),
@@ -148,6 +151,39 @@ def report(config):
             value, ('through',), ('state',), ('verified',))),
         hf=hf_progress(Path(config['hf']), Path(config['hf_windows'])),
         hf_drive=hf_progress(Path(config['hf_drive'])),
+    )
+    if 'health' in config:
+        data['health'] = monitor_health.collect(config['health'], data['node_market'], data['hf'],
+                                                (previous or {}).get('health', {}))
+    return data
+
+
+def web_health(data):
+    def group(name, keys, integers=(), labels=()):
+        return {key: fields(row, integers, labels) for key, row in data.get(name, {}).items()
+                if key in keys and isinstance(row, dict)}
+
+    stages = group('stages', monitor_health.STAGES,
+                   ('through', 'lag', 'start', 'end', 'accepted_at', 'heartbeat', 'advance_24h'), ('state', 'phase'))
+    protocols = {'uniswap-v2', 'uniswap-v3', 'aave-v2', 'aave-v3'}
+    for name, row in stages.items():
+        coverage = data['stages'][name].get('protocols')
+        if isinstance(coverage, dict):
+            row['protocols'] = [dict(name=key, through=height) for key, height in coverage.items()
+                                if key in protocols and type(height) is int and height >= 0]
+    return dict(
+        chain=fields(data.get('chain', {}), ('latest', 'finalized', 'latest_time', 'finalized_time',
+                                           'last_success', 'unfinalized'), ('availability',)),
+        schedule=fields(data.get('schedule', {}), ('last_start', 'last_success', 'next_run', 'elapsed'),
+                        ('availability', 'state', 'result', 'timer')),
+        storage=fields(data.get('storage', {}), ('free_bytes', 'total_bytes', 'growth_bytes_per_day'),
+                       ('availability',)),
+        stages=stages,
+        workers=group('workers', monitor_health.WORKERS, labels=('availability', 'task', 'fallback')),
+        drive=group('drive', ('market_historical', 'market_new', 'revert', 'wallet_historical',
+                              'hf_historical_aggregates', 'hf_contiguous', 'hf_tail'),
+                    ('verified_through', 'verified_count', 'pending_count', 'expected_pack_count',
+                     'uploaded_pack_count', 'pending_pack_count', 'updated_at'), ('state',)),
     )
 
 
@@ -172,6 +208,7 @@ def web_status(report):
         historical_market=fields(report['historical_market'], ('through', 'published', 'total_markets')),
         historical_market_drive=fields(report['historical_market_drive'], ('verified',), ('state',)),
         historical_revert_drive=fields(report['historical_revert_drive'], ('through',), ('state',)),
+        health=web_health(report.get('health', {})),
     )
 
 
@@ -212,8 +249,14 @@ def main():
         config = json.loads(args.config.read_text())
         if args.follow and args.output is None:
             parser.error('--follow requires --output')
+        previous = None
+        if args.output and args.output.is_file():
+            try:
+                previous = json.loads(args.output.read_text())
+            except (OSError, ValueError):
+                pass
         while True:
-            data = report(config)
+            data = report(config, previous)
             if args.output:
                 write_json(args.output, data)
             if 'publish_monitor' in config:
@@ -224,6 +267,7 @@ def main():
             if not args.follow:
                 print(json.dumps(data))
                 return
+            previous = data
             time.sleep(30)
 
 

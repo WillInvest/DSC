@@ -56,6 +56,33 @@ The Node market ledger and canonical catalog live under
 `/mnt/storage/dsc-data/metadata/market`. The HF window, work and archive
 cursors live under `/mnt/storage/dsc-data/lending/aaveV3/health-factor`.
 
+## Finalized-block schedule
+
+`dsc-node-research-pass.timer` triggers `dsc-node-research-pass.service`
+every five minutes. The service runs the local-only launcher as `node`,
+reads `/etc/dsc/research-pass.json`, and binds the image referenced by
+`/etc/dsc/research-hf-input` read-only at `/home/dsc-data` in its own
+mount namespace. The deployment config and image link must point to the
+same verified HF input. systemd leaves an active pass running when the
+timer elapses, and the launcher also takes the shared scheduled-pass lock.
+Drive uploads use separate jobs.
+
+Check the next trigger with `systemctl list-timers dsc-node-research-pass.timer`.
+Use `journalctl -u dsc-node-research-pass.service` and the market ledger's
+`progress.json` to see the running interval and last accepted block.
+Verify HF independently using its local accepted windows.
+
+The read-only `dsc-node-research-monitor.service` starts at boot. Its Node
+config is `/etc/dsc/research-monitor.json`, its code resolves through
+`/mnt/storage/dsc-monitor-releases/current`, and its latest local snapshot is
+`/mnt/storage/dsc-data/metadata/node-monitor-progress.json`. The monitor probes
+the configured worker SSH endpoints on the same LAN routes the coordinator
+uses. A reachable endpoint confirms a TCP connection. An assigned task or
+fallback indicator comes from the coordinator and HF worker receipts.
+The existing fixed-command SSH receiver publishes the filtered snapshot to
+the CU1 private monitor. Check `/api/progress` on the monitor for the sample age,
+accepted watermarks, and Drive progress.
+
 ## Compute unit names
 
 | Operator label | Current host | Node connection |

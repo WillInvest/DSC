@@ -1,0 +1,14 @@
+[Unit]
+Description=Publish one finalized DSC research pass
+Wants=network-online.target
+After=network-online.target
+RequiresMountsFor=/mnt/storage /home/node/dsc-data
+AssertPathExists=/etc/dsc/node-production-fence.json
+
+[Service]
+Type=oneshot
+User=node
+BindReadOnlyPaths=/etc/dsc/research-hf-input:/home/dsc-data
+ExecStart=/usr/bin/python3 /mnt/storage/dsc-scripts/main.py run --local-only --config /etc/dsc/research-pass.json
+TimeoutStartSec=infinity
+TimeoutStopSec=180

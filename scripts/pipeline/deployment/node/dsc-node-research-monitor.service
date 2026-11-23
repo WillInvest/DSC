@@ -1,0 +1,16 @@
+[Unit]
+Description=Publish read-only DSC research health snapshots
+Wants=network-online.target
+After=network-online.target
+RequiresMountsFor=/mnt/storage /home/node/dsc-data
+
+[Service]
+Type=exec
+User=node
+Environment=PYTHONPATH=/mnt/storage/dsc-monitor-releases/current/scripts
+ExecStart=/home/node/dsc-extraction/.venv-abi/bin/python -u -m pipeline.node_status aggregate /etc/dsc/research-monitor.json --output /mnt/storage/dsc-data/metadata/node-monitor-progress.json --follow
+Restart=on-failure
+RestartSec=30s
+
+[Install]
+WantedBy=multi-user.target

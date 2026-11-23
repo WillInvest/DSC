@@ -12,10 +12,37 @@ from pipeline.node_status import (FORMAT, LEGACY_COMMAND, MAX_MONITOR_BYTES, MON
                                   fetch_legacy, hf_progress, legacy_report, publish_monitor,
                                   receive_monitor)
 from pipeline.main import main
+from pipeline.monitor_health import coverage, drive_status
 from shared.artifacts import write_json
 
 
 class NodeStatusTests(unittest.TestCase):
+    def test_live_stage_watermarks_use_accepted_publication_and_hf_cursor(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            meta = root/'metadata'
+            meta.mkdir()
+            write_json(meta/'publication.json', dict(stage='complete', market_through=100, revert_through=100))
+            write_json(meta/'encoded-publication.json', dict(stage='complete', market_through=101))
+            write_json(meta/'global-revert-publication.json', dict(stage='complete', through=100))
+            write_json(meta/'protocol-revert-publication.json', dict(stage='complete', through=98))
+            market = dict(stage='decode', state='running', cycle=dict(start=101, end=110))
+            rows = coverage(root, market, {'through': 95}, 112)
+            self.assertEqual([(v['through'], v['lag']) for v in rows.values()],
+                             [(100, 12), (100, 12), (98, 14), (95, 17)])
+            self.assertEqual((rows['events']['start'], rows['events']['end']), (101, 110))
+
+    def test_drive_uploaded_packs_and_restore_coverage_are_independent(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            write_json(root/'wallet', dict(uploaded_pack_count=8, expected_pack_count=10, pending_pack_count=2))
+            write_json(root/'revert', dict(format='dsc-revert-restore-plan-drive-receipt-v1',
+                                          through=100, restore={'exact': True}))
+            rows = drive_status({'wallet': [root/'wallet'], 'revert': [root/'revert']}, {})
+            self.assertEqual(rows['wallet']['uploaded_pack_count'], 8)
+            self.assertNotIn('verified_through', rows['wallet'])
+            self.assertEqual(rows['revert']['verified_through'], 100)
+
     def test_legacy_report_exposes_counts_without_worker_errors_or_paths(self):
         with TemporaryDirectory() as directory:
             root = Path(directory)
@@ -71,6 +98,10 @@ class NodeStatusTests(unittest.TestCase):
                        legacy=dict(availability='unreachable'), hf=dict(through=90), hf_drive=dict(through=80))
         payload.update({key: {} for key in ('handoff', 'shadow', 'market_drive', 'historical_market',
                                             'historical_market_drive', 'historical_revert_drive')})
+        payload['health'] = dict(chain=dict(availability='available', latest=140, finalized=130),
+                                 stages=dict(events=dict(through=100, lag=30, path='/private/input')),
+                                 workers=dict(CU1=dict(availability='reachable', task='hf'),
+                                              private=dict(availability='reachable')))
         with TemporaryDirectory() as directory:
             path = Path(directory)/'report.json'
             receive_monitor(path, io.BytesIO(json.dumps(payload).encode()))
@@ -78,6 +109,8 @@ class NodeStatusTests(unittest.TestCase):
             self.assertEqual(saved['catalog'], {'through': 100})
             self.assertEqual(saved['legacy'], {'availability': 'unreachable'})
             self.assertEqual((saved['hf']['through'], saved['hf_drive']['through']), (90, 80))
+            self.assertEqual(saved['health']['stages'], {'events': {'through': 100, 'lag': 30}})
+            self.assertEqual(set(saved['health']['workers']), {'CU1'})
             self.assertNotIn('private', json.dumps(saved))
             with self.assertRaisesRegex(ValueError, 'size limit'):
                 receive_monitor(path, io.BytesIO(b'x' * (MAX_MONITOR_BYTES + 1)))

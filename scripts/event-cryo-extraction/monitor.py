@@ -92,5 +92,10 @@ def progress():
 
 
 @app.get('/')
-def index():
+def overview():
+    return FileResponse(Path(__file__).with_name('overview.html'), headers={'Cache-Control': 'no-store'})
+
+
+@app.get('/details')
+def details():
     return FileResponse(Path(__file__).with_name('index.html'), headers={'Cache-Control': 'no-store'})
