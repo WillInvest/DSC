@@ -123,6 +123,14 @@ command for unified market storage, or the packed delta restore command
 with its recorded predecessor. Verify the restored manifest, coverage and
 hashes against the receipt before using the restored files.
 
+The `global-failed-transaction-archive` and `protocol-matched-reverts`
+releases share a Drive recovery receipt. Its plan identifies the historical
+TAR ranges, compacted baseline and delta, production snapshot, and canonical
+incremental boundaries. The same plan pins the source release and contract
+registry for rebuilding each protocol's `reverted-tx` partition from the
+restored selected archive. Compare the rebuilt partition content digests and
+match counts with the plan before publishing.
+
 Generate a new index with
 `python -m pipeline.dataset_index CONFIG --output PATH`. Source progress
 and acceptance records remain authoritative as new intervals finish.

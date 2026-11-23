@@ -56,6 +56,21 @@ The Node market ledger and canonical catalog live under
 `/mnt/storage/dsc-data/metadata/market`. The HF window, work and archive
 cursors live under `/mnt/storage/dsc-data/lending/aaveV3/health-factor`.
 
+## Compute unit names
+
+| Operator label | Current host | Node connection |
+| --- | --- | --- |
+| CU1 | `dsc-compute` and `dsc-web` on the same host | `dsc-hf-compute` |
+| CU2 | `dsc-data` | `dsc-hf-data` |
+| CU3 | `dsc-revert` | `dsc-revert-pipeline` |
+
+The labels identify the existing workers. CU1 also serves the private DSC
+monitor through the `dsc-compute` and `dsc-web` tailnet names. Preserve its
+monitor service and endpoints during the transition. Retire legacy research
+copies after Node acceptance and the matching Drive restore verification.
+Before changing a worker connection, check `hf_helpers` or `revert_ssh_config`
+and verify the worker can accept a Node task and return its result.
+
 ## Release recovery
 
 Use the source tar and Git bundle under
